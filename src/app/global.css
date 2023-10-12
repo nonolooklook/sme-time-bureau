@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-gray-50;
+}
+.nav-item {
+    @apply font-semibold text-lg text-[#040914] relative;
+}
+
+.nav-item.active:after {
+    display: block;
+    content: '';
+    width: 32px;
+    height: 1px;
+    @apply bg-gray-600 absolute left-1/2 -translate-x-1/2 mt-2;
+}
+
+.divider {
+    @apply h-[1px] w-full bg-gray-200 my-4;
+}
+
+.btn {
+    @apply flex items-center gap-2 justify-center cursor-pointer;
+}
+
+.btn:disabled {
+    @apply opacity-50;
+}
+
+.btn-primary {
+    @apply bg-primary rounded-xl py-3 text-white px-4 text-sm;
+}
+
+.btn-large {
+    @apply text-lg;
+}
+
+.btn-outline {
+    @apply border border-solid border-gray-800 rounded-xl py-3 px-4 text-sm;
+}
+
+.dialog-overlay {
+    background-color: rgba(0, 0, 0, .3);
+    position: fixed;
+    inset: 0;
+    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialog-content {
+    @apply rounded-2xl border border-2 border-gray-800;
+    background-color: white;
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 450px;
+    max-height: 85vh;
+    padding: 25px;
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dialog-content:focus {
+    outline: none;
+}
+
+.CheckboxRoot {
+    @apply w-[14px] h-[14px] rounded-md flex items-center justify-center cursor-pointer;
+    border: 1px solid #999;
+}
+.CheckboxRoot:hover {
+    background-color: #f0f0f0;
+}
+
+.CheckboxIndicator {
+    color: #000;
+}
+
+button {
+    all: unset;
+}
+
+.card-shadow {
+    box-shadow: 0 0 70px #f0f0f0;
+}

@@ -1,94 +1,62 @@
-import { Account } from '../components/Account'
-import { Balance } from '../components/Balance'
-import { BlockNumber } from '../components/BlockNumber'
-import { ConnectKitButton } from '../components/ConnectKitButton'
-import { Connected } from '../components/Connected'
-import { NetworkSwitcher } from '../components/NetworkSwitcher'
-import { ReadContract } from '../components/ReadContract'
-import { ReadContracts } from '../components/ReadContracts'
-import { ReadContractsInfinite } from '../components/ReadContractsInfinite'
-import { SendTransaction } from '../components/SendTransaction'
-import { SendTransactionPrepared } from '../components/SendTransactionPrepared'
-import { SignMessage } from '../components/SignMessage'
-import { SignTypedData } from '../components/SignTypedData'
-import { Token } from '../components/Token'
-import { WatchContractEvents } from '../components/WatchContractEvents'
-import { WatchPendingTransactions } from '../components/WatchPendingTransactions'
-import { WriteContract } from '../components/WriteContract'
-import { WriteContractPrepared } from '../components/WriteContractPrepared'
+'use client'
+
+import { Header } from '../components/Header'
+import Image from 'next/image'
+import { useState } from 'react'
+import { useMint } from '../hooks/useMint'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Spinner } from '../components/Spinner'
+import { InputWithButton } from '@/components/InputWithButton'
 
 export function Page() {
+  const [amount, setAmount] = useState('1')
+  const { mint, isMintLoading } = useMint(amount, () => {
+    setOpen(true)
+  })
+  const [open, setOpen] = useState(false)
+
   return (
     <>
-      <h1>wagmi + ConnectKit + Next.js</h1>
+      <Header />
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className={'dialog-overlay'} />
+          <Dialog.Content className={'dialog-content'}>
+            <div className='flex items-center gap-1'>
+              <Image src={'/success.png'} alt={'success'} width={160} height={160} />
+              <div className={'text-2xl font-semibold'}>Mint Successful</div>
+            </div>
+            <div className='flex gap-6 justify-center mt-2'>
+              <div className='btn btn-outline'>Scratch Now</div>
+              <div className='btn btn-primary'>Check In My Portfolio</div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
-      <ConnectKitButton />
+      <div className='container mx-auto mt-32'>
+        <div className={'rounded-xl bg-[#040914] bg-opacity-5 p-8 flex items-start gap-10'}>
+          <Image src={'/demo-1.png'} alt={'demo'} width={350} height={700} className={'-mt-20'} />
+          <div>
+            <div className={'font-bold text-4xl mb-4'}>SCRATCH TICKET</div>
+            <div className={'text-base text-[#040914] font-light mb-4'}>
+              Unlock potential treasures with our scratch-off NFT! For just 10 USDT, dive into an exhilarating experience. Remember, each
+              address can claim up to 5 chances. Scratch it, and you could win up to $100!
+            </div>
+            <div className={'font-semibold text-lg'}>Public Mint:</div>
+            <div className={'text-lg font-light'}>Start on 18/10/2023 8:00(UTC)</div>
+            <div className={'text-lg font-light mb-6'}>Price: 10USDT</div>
 
-      <Connected>
-        <hr />
-        <h2>Network</h2>
-        <NetworkSwitcher />
-        <br />
-        <hr />
-        <h2>Account</h2>
-        <Account />
-        <br />
-        <hr />
-        <h2>Balance</h2>
-        <Balance />
-        <br />
-        <hr />
-        <h2>Block Number</h2>
-        <BlockNumber />
-        <br />
-        <hr />
-        <h2>Read Contract</h2>
-        <ReadContract />
-        <br />
-        <hr />
-        <h2>Read Contracts</h2>
-        <ReadContracts />
-        <br />
-        <hr />
-        <h2>Read Contracts Infinite</h2>
-        <ReadContractsInfinite />
-        <br />
-        <hr />
-        <h2>Send Transaction</h2>
-        <SendTransaction />
-        <br />
-        <hr />
-        <h2>Send Transaction (Prepared)</h2>
-        <SendTransactionPrepared />
-        <br />
-        <hr />
-        <h2>Sign Message</h2>
-        <SignMessage />
-        <br />
-        <hr />
-        <h2>Sign Typed Data</h2>
-        <SignTypedData />
-        <br />
-        <hr />
-        <h2>Token</h2>
-        <Token />
-        <br />
-        <hr />
-        <h2>Watch Contract Events</h2>
-        <WatchContractEvents />
-        <br />
-        <hr />
-        <h2>Watch Pending Transactions</h2>
-        <WatchPendingTransactions />
-        <br />
-        <hr />
-        <h2>Write Contract</h2>
-        <WriteContract />
-        <br />
-        <hr />
-        <h2>Write Contract (Prepared)</h2>
-        <WriteContractPrepared />
-      </Connected>
+            <div className={'text-lg font-light'}>Minted: 143/1000</div>
+            <InputWithButton amount={amount} setAmount={setAmount} />
+
+            <button className={'text-xl btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
+              {isMintLoading && <Spinner />}
+              Mint
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
