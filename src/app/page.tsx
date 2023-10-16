@@ -7,6 +7,7 @@ import { useMint } from '../hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '../components/Spinner'
 import { InputWithButton } from '@/components/InputWithButton'
+import Link from 'next/link'
 
 export function Page() {
   const [amount, setAmount] = useState('1')
@@ -27,8 +28,12 @@ export function Page() {
               <div className={'text-2xl font-semibold'}>Mint Successful</div>
             </div>
             <div className='flex gap-6 justify-center mt-2'>
-              <div className='btn btn-outline'>Scratch Now</div>
-              <div className='btn btn-primary'>Check In My Portfolio</div>
+              <Link href={'/scratch'} className='btn btn-outline'>
+                Scratch Now
+              </Link>
+              <Link href={'/portfolio'} className='btn btn-primary'>
+                Check In My Portfolio
+              </Link>
             </div>
           </Dialog.Content>
         </Dialog.Portal>
@@ -50,7 +55,7 @@ export function Page() {
             <div className={'text-lg font-light'}>Minted: 143/1000</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
 
-            <button className={'text-xl btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
+            <button className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
               {isMintLoading && <Spinner />}
               Mint
             </button>

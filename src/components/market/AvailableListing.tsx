@@ -2,12 +2,83 @@ import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { PriceInput } from '@/components/PriceInput'
-import { useState } from 'react'
+import React, { useCallback, useState } from 'react'
+import { parseEther, parseUnits } from 'viem'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { Seaport } from '@opensea/seaport-js'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { sepolia } from 'viem/chains'
+import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { NFTContractAddress } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { useAccount } from 'wagmi'
+import { useRouter } from 'next/navigation'
+import { Spinner } from '../Spinner'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
 
 export const AvailableListing = () => {
+  const router = useRouter()
   const [min, setMin] = useState('0.96')
   const [max, setMax] = useState('1.2')
+  const mid = parseEther(min as `${number}`) / 2n + parseEther(max as `${number}`) / 2n
   const [amount, setAmount] = useState('1')
+  const signer = useEthersSigner()
+  const [loading, setLoading] = useState(false)
+  const { address } = useAccount()
+
+  const createOrder = useCallback(async () => {
+    if (!signer) return
+    setLoading(true)
+    try {
+      const seaport = new Seaport(signer, {
+        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+      })
+
+      console.log(seaport)
+      const makerOrder = {
+        zone: '0x0000000000000000000000000000000000000000',
+        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        startTime: Math.floor(new Date().getTime() / 1000).toString(),
+        endTime: Math.floor(new Date().getTime() / 1000 + 2 * 30 * 24 * 60 * 60).toString(),
+        offer: [
+          {
+            itemType: ItemType.ERC1155,
+            token: NFTContractAddress,
+            identifier: '0',
+            amount: amount,
+          },
+        ],
+        consideration: [
+          {
+            amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
+            endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
+            token: ERC20_ADDRESS[sepolia.id],
+            recipient: address,
+          },
+        ],
+      }
+      const { executeAllActions } = await seaport.createOrder(makerOrder, address)
+
+      const order = await executeAllActions()
+      const hash = seaport.getOrderHash(order.parameters)
+      await fetch('https://sme-demo.mcglobal.ai/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hash: hash,
+          entry: order,
+          type: 1,
+        }),
+      }).catch((e) => console.error(e))
+      router.push('/market')
+    } catch (e) {
+      console.error(e)
+    }
+    setLoading(false)
+  }, [signer, min, max, amount])
 
   return (
     <>
@@ -30,7 +101,7 @@ export const AvailableListing = () => {
 
         <div className={'px-10 py-8 w-full'}>
           <div className='text-2xl'>Set the price range per NFT</div>
-          <BetaD3Chart minPrice={1n} expectedPrice={2n} maxPrice={3n} />
+          <BetaD3Chart minPrice={parseEther(min as `${number}`)} expectedPrice={mid} maxPrice={parseEther(max as `${number}`)} />
 
           <div className={'grid grid-cols-2 gap-4'}>
             <div className='col-span-1'>
@@ -43,7 +114,10 @@ export const AvailableListing = () => {
           </div>
 
           <div className={'text-center font-semibold my-8'}>Authorization required for $22.7</div>
-          <button className={'btn btn-primary w-full'}>Place a bid</button>
+          <button className={'btn btn-primary w-full'} disabled={loading} onClick={createOrder}>
+            {loading && <Spinner />}
+            Start Listing
+          </button>
         </div>
       </div>
     </>

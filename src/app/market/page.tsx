@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/Header'
 import Image from 'next/image'
-import { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
@@ -12,16 +12,26 @@ import { ERC1155ABI } from '@/config/abi/ERC1155'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { CheckIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
+import Stepper from 'awesome-react-stepper'
+import { Seaport } from '@opensea/seaport-js'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { sepolia } from 'viem/chains'
+import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { parseEther, parseUnits } from 'viem'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { displayBalance } from '@/utils/display'
+import { calculateMidPrice } from '@/utils/price'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 
 export function Page() {
+  const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const [amount, setAmount] = useState('1')
   const { mint, isMintLoading } = useMint(amount, () => {
     setOpen(true)
   })
-  const [open, setOpen] = useState(false)
-  const [bidList, setBidList] = useState<boolean[]>(Array.from(Array(25)).fill(false))
-  console.log(bidList)
 
   const { data } = useContractReads({
     contracts: [
@@ -36,22 +46,208 @@ export function Page() {
   })
 
   const nftBalance = data?.[0]?.result
+  const [lists, setLists] = useState<any[]>([])
+  const [bids, setBids] = useState<any[]>([])
+  const [open, setOpen] = useState(false)
+
+  const [checkedLists, setCheckedLists] = useState<boolean[]>()
+  const [checkedBids, setCheckedBids] = useState<boolean[]>()
+
+  useEffect(() => {
+    const q = async () => {
+      fetch('https://sme-demo.mcglobal.ai/order?type=1', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((r) => r.json())
+        .then((r) => {
+          setLists(r?.data)
+          setCheckedLists(Array(r?.data?.length).fill(false))
+        })
+        .catch((e) => console.error(e))
+
+      fetch('https://sme-demo.mcglobal.ai/order?type=2', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((r) => r.json())
+        .then((r) => {
+          setBids(r?.data)
+          setCheckedBids(Array(r?.data?.length).fill(false))
+        })
+        .catch((e) => console.error(e))
+    }
+    q()
+  }, [])
+  console.log(bids)
+  console.log(lists)
+  const signer = useEthersSigner()
+
+  const fillBidOrder = async () => {
+    if (!signer) return
+    const finalMakerOrders = lists?.filter((l, i) => checkedLists?.[i])
+    const offerAmount = finalMakerOrders?.reduce(
+      (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
+      0n,
+    )
+    const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
+    const seaport = new Seaport(signer, {
+      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+    })
+    const takerOrder = {
+      zone: '0x0000000000000000000000000000000000000000',
+      conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+      startTime: Math.floor(new Date().getTime() / 1000).toString(),
+      endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+      offer: [
+        {
+          amount: offerAmount.toString(),
+          endAmount: offerAmount.toString(),
+          token: ERC20_ADDRESS[sepolia.id],
+          recipient: address,
+        },
+      ],
+      consideration: [
+        {
+          itemType: ItemType.ERC1155,
+          token: NFTContractAddress,
+          identifier: '0',
+          amount: itemAmount.toString(),
+        },
+      ],
+    }
+
+    console.log(takerOrder)
+    // const takerOrder = {
+    //   zone: '0x0000000000000000000000000000000000000000',
+    //   conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+    //   startTime: Math.floor(new Date().getTime() / 1000).toString(),
+    //   endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+    //   offer: [
+    //     {
+    //       itemType: ItemType.ERC1155,
+    //       token: NFTContractAddress,
+    //       identifier: '0',
+    //       amount: '1',
+    //     },
+    //   ],
+    //   consideration: [
+    //     {
+    //       amount: ((parseEther('2' as `${number}`) * 9n) / 10n).toString(),
+    //       endAmount: ((parseEther('2.3' as `${number}`) * 9n) / 10n).toString(),
+    //       token: ERC20_ADDRESS[sepolia.id],
+    //       recipient: address,
+    //     },
+    //   ],
+    // }
+    const { executeAllActions } = await seaport.createOrder(takerOrder, address)
+
+    const order = await executeAllActions()
+    console.log(order)
+    const modeOrderFulfillments: MatchOrdersFulfillment[] = []
+    modeOrderFulfillments.push({
+      offerComponents: [
+        {
+          orderIndex: 0,
+          itemIndex: 0,
+        },
+        {
+          orderIndex: 1,
+          itemIndex: 0,
+        },
+      ],
+      considerationComponents: [
+        {
+          orderIndex: 2,
+          itemIndex: 0,
+        },
+      ],
+    })
+
+    modeOrderFulfillments.push({
+      offerComponents: [
+        {
+          orderIndex: 2,
+          itemIndex: 0,
+        },
+      ],
+      considerationComponents: [
+        {
+          orderIndex: 0,
+          itemIndex: 0,
+        },
+        {
+          orderIndex: 1,
+          itemIndex: 0,
+        },
+      ],
+    })
+    fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        randomNumberCount: finalMakerOrders?.length,
+        randomStrategy: 0,
+        takerOrders: [takerOrder],
+        makerOrders: finalMakerOrders,
+        modeOrderFulfillments: modeOrderFulfillments,
+      }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        console.log(r)
+      })
+      .catch((e) => console.error(e))
+  }
 
   return (
     <>
       <Header />
-      <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Root open={open} onOpenChange={() => setOpen(false)}>
         <Dialog.Portal>
           <Dialog.Overlay className={'dialog-overlay'} />
           <Dialog.Content className={'dialog-content'}>
-            <div className='flex items-center gap-1'>
-              <Image src={'/success.png'} alt={'success'} width={160} height={160} />
-              <div className={'text-2xl font-semibold'}>Mint Successful</div>
-            </div>
-            <div className='flex gap-6 justify-center mt-2'>
-              <div className='btn btn-outline'>Scratch Now</div>
-              <div className='btn btn-primary'>Check In My Portfolio</div>
-            </div>
+            <div
+              onClick={() => {
+                if (ref.current) {
+                  ref.current.click()
+                }
+              }}
+            />
+            <div className={'py-10'} />
+            <Stepper
+              allowClickControl={false}
+              backBtn={<></>}
+              continueBtn={<div ref={ref} />}
+              submitBtn={<></>}
+              fillStroke={'#000'}
+              activeColor={'#000'}
+              activeProgressBorder={'#000'}
+              contentBoxClassName={'text-sm text-center mb-10'}
+            >
+              <div className={'mt-10 flex items-center gap-2 justify-center'}>
+                <Spinner />
+                <h1>Initiating random number request to Chainlink.</h1>
+              </div>
+              <div className={'mt-10 flex items-center gap-2 justify-center'}>
+                <Spinner />
+                <h1>Waiting for Chainlink to return a random number</h1>
+              </div>
+              <div className={'mt-10 flex items-center gap-2 justify-center'}>
+                <Spinner />
+                <h1>Transaction in progress.</h1>
+              </div>
+              <div className={'mt-10'}>
+                <h1>Transaction successful</h1>
+              </div>
+            </Stepper>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
@@ -84,20 +280,22 @@ export function Page() {
               <div className='w-1/4'>Deviation</div>
               <div className='w-1/4'>Quantity</div>
             </div>
-            <div className={'flex flex-col gap-3 h-[550px] overflow-y-scroll'}>
-              {Array.from(Array(25)).map((a, i) => (
+            <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
+              {bids?.map((bid, i) => (
                 <div className='flex' key={i}>
                   <div className='w-1/4'>8.93</div>
                   <div className='w-1/4'>10%</div>
-                  <div className='w-1/4'>3</div>
+                  <div className='w-1/4'>{bid?.entry?.parameters?.consideration?.[0]?.startAmount}</div>
                   <div className='w-1/4'>
                     <Checkbox.Root
-                      checked={bidList[i]}
+                      checked={checkedBids?.[i]}
                       onCheckedChange={(e) => {
                         console.log(e)
-                        let list = [...bidList]
-                        list[i] = Boolean(e)
-                        setBidList(list)
+                        if (checkedBids) {
+                          let list = [...checkedBids]
+                          list[i] = Boolean(e)
+                          setCheckedBids(list)
+                        }
                       }}
                       className='CheckboxRoot'
                       defaultChecked
@@ -112,7 +310,9 @@ export function Page() {
               ))}
             </div>
             <div className={'flex justify-end'}>
-              <button className={'btn btn-primary mt-10'}>Fill the order</button>
+              <button className={'btn btn-primary mt-10'} onClick={fillBidOrder}>
+                Fill the order
+              </button>
             </div>
           </div>
           <div className='col-span-1 pt-10 flex flex-col items-center'>
@@ -132,20 +332,29 @@ export function Page() {
               <div className='w-1/4'>Deviation</div>
               <div className='w-1/4'>Quantity</div>
             </div>
-            <div className={'flex flex-col gap-3 h-[550px] overflow-y-scroll'}>
-              {Array.from(Array(25)).map((a, i) => (
+            <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
+              {lists?.map((list, i) => (
                 <div className='flex' key={i}>
-                  <div className='w-1/4'>8.93</div>
+                  <div className='w-1/4'>
+                    {displayBalance(
+                      calculateMidPrice(
+                        list?.entry?.parameters?.consideration?.[0]?.startAmount,
+                        list?.entry?.parameters?.consideration?.[0]?.endAmount,
+                      ),
+                    )}
+                  </div>
                   <div className='w-1/4'>10%</div>
-                  <div className='w-1/4'>3</div>
+                  <div className='w-1/4'>{list?.entry?.parameters?.offer?.[0]?.startAmount}</div>
                   <div className='w-1/4'>
                     <Checkbox.Root
-                      checked={bidList[i]}
+                      checked={checkedLists?.[i]}
                       onCheckedChange={(e) => {
                         console.log(e)
-                        let list = [...bidList]
-                        list[i] = Boolean(e)
-                        setBidList(list)
+                        if (checkedLists) {
+                          let list = [...checkedLists]
+                          list[i] = Boolean(e)
+                          setCheckedLists(list)
+                        }
                       }}
                       className='CheckboxRoot'
                       defaultChecked
@@ -160,7 +369,9 @@ export function Page() {
               ))}
             </div>
             <div className={'flex justify-end'}>
-              <button className={'btn btn-primary mt-10'}>Fill the order</button>
+              <button className={'btn btn-primary mt-10'} onClick={fillBidOrder}>
+                Fill the order
+              </button>
             </div>
           </div>
         </div>

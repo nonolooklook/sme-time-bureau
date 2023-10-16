@@ -57,7 +57,7 @@ export function Page() {
         </Dialog.Portal>
       </Dialog.Root>
 
-      <div className='container mx-auto mt-20'>
+      <div className='container mx-auto mt-10 pb-10'>
         <div className='flex mb-8 items-center gap-8 text-gray-400'>
           <Link className={'w-[32px] h-[32px] bg-white rounded-full flex items-center justify-center cursor-pointer'} href={'/market'}>
             <ChevronLeftIcon />
