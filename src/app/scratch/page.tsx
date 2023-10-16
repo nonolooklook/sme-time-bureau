@@ -10,7 +10,7 @@ import { Address, useAccount, useContractReads } from 'wagmi'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 
-export function Page() {
+export default function Scratch() {
   const { address } = useAccount()
   const [amount, setAmount] = useState('1')
   const { mint, isMintLoading } = useMint(amount, () => {
@@ -119,5 +119,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page

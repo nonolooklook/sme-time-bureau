@@ -17,7 +17,7 @@ import Link from 'next/link'
 import { PlaceBid } from '@/components/market/PlaceBid'
 import { MyBidding } from '@/components/market/MyBidding'
 
-export function Page() {
+export default function Bid() {
   const [type, setType] = useState(0)
   const { address } = useAccount()
   const [open, setOpen] = useState(false)
@@ -74,5 +74,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page

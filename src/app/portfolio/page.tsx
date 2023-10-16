@@ -10,7 +10,7 @@ import { InputWithButton } from '@/components/InputWithButton'
 import { PortfolioListed } from '@/components/portfolio/PortfolioListed'
 import { PortfolioAvailable } from '@/components/portfolio/PortfolioAvailable'
 
-export function Page() {
+export default function Portfolio() {
   const [type, setType] = useState(0)
 
   return (
@@ -47,5 +47,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page

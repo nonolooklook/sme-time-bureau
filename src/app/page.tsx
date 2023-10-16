@@ -1,15 +1,15 @@
 'use client'
 
-import { Header } from '../components/Header'
+import { Header } from '@/components/Header'
 import Image from 'next/image'
 import { useState } from 'react'
-import { useMint } from '../hooks/useMint'
+import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Spinner } from '../components/Spinner'
+import { Spinner } from '@/components/Spinner'
 import { InputWithButton } from '@/components/InputWithButton'
 import Link from 'next/link'
 
-export function Page() {
+export default function Page() {
   const [amount, setAmount] = useState('1')
   const { mint, isMintLoading } = useMint(amount, () => {
     setOpen(true)
@@ -65,5 +65,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page

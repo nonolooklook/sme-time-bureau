@@ -25,13 +25,9 @@ import { displayBalance } from '@/utils/display'
 import { calculateMidPrice } from '@/utils/price'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 
-export function Page() {
+export default function Market() {
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
-  const [amount, setAmount] = useState('1')
-  const { mint, isMintLoading } = useMint(amount, () => {
-    setOpen(true)
-  })
 
   const { data } = useContractReads({
     contracts: [
@@ -86,9 +82,11 @@ export function Page() {
   console.log(bids)
   console.log(lists)
   const signer = useEthersSigner()
+  const [loading, setLoading] = useState(false)
 
   const fillBidOrder = async () => {
     if (!signer) return
+    setOpen(true)
     const finalMakerOrders = lists?.filter((l, i) => checkedLists?.[i])
     const offerAmount = finalMakerOrders?.reduce(
       (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
@@ -187,24 +185,28 @@ export function Page() {
         },
       ],
     })
-    fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        randomNumberCount: finalMakerOrders?.length,
-        randomStrategy: 0,
-        takerOrders: [takerOrder],
-        makerOrders: finalMakerOrders,
-        modeOrderFulfillments: modeOrderFulfillments,
-      }),
-    })
-      .then((r) => r.json())
-      .then((r) => {
-        console.log(r)
-      })
-      .catch((e) => console.error(e))
+    console.log(2222222222)
+    try {
+      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          randomNumberCount: finalMakerOrders?.length,
+          randomStrategy: 0,
+          takerOrders: [takerOrder],
+          makerOrders: finalMakerOrders,
+          modeOrderFulfillments: modeOrderFulfillments,
+        }),
+      }).then((r) => r.json())
+      ref?.current?.click()
+      console.log(res)
+    } catch (e) {
+      console.error(e)
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -369,7 +371,8 @@ export function Page() {
               ))}
             </div>
             <div className={'flex justify-end'}>
-              <button className={'btn btn-primary mt-10'} onClick={fillBidOrder}>
+              <button className={'btn btn-primary mt-10'} onClick={fillBidOrder} disabled={loading}>
+                {loading && <Spinner />}
                 Fill the order
               </button>
             </div>
@@ -379,5 +382,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page

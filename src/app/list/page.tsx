@@ -19,7 +19,7 @@ import { MyBidding } from '@/components/market/MyBidding'
 import { AvailableListing } from '@/components/market/AvailableListing'
 import { Listed } from '@/components/market/Listed'
 
-export function Page() {
+export default function List() {
   const [type, setType] = useState(0)
   const { address } = useAccount()
   const [open, setOpen] = useState(false)
@@ -76,5 +76,3 @@ export function Page() {
     </>
   )
 }
-
-export default Page
