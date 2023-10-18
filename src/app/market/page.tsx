@@ -3,7 +3,6 @@
 import { Header } from '@/components/Header'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
-import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { Address, useAccount, useContractReads } from 'wagmi'
@@ -19,7 +18,7 @@ import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { sepolia } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { parseEther, parseUnits } from 'viem'
+import { parseUnits } from 'viem'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { displayBalance } from '@/utils/display'
 import { calculateMidPrice } from '@/utils/price'
@@ -154,6 +153,17 @@ export default function Market() {
           orderIndex: 0,
           itemIndex: 0,
         },
+      ],
+      considerationComponents: [
+        {
+          orderIndex: 2,
+          itemIndex: 0,
+        },
+      ],
+    })
+
+    modeOrderFulfillments.push({
+      offerComponents: [
         {
           orderIndex: 1,
           itemIndex: 0,
@@ -179,6 +189,17 @@ export default function Market() {
           orderIndex: 0,
           itemIndex: 0,
         },
+      ],
+    })
+
+    modeOrderFulfillments.push({
+      offerComponents: [
+        {
+          orderIndex: 2,
+          itemIndex: 0,
+        },
+      ],
+      considerationComponents: [
         {
           orderIndex: 1,
           itemIndex: 0,
@@ -195,8 +216,8 @@ export default function Market() {
         body: JSON.stringify({
           randomNumberCount: finalMakerOrders?.length,
           randomStrategy: 0,
-          takerOrders: [takerOrder],
-          makerOrders: finalMakerOrders,
+          takerOrders: [order],
+          makerOrders: finalMakerOrders?.map((f) => f.entry),
           modeOrderFulfillments: modeOrderFulfillments,
         }),
       }).then((r) => r.json())

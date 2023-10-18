@@ -1,4 +1,23 @@
+import { useEffect, useState } from 'react'
+import { useAccount } from 'wagmi'
+
 export const PortfolioListed = () => {
+  const { address } = useAccount()
+  const [list, setList] = useState([])
+  useEffect(() => {
+    fetch('https://sme-demo.mcglobal.ai/order?type=1&offerer=' + address, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        setList(r?.data)
+      })
+      .catch((e) => console.error(e))
+  }, [])
+  console.log(list)
   return (
     <>
       <div className='flex w-full text-gray-500 mb-8'>

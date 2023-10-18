@@ -7,9 +7,20 @@ module.exports = {
         primary: '#040616',
       },
       backgroundColor: {
-        primary: '#040616'
-      }
+        primary: '#040616',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.container': {
+          maxWidth: '100%',
+          '@screen xl': {
+            maxWidth: '1100px',
+          },
+        },
+      })
+    },
+  ],
 }
