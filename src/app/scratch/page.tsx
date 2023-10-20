@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/Header'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
@@ -31,6 +31,17 @@ export default function Scratch() {
   })
 
   const nftBalance = data?.[0]?.result
+
+  const [remaining, setRemaining] = useState(0)
+
+  useEffect(() => {
+    fetch('https://sme-demo.mcglobal.ai/order/remainingNft')
+      .then((r) => r.json())
+      .then((r) => {
+        setRemaining(r.data)
+      })
+      .catch((e) => console.error(e))
+  }, [])
 
   return (
     <>
@@ -61,7 +72,7 @@ export default function Scratch() {
                 <div className={'text-sm text-gray-500'}>Lucky pool</div>
               </div>
               <div>
-                <div className='text-3xl mb-3'>672</div>
+                <div className='text-3xl mb-3'>{remaining}</div>
                 <div className={'text-sm text-gray-500'}>NFT Remaining</div>
               </div>
             </div>

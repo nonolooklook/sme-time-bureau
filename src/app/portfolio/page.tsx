@@ -17,7 +17,7 @@ export default function Portfolio() {
     <>
       <Header />
 
-      <div className='container mx-auto mt-32'>
+      <div className='container mx-auto mt-10 pb-10'>
         <div className='flex'>
           <div
             className={`cursor-pointer px-6 rounded-t-lg py-2 ${type === 0 ? 'text-gray-900 bg-primary bg-opacity-5' : ''}`}
@@ -38,10 +38,10 @@ export default function Portfolio() {
             My bidding
           </div>
         </div>
-        <div className={`bg-primary bg-opacity-5 px-8 py-8 rounded-2xl ${type === 0 ? 'rounded-tl-sm' : ''}`}>
+        <div className={`bg-primary bg-opacity-5 px-8 pt-8 rounded-2xl ${type === 0 ? 'rounded-tl-sm' : ''}`}>
           {type === 0 && <PortfolioAvailable />}
-          {type === 1 && <PortfolioListed />}
-          {type === 2 && <PortfolioListed />}
+          {type === 1 && <PortfolioListed isBid={false} />}
+          {type === 2 && <PortfolioListed isBid={true} />}
         </div>
       </div>
     </>

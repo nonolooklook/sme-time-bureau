@@ -1,23 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
+import { displayBalance } from '@/utils/display'
+import { parseUnits } from 'viem'
+import exp from 'constants'
+import { useCancelList } from '@/hooks/useCancelList'
+import { PortfolioListItem } from '@/components/portfolio/PortfolioListItem'
+import { useUserOrders } from '@/hooks/useUserOrders'
 
-export const PortfolioListed = () => {
+export const PortfolioListed = ({ isBid }: { isBid: boolean }) => {
   const { address } = useAccount()
-  const [list, setList] = useState([])
-  useEffect(() => {
-    fetch('https://sme-demo.mcglobal.ai/order?type=1&offerer=' + address, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((r) => r.json())
-      .then((r) => {
-        setList(r?.data)
-      })
-      .catch((e) => console.error(e))
-  }, [])
-  console.log(list)
+  const { mutate, orders, isLoading } = useUserOrders(isBid, address ?? '')
+
   return (
     <>
       <div className='flex w-full text-gray-500 mb-8'>
@@ -28,21 +21,7 @@ export const PortfolioListed = () => {
         <div className='w-1/6'>Max</div>
       </div>
       <div className={'flex flex-col gap-6'}>
-        {Array.from(Array(3)).map((_, i) => (
-          <div key={i}>
-            <div className='flex w-full text-gray-900'>
-              <div className='w-1/6'>{i + 1}</div>
-              <div className='w-1/6'>3</div>
-              <div className='w-1/6'>$9.23</div>
-              <div className='w-1/6'>$10.23</div>
-              <div className='w-1/6'>$11.23</div>
-              <div>
-                <button className={'btn btn-primary'}>Cancel listing</button>
-              </div>
-            </div>
-            <div className='divider' />
-          </div>
-        ))}
+        {orders?.map((l: any, i: number) => <PortfolioListItem mutate={mutate} isBid={isBid} order={l} i={i} key={i} />)}
       </div>
     </>
   )
