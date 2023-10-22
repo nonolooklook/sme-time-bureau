@@ -53,12 +53,13 @@ export default function Market() {
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
   const [wrongMsg, setWrongMsg] = useState('')
-  const seaport = new Seaport(signer, {
-    overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
-    conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-  })
+
   const fillSellOrder = async () => {
     if (!signer) return
+    const seaport = new Seaport(signer, {
+      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+    })
     setOpen(true)
     const finalMakerOrders = listOrders?.filter((l, i) => checkedLists?.[i])
     const offerAmount = finalMakerOrders?.reduce(
@@ -150,6 +151,10 @@ export default function Market() {
   const fillBidOrder = async () => {
     if (!signer) return
     setOpen(true)
+    const seaport = new Seaport(signer, {
+      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+    })
     const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])
     const offerAmount = finalMakerOrders?.reduce(
       (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
