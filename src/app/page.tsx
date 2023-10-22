@@ -8,12 +8,24 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { InputWithButton } from '@/components/InputWithButton'
 import Link from 'next/link'
+import { useContractRead } from 'wagmi'
+import { NFTContractAddress } from '@/config/contract'
+import { ERC1155ABI } from '@/config/abi/ERC1155'
+import { displayBalance } from '@/utils/display'
 
 export default function Page() {
   const [amount, setAmount] = useState('1')
   const { mint, isMintLoading } = useMint(amount, () => {
     setOpen(true)
   })
+
+  const { data: totalSupply } = useContractRead({
+    address: NFTContractAddress,
+    abi: ERC1155ABI,
+    functionName: 'totalSupply',
+    watch: true,
+  })
+
   const [open, setOpen] = useState(false)
 
   return (
@@ -52,7 +64,7 @@ export default function Page() {
             <div className={'text-lg font-light'}>Start on 18/10/2023 8:00(UTC)</div>
             <div className={'text-lg font-light mb-6'}>Price: 10USDT</div>
 
-            <div className={'text-lg font-light'}>Minted: 143/1000</div>
+            <div className={'text-lg font-light'}>Minted: {totalSupply?.toString()}/1000</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
 
             <button className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>

@@ -23,6 +23,8 @@ import { ERC20_ADDRESS } from '@/config/erc20'
 import { displayBalance } from '@/utils/display'
 import { calculateMidPrice } from '@/utils/price'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
+import { sleep } from '@/utils/sleep'
+import { useOrders } from '@/hooks/useOrders'
 
 export default function Market() {
   const ref = useRef<HTMLDivElement>(null)
@@ -40,62 +42,31 @@ export default function Market() {
     watch: true,
   })
 
-  const nftBalance = data?.[0]?.result
-  const [lists, setLists] = useState<any[]>([])
-  const [bids, setBids] = useState<any[]>([])
   const [open, setOpen] = useState(false)
-
   const [checkedLists, setCheckedLists] = useState<boolean[]>()
   const [checkedBids, setCheckedBids] = useState<boolean[]>()
+  const { orders: listOrders } = useOrders(false)
+  const { orders: bidOrders } = useOrders(true)
+  useEffect(() => setCheckedLists(Array(listOrders?.length).fill(false)), [listOrders])
+  useEffect(() => setCheckedBids(Array(bidOrders?.length).fill(false)), [bidOrders])
 
-  useEffect(() => {
-    const q = async () => {
-      fetch('https://sme-demo.mcglobal.ai/order?type=1', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((r) => r.json())
-        .then((r) => {
-          setLists(r?.data)
-          setCheckedLists(Array(r?.data?.length).fill(false))
-        })
-        .catch((e) => console.error(e))
-
-      fetch('https://sme-demo.mcglobal.ai/order?type=2', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((r) => r.json())
-        .then((r) => {
-          setBids(r?.data)
-          setCheckedBids(Array(r?.data?.length).fill(false))
-        })
-        .catch((e) => console.error(e))
-    }
-    q()
-  }, [])
-  console.log(bids)
-  console.log(lists)
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
-
-  const fillBidOrder = async () => {
+  const [wrongMsg, setWrongMsg] = useState('')
+  const seaport = new Seaport(signer, {
+    overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+    conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+  })
+  const fillSellOrder = async () => {
     if (!signer) return
     setOpen(true)
-    const finalMakerOrders = lists?.filter((l, i) => checkedLists?.[i])
+    const finalMakerOrders = listOrders?.filter((l, i) => checkedLists?.[i])
     const offerAmount = finalMakerOrders?.reduce(
       (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
       0n,
     )
+    console.log(finalMakerOrders)
     const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
-    const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
-      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-    })
     const takerOrder = {
       zone: '0x0000000000000000000000000000000000000000',
       conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
@@ -119,94 +90,27 @@ export default function Market() {
       ],
     }
 
-    console.log(takerOrder)
-    // const takerOrder = {
-    //   zone: '0x0000000000000000000000000000000000000000',
-    //   conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
-    //   startTime: Math.floor(new Date().getTime() / 1000).toString(),
-    //   endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
-    //   offer: [
-    //     {
-    //       itemType: ItemType.ERC1155,
-    //       token: NFTContractAddress,
-    //       identifier: '0',
-    //       amount: '1',
-    //     },
-    //   ],
-    //   consideration: [
-    //     {
-    //       amount: ((parseEther('2' as `${number}`) * 9n) / 10n).toString(),
-    //       endAmount: ((parseEther('2.3' as `${number}`) * 9n) / 10n).toString(),
-    //       token: ERC20_ADDRESS[sepolia.id],
-    //       recipient: address,
-    //     },
-    //   ],
-    // }
     const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
+    const orderNumber = finalMakerOrders?.length
     const order = await executeAllActions()
-    console.log(order)
     const modeOrderFulfillments: MatchOrdersFulfillment[] = []
-    modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 0,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 2,
-          itemIndex: 0,
-        },
-      ],
-    })
+    for (let i = 0; i < orderNumber; i++) {
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: i, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+      })
+    }
 
-    modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 1,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 2,
-          itemIndex: 0,
-        },
-      ],
-    })
+    for (let i = 0; i < orderNumber; i++) {
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
+      })
+    }
 
-    modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 2,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 0,
-          itemIndex: 0,
-        },
-      ],
-    })
-
-    modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 2,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 1,
-          itemIndex: 0,
-        },
-      ],
-    })
-    console.log(2222222222)
+    await sleep(2000)
+    ref?.current?.click()
     try {
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
@@ -221,8 +125,111 @@ export default function Market() {
           modeOrderFulfillments: modeOrderFulfillments,
         }),
       }).then((r) => r.json())
-      ref?.current?.click()
+
       console.log(res)
+      if (!res?.data?.status) {
+        ref?.current?.click()
+        setWrongMsg(res?.data?.data)
+        return
+      }
+
+      const itr = setInterval(async () => {
+        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        if (r2?.data?.status === 'matched') {
+          clearInterval(itr)
+          ref?.current?.click()
+        }
+      }, 5000)
+    } catch (e) {
+      console.error(e)
+    }
+
+    setLoading(false)
+  }
+
+  const fillBidOrder = async () => {
+    if (!signer) return
+    setOpen(true)
+    const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])
+    const offerAmount = finalMakerOrders?.reduce(
+      (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
+      0n,
+    )
+    const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
+
+    const takerOrder = {
+      zone: '0x0000000000000000000000000000000000000000',
+      conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+      startTime: Math.floor(new Date().getTime() / 1000).toString(),
+      endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+      offer: [
+        {
+          itemType: ItemType.ERC1155,
+          token: NFTContractAddress,
+          identifier: '0',
+          amount: offerAmount.toString(),
+        },
+      ],
+      consideration: [
+        {
+          amount: itemAmount.toString(),
+          endAmount: itemAmount.toString(),
+          token: ERC20_ADDRESS[sepolia.id],
+          recipient: address,
+        },
+      ],
+    }
+
+    const { executeAllActions } = await seaport.createOrder(takerOrder, address)
+
+    const orderNumber = finalMakerOrders?.length
+    const order = await executeAllActions()
+    const modeOrderFulfillments: MatchOrdersFulfillment[] = []
+    for (let i = 0; i < orderNumber; i++) {
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: i, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+      })
+    }
+
+    for (let i = 0; i < orderNumber; i++) {
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
+      })
+    }
+
+    await sleep(2000)
+    ref?.current?.click()
+    try {
+      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          randomNumberCount: 1,
+          randomStrategy: 0,
+          takerOrders: [order],
+          makerOrders: finalMakerOrders?.map((f) => f.entry),
+          modeOrderFulfillments: modeOrderFulfillments,
+        }),
+      }).then((r) => r.json())
+
+      console.log(res)
+      if (!res?.data?.status) {
+        ref?.current?.click()
+        setWrongMsg(res?.data?.data)
+        return
+      }
+
+      const itr = setInterval(async () => {
+        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        if (r2?.data?.status === 'matched') {
+          clearInterval(itr)
+          ref?.current?.click()
+        }
+      }, 5000)
     } catch (e) {
       console.error(e)
     }
@@ -264,11 +271,7 @@ export default function Market() {
                 <h1>Waiting for Chainlink to return a random number</h1>
               </div>
               <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Transaction in progress.</h1>
-              </div>
-              <div className={'mt-10'}>
-                <h1>Transaction successful</h1>
+                <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
               </div>
             </Stepper>
           </Dialog.Content>
@@ -304,7 +307,7 @@ export default function Market() {
               <div className='w-1/4'>Quantity</div>
             </div>
             <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
-              {bids?.map((bid, i) => (
+              {bidOrders?.map((bid, i) => (
                 <div className='flex' key={i}>
                   <div className='w-1/4'>8.93</div>
                   <div className='w-1/4'>10%</div>
@@ -356,7 +359,7 @@ export default function Market() {
               <div className='w-1/4'>Quantity</div>
             </div>
             <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
-              {lists?.map((list, i) => (
+              {listOrders?.map((list, i) => (
                 <div className='flex' key={i}>
                   <div className='w-1/4'>
                     {displayBalance(
@@ -392,7 +395,7 @@ export default function Market() {
               ))}
             </div>
             <div className={'flex justify-end'}>
-              <button className={'btn btn-primary mt-10'} onClick={fillBidOrder} disabled={loading}>
+              <button className={'btn btn-primary mt-10'} onClick={fillSellOrder} disabled={loading}>
                 {loading && <Spinner />}
                 Fill the order
               </button>
