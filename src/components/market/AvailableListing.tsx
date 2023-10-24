@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { PriceInput } from '@/components/PriceInput'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { parseEther, parseUnits } from 'viem'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { Seaport } from '@opensea/seaport-js'
@@ -20,13 +20,14 @@ import { ERC1155ABI } from '@/config/abi/ERC1155'
 
 export const AvailableListing = () => {
   const router = useRouter()
+  const { address } = useAccount()
   const [min, setMin] = useState('0.96')
   const [max, setMax] = useState('1.2')
+  const [wrong, setWrong] = useState(false)
   const mid = parseEther(min as `${number}`) / 2n + parseEther(max as `${number}`) / 2n
   const [amount, setAmount] = useState('1')
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
-  const { address } = useAccount()
 
   const { data } = useContractReads({
     contracts: [
@@ -43,6 +44,8 @@ export const AvailableListing = () => {
   const nftBalance = data?.[0]?.result ?? 0n
 
   const canList = nftBalance >= parseUnits(amount as `${number}`, 0)
+
+  useEffect(() => setWrong(min >= max), [min, max])
 
   const createOrder = useCallback(async () => {
     if (min >= max) {
@@ -127,11 +130,11 @@ export const AvailableListing = () => {
 
           <div className={'grid grid-cols-2 gap-4'}>
             <div className='col-span-1'>
-              <PriceInput title={'Min'} value={min} setValue={setMin} minimum={'0'} maximum={max} />
+              <PriceInput title={'Min'} value={min} setValue={setMin} minimum={'0'} maximum={max} wrong={wrong} />
             </div>
 
             <div className='col-span-1'>
-              <PriceInput title={'Max'} value={max} setValue={setMax} minimum={min} maximum={'10000000000000'} />
+              <PriceInput title={'Max'} value={max} setValue={setMax} minimum={min} maximum={'10000000000000'} wrong={wrong} />
             </div>
           </div>
 

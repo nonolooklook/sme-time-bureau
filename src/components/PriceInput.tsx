@@ -6,20 +6,21 @@ export const PriceInput = ({
   setValue,
   minimum,
   maximum,
+  wrong,
 }: {
   title: string
   value: string
   setValue: any
   minimum: string
   maximum: string
+  wrong: boolean
 }) => {
   // const isWrong = value < minimum || value > maximum;
-  const isWrong = false
 
   return (
     <div
       className={`${
-        isWrong ? 'border-red-400' : 'border-primary'
+        wrong ? 'border-red-400' : 'border-primary'
       } border rounded-[12px] p-4 text-xs flex flex-col gap-4 items-center cursor-pointer`}
     >
       <div className={'text-primary'}>{title}</div>

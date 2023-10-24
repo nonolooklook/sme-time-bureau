@@ -1,11 +1,16 @@
 import { MinusIcon, PlusIcon } from '@radix-ui/react-icons'
+import { parseUnits } from 'viem'
 
 export const InputWithButton = ({ amount, setAmount }: { amount: string; setAmount: any }) => {
   return (
     <div className='flex items-center gap-2'>
       <div
         className={'w-[46px] h-[46px] flex items-center justify-center border border-gray-400 border-dotted rounded-full cursor-pointer'}
-        onClick={() => setAmount((Number(amount) - 1).toString())}
+        onClick={() => {
+          if (parseUnits(amount as `${number}`, 0) > 1n) {
+            setAmount((Number(amount) - 1).toString())
+          }
+        }}
       >
         <MinusIcon />
       </div>
