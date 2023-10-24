@@ -138,7 +138,7 @@ export const AvailableListing = () => {
             </div>
           </div>
 
-          <button className={'btn btn-primary w-full mt-10'} disabled={loading || !canList} onClick={createOrder}>
+          <button className={'btn btn-primary w-full mt-10'} disabled={loading || !canList || wrong} onClick={createOrder}>
             {loading && <Spinner />}
             Start Listing
           </button>

@@ -152,7 +152,7 @@ export const PlaceBid = () => {
               Approve
             </button>
           ) : (
-            <button className={'btn btn-primary w-full'} onClick={createOrder} disabled={loading}>
+            <button className={'btn btn-primary w-full'} onClick={createOrder} disabled={loading || wrong}>
               {loading && <Spinner />}
               Place a bid
             </button>
