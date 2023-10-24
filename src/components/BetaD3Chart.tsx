@@ -2,6 +2,7 @@ import { displayBalance } from '@/utils/display'
 import { calculateBetaFunction } from '@/utils/beta'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
+import Image from 'next/image'
 
 const d = calculateBetaFunction(3, 3)
 const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
@@ -39,7 +40,7 @@ export const BetaD3Chart = ({
     if (minPrice > 0 && expectedPrice > 0 && maxPrice > 0) {
       rendered = true
       const chartW = chartRef.current.offsetWidth
-      const chartH = 280
+      const chartH = 260
       setChartW(chartW)
       setChartH(chartH)
       const width = chartW - margin.left - margin.right
@@ -56,8 +57,8 @@ export const BetaD3Chart = ({
           .attr('y2', '0')
 
         gradient.append('stop').attr('offset', '0%').attr('style', 'stop-color:#82ca9d;stop-opacity:0.8')
-        gradient.append('stop').attr('class', 'end').attr('offset', '70%').attr('style', 'stop-color:#e9efd2;stop-opacity:0.2')
-        gradient.append('stop').attr('class', 'end').attr('offset', '70%').attr('style', 'stop-color:#e17ae7;stop-opacity:1')
+        gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#e9efd2;stop-opacity:0.2')
+        gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#e17ae7;stop-opacity:1')
         gradient.append('stop').attr('offset', '100%').attr('style', 'stop-color:#e17ae7;stop-opacity:1')
       }
 
@@ -90,7 +91,7 @@ export const BetaD3Chart = ({
         .attr('stroke-width', '1')
         .style('fill', 'none')
         .style('filter', 'url(#glow)')
-        .attr('stroke', '#9eb802')
+        .attr('stroke', '#000')
 
       svg.select('.domain').attr('stroke', '#ddd')
 
@@ -102,7 +103,7 @@ export const BetaD3Chart = ({
         .attr('y1', 0)
         .attr('x2', 10)
         .attr('y2', 260)
-        .attr('stroke', '#9eb802')
+        .attr('stroke', '#000')
         .attr('stroke-width', 1)
         .attr('stroke-dasharray', '4,4')
         .style('opacity', 0)
@@ -204,13 +205,11 @@ export const BetaD3Chart = ({
         }
       }
 
-      const brush = d3
-        .brushX()
-        .extent([
-          [xPadding, 0],
-          [width - xPadding, height],
-        ])
-        .on('brush', brushed)
+      const brush = d3.brushX().extent([
+        [xPadding, 0],
+        [width - xPadding, height],
+      ])
+      // .on('brush', brushed)
       const brushG = svg
         .append('g')
         .call(brush)
@@ -238,7 +237,7 @@ export const BetaD3Chart = ({
         .on('mouseleave', () => {
           dropTooltip.style('opacity', 0)
         })
-      brushG.selectAll('.handle').style('fill', '#9eb801').style('stroke', 'none').style('width', '2px')
+      brushG.selectAll('.handle').style('fill', '#000').style('stroke', 'none').style('width', '2px')
       brushG.selectAll('.handle').each(function () {
         d3.select(this)
           .append('rect')
@@ -279,7 +278,7 @@ export const BetaD3Chart = ({
   }, [minPrice, expectedPrice, maxPrice, svgRef, chartW, chartH])
 
   return (
-    <div className={'pt-20 relative'}>
+    <div className={'pt-[60px] relative'}>
       {x > 0 && x <= 1 && (
         <div className={'flex justify-end mb-8 absolute top-4 left-0'}>
           <div className={'border border-black rounded-lg p-2 w-[380px] text-sm'}>
@@ -287,18 +286,6 @@ export const BetaD3Chart = ({
           </div>
         </div>
       )}
-      {/*{showEnd && (*/}
-      {/*  <div className={'flex justify-end mb-8 absolute -top-4 right-0'}>*/}
-      {/*    <div className={'border border-black rounded-lg p-2 w-[140px] text-xs'}>*/}
-      {/*      You need to pay a permium fee of 0.87 for this rejection space. Only prices lower than {endValue} will be executed*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*)}*/}
-      {/*<div className={'flex justify-end mb-8 absolute top-2 right-0'}>*/}
-      {/*  <div className={'border border-black rounded-lg p-2 w-[200px] text-sm'}>*/}
-      {/*    The probability of a deal occurring above {displayBalance(cx)} is {((1 - x) * 100).toFixed(0)}%.*/}
-      {/*  </div>*/}
-      {/*</div>*/}
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <>
@@ -321,7 +308,7 @@ export const BetaD3Chart = ({
             <rect width={chartW} height={1} x={0} y={chartH - 20} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />
-              <polygon id={'tooltip-arrow'} fill={'#9eb802'} points={'2,2 2,2 2,2'} />
+              <polygon id={'tooltip-arrow'} fill={'#000'} points={'2,2 2,2 2,2'} />
               <ellipse ry={16} rx={30} stroke={'#000'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'tooltip-ellipse'} />
               <text id={'tooltip-text'} fontSize={13} fontWeight={800} />
               {withBrush && (
@@ -338,12 +325,13 @@ export const BetaD3Chart = ({
               <text id={'end-tooltip-text'} fontSize={13} fontWeight={800} />
             </g>
           </svg>
+          <Image src={'/usdt.svg'} alt={'usdt'} width={16} height={16} className={'absolute right-0 bottom-8'} />
+          <div className={'-mt-2 text-sm flex items-center justify-between mb-4 px-16'}>
+            <div>{displayBalance(minPrice)}</div>
+            <div>{displayBalance(expectedPrice)}</div>
+            <div>{displayBalance(maxPrice)}</div>
+          </div>
         </div>
-        {/*<div className={'flex justify-between pl-16 pr-20 mb-8'}>*/}
-        {/*  <div>{displayBalance(minPrice)}</div>*/}
-        {/*  <div>{displayBalance(expectedPrice)}</div>*/}
-        {/*  <div>{displayBalance(maxPrice)}</div>*/}
-        {/*</div>*/}
       </div>
     </div>
   )

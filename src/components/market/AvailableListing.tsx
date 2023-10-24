@@ -11,10 +11,12 @@ import { sepolia } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { useAccount } from 'wagmi'
+import { Address, useAccount, useContractReads } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { Spinner } from '../Spinner'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { toast } from 'sonner'
+import { ERC1155ABI } from '@/config/abi/ERC1155'
 
 export const AvailableListing = () => {
   const router = useRouter()
@@ -26,7 +28,27 @@ export const AvailableListing = () => {
   const [loading, setLoading] = useState(false)
   const { address } = useAccount()
 
+  const { data } = useContractReads({
+    contracts: [
+      {
+        address: NFTContractAddress,
+        abi: ERC1155ABI,
+        functionName: 'balanceOf',
+        args: [address as Address, 0n],
+      },
+    ],
+    watch: true,
+  })
+
+  const nftBalance = data?.[0]?.result ?? 0n
+
+  const canList = nftBalance >= parseUnits(amount as `${number}`, 0)
+
   const createOrder = useCallback(async () => {
+    if (min >= max) {
+      toast.error('Min price can`t be greater than max price')
+      return
+    }
     if (!signer) return
     setLoading(true)
     try {
@@ -35,7 +57,6 @@ export const AvailableListing = () => {
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
-      console.log(seaport)
       const makerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
         conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
@@ -74,8 +95,9 @@ export const AvailableListing = () => {
         }),
       }).catch((e) => console.error(e))
       router.push('/market')
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      toast.error(e?.toString())
     }
     setLoading(false)
   }, [signer, min, max, amount])
@@ -113,8 +135,7 @@ export const AvailableListing = () => {
             </div>
           </div>
 
-          <div className={'text-center font-semibold my-8'}>Authorization required for $22.7</div>
-          <button className={'btn btn-primary w-full'} disabled={loading} onClick={createOrder}>
+          <button className={'btn btn-primary w-full mt-10'} disabled={loading || !canList} onClick={createOrder}>
             {loading && <Spinner />}
             Start Listing
           </button>

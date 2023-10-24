@@ -313,33 +313,41 @@ export default function Market() {
               <div className='w-1/4'>Quantity</div>
             </div>
             <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
-              {bidOrders?.map((bid, i) => (
-                <div className='flex' key={i}>
-                  <div className='w-1/4'>8.93</div>
-                  <div className='w-1/4'>10%</div>
-                  <div className='w-1/4'>{bid?.entry?.parameters?.consideration?.[0]?.startAmount}</div>
-                  <div className='w-1/4'>
-                    <Checkbox.Root
-                      checked={checkedBids?.[i]}
-                      onCheckedChange={(e) => {
-                        console.log(e)
-                        if (checkedBids) {
-                          let list = [...checkedBids]
-                          list[i] = Boolean(e)
-                          setCheckedBids(list)
-                        }
-                      }}
-                      className='CheckboxRoot'
-                      defaultChecked
-                      id='c1'
-                    >
-                      <Checkbox.Indicator className='CheckboxIndicator'>
-                        <CheckIcon />
-                      </Checkbox.Indicator>
-                    </Checkbox.Root>
+              {bidOrders?.map((bid, i) => {
+                const mid = calculateMidPrice(
+                  bid?.entry?.parameters?.offer?.[0]?.startAmount,
+                  bid?.entry?.parameters?.offer?.[0]?.endAmount,
+                )
+                const count = bid?.entry?.parameters?.consideration?.[0]?.startAmount
+                const realMid = mid / parseUnits(count, 0)
+                return (
+                  <div className='flex' key={i}>
+                    <div className='w-1/4'>${displayBalance(realMid)}</div>
+                    <div className='w-1/4'>10%</div>
+                    <div className='w-1/4'>{count}</div>
+                    <div className='w-1/4'>
+                      <Checkbox.Root
+                        checked={checkedBids?.[i]}
+                        onCheckedChange={(e) => {
+                          console.log(e)
+                          if (checkedBids) {
+                            let list = [...checkedBids]
+                            list[i] = Boolean(e)
+                            setCheckedBids(list)
+                          }
+                        }}
+                        className='CheckboxRoot'
+                        defaultChecked
+                        id='c1'
+                      >
+                        <Checkbox.Indicator className='CheckboxIndicator'>
+                          <CheckIcon />
+                        </Checkbox.Indicator>
+                      </Checkbox.Root>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <div className={'flex justify-end'}>
               <button className={'btn btn-primary mt-10'} onClick={fillBidOrder}>
@@ -365,40 +373,41 @@ export default function Market() {
               <div className='w-1/4'>Quantity</div>
             </div>
             <div className={'flex flex-col gap-3 max-h-[550px] overflow-y-scroll'}>
-              {listOrders?.map((list, i) => (
-                <div className='flex' key={i}>
-                  <div className='w-1/4'>
-                    {displayBalance(
-                      calculateMidPrice(
-                        list?.entry?.parameters?.consideration?.[0]?.startAmount,
-                        list?.entry?.parameters?.consideration?.[0]?.endAmount,
-                      ),
-                    )}
+              {listOrders?.map((list, i) => {
+                const mid = calculateMidPrice(
+                  list?.entry?.parameters?.consideration?.[0]?.startAmount,
+                  list?.entry?.parameters?.consideration?.[0]?.endAmount,
+                )
+                const count = list?.entry?.parameters?.offer?.[0]?.startAmount
+                const realMid = mid / parseUnits(count, 0)
+                return (
+                  <div className='flex' key={i}>
+                    <div className='w-1/4'>${displayBalance(realMid)}</div>
+                    <div className='w-1/4'>10%</div>
+                    <div className='w-1/4'>{count}</div>
+                    <div className='w-1/4'>
+                      <Checkbox.Root
+                        checked={checkedLists?.[i]}
+                        onCheckedChange={(e) => {
+                          console.log(e)
+                          if (checkedLists) {
+                            let list = [...checkedLists]
+                            list[i] = Boolean(e)
+                            setCheckedLists(list)
+                          }
+                        }}
+                        className='CheckboxRoot'
+                        defaultChecked
+                        id='c1'
+                      >
+                        <Checkbox.Indicator className='CheckboxIndicator'>
+                          <CheckIcon />
+                        </Checkbox.Indicator>
+                      </Checkbox.Root>
+                    </div>
                   </div>
-                  <div className='w-1/4'>10%</div>
-                  <div className='w-1/4'>{list?.entry?.parameters?.offer?.[0]?.startAmount}</div>
-                  <div className='w-1/4'>
-                    <Checkbox.Root
-                      checked={checkedLists?.[i]}
-                      onCheckedChange={(e) => {
-                        console.log(e)
-                        if (checkedLists) {
-                          let list = [...checkedLists]
-                          list[i] = Boolean(e)
-                          setCheckedLists(list)
-                        }
-                      }}
-                      className='CheckboxRoot'
-                      defaultChecked
-                      id='c1'
-                    >
-                      <Checkbox.Indicator className='CheckboxIndicator'>
-                        <CheckIcon />
-                      </Checkbox.Indicator>
-                    </Checkbox.Root>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <div className={'flex justify-end'}>
               <button className={'btn btn-primary mt-10'} onClick={fillSellOrder} disabled={loading}>

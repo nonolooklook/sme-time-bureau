@@ -17,7 +17,10 @@ import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { useAccount } from 'wagmi'
+import { erc20ABI, useAccount, useContractReads } from 'wagmi'
+import { displayBalance } from '@/utils/display'
+import { ERC1155ABI } from '@/config/abi/ERC1155'
+import { useApprove } from '@/hooks/useApprove'
 
 export const PlaceBid = () => {
   const { address } = useAccount()
@@ -29,7 +32,26 @@ export const PlaceBid = () => {
   const [amount, setAmount] = useState('1')
   const [loading, setLoading] = useState(false)
 
+  const total = parseUnits(max as `${number}`, 18) * parseUnits(amount as `${number}`, 0)
+
   const signer = useEthersSigner()
+
+  const { data } = useContractReads({
+    contracts: [
+      {
+        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
+        abi: erc20ABI,
+        functionName: 'allowance',
+        args: [address as `0x${string}`, NFTContractAddress],
+      },
+    ],
+    watch: true,
+  })
+
+  const allowance = data?.[0]?.result ?? 0n
+  const shouldApprove = allowance < total
+
+  const { approve, isApproveLoading } = useApprove(() => {})
 
   const createOrder = useCallback(async () => {
     if (!signer) return
@@ -119,11 +141,18 @@ export const PlaceBid = () => {
             </div>
           </div>
 
-          <div className={'text-center font-semibold my-8'}>Authorization required for $22.7</div>
-          <button className={'btn btn-primary w-full'} onClick={createOrder} disabled={loading}>
-            {loading && <Spinner />}
-            Place a bid
-          </button>
+          <div className={'text-center font-semibold my-4'}>Authorization required for ${displayBalance(total)}</div>
+          {shouldApprove ? (
+            <button className={'btn btn-primary w-full'} onClick={approve} disabled={isApproveLoading || !approve}>
+              {loading && <Spinner />}
+              Approve
+            </button>
+          ) : (
+            <button className={'btn btn-primary w-full'} onClick={createOrder} disabled={loading}>
+              {loading && <Spinner />}
+              Place a bid
+            </button>
+          )}
         </div>
       </div>
     </>

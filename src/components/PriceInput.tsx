@@ -59,7 +59,7 @@ export const PriceInput = ({
           </svg>
         </div>
       </div>
-      {/*<div className={'text-primary'}>WETH</div>*/}
+      <div className={'text-primary'}>USDT</div>
     </div>
   )
 }
