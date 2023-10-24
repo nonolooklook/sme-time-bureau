@@ -326,7 +326,7 @@ export const BetaD3Chart = ({
             </g>
           </svg>
           <Image src={'/usdt.svg'} alt={'usdt'} width={16} height={16} className={'absolute right-0 bottom-8'} />
-          <div className={'-mt-2 text-sm flex items-center justify-between mb-4 px-16'}>
+          <div className={'-mt-4 py-2 text-sm flex items-center justify-between mb-4 px-16'}>
             <div>{displayBalance(minPrice)}</div>
             <div>{displayBalance(expectedPrice)}</div>
             <div>{displayBalance(maxPrice)}</div>
