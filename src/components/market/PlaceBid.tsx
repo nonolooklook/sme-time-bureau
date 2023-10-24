@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { PriceInput } from '@/components/PriceInput'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { parseEther, parseUnits } from 'viem'
 import * as Dialog from '@radix-ui/react-dialog'
 import Stepper from 'awesome-react-stepper'
@@ -52,6 +52,8 @@ export const PlaceBid = () => {
   const shouldApprove = allowance < total
 
   const { approve, isApproveLoading } = useApprove(() => {})
+  const [wrong, setWrong] = useState(false)
+  useEffect(() => setWrong(min >= max), [min, max])
 
   const createOrder = useCallback(async () => {
     if (!signer) return
@@ -133,11 +135,11 @@ export const PlaceBid = () => {
 
           <div className={'grid grid-cols-2 gap-4'}>
             <div className='col-span-1'>
-              <PriceInput title={'Min'} value={min} setValue={setMin} minimum={'0'} maximum={max} />
+              <PriceInput title={'Min'} value={min} setValue={setMin} minimum={'0'} maximum={max} wrong={wrong} />
             </div>
 
             <div className='col-span-1'>
-              <PriceInput title={'Max'} value={max} setValue={setMax} minimum={min} maximum={'10000000000000'} />
+              <PriceInput title={'Max'} value={max} setValue={setMax} minimum={min} maximum={'10000000000000'} wrong={wrong} />
             </div>
           </div>
 
