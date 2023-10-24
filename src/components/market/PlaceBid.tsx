@@ -21,6 +21,7 @@ import { erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { displayBalance } from '@/utils/display'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useApprove } from '@/hooks/useApprove'
+import { toast } from 'sonner'
 
 export const PlaceBid = () => {
   const { address } = useAccount()
@@ -106,6 +107,7 @@ export const PlaceBid = () => {
       router.push('/market')
     } catch (e) {
       console.error(e)
+      toast.error(e?.toString())
     }
     setLoading(false)
   }, [signer, min, max, amount])
