@@ -25,6 +25,7 @@ import { calculateMidPrice } from '@/utils/price'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import { sleep } from '@/utils/sleep'
 import { useOrders } from '@/hooks/useOrders'
+import { toast } from 'sonner'
 
 export default function Market() {
   const ref = useRef<HTMLDivElement>(null)
@@ -55,64 +56,64 @@ export default function Market() {
   const [wrongMsg, setWrongMsg] = useState('')
 
   const fillSellOrder = async () => {
-    if (!signer) return
-    const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
-      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-    })
-    setOpen(true)
-    const finalMakerOrders = listOrders?.filter((l, i) => checkedLists?.[i])
-    const offerAmount = finalMakerOrders?.reduce(
-      (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
-      0n,
-    )
-    console.log(finalMakerOrders)
-    const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
-    const takerOrder = {
-      zone: '0x0000000000000000000000000000000000000000',
-      conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
-      startTime: Math.floor(new Date().getTime() / 1000).toString(),
-      endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
-      offer: [
-        {
-          amount: offerAmount.toString(),
-          endAmount: offerAmount.toString(),
-          token: ERC20_ADDRESS[sepolia.id],
-          recipient: address,
-        },
-      ],
-      consideration: [
-        {
-          itemType: ItemType.ERC1155,
-          token: NFTContractAddress,
-          identifier: '0',
-          amount: itemAmount.toString(),
-        },
-      ],
-    }
-
-    const { executeAllActions } = await seaport.createOrder(takerOrder, address)
-
-    const orderNumber = finalMakerOrders?.length
-    const order = await executeAllActions()
-    const modeOrderFulfillments: MatchOrdersFulfillment[] = []
-    for (let i = 0; i < orderNumber; i++) {
-      modeOrderFulfillments.push({
-        offerComponents: [{ orderIndex: i, itemIndex: 0 }],
-        considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
-      })
-    }
-
-    for (let i = 0; i < orderNumber; i++) {
-      modeOrderFulfillments.push({
-        offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
-        considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
-      })
-    }
-
-    await sleep(2000)
-    ref?.current?.click()
     try {
+      if (!signer) return
+      const seaport = new Seaport(signer, {
+        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+      })
+      setOpen(true)
+      const finalMakerOrders = listOrders?.filter((l, i) => checkedLists?.[i])
+      const offerAmount = finalMakerOrders?.reduce(
+        (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
+        0n,
+      )
+      console.log(finalMakerOrders)
+      const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
+      const takerOrder = {
+        zone: '0x0000000000000000000000000000000000000000',
+        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        startTime: Math.floor(new Date().getTime() / 1000).toString(),
+        endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+        offer: [
+          {
+            amount: offerAmount.toString(),
+            endAmount: offerAmount.toString(),
+            token: ERC20_ADDRESS[sepolia.id],
+            recipient: address,
+          },
+        ],
+        consideration: [
+          {
+            itemType: ItemType.ERC1155,
+            token: NFTContractAddress,
+            identifier: '0',
+            amount: itemAmount.toString(),
+          },
+        ],
+      }
+
+      const { executeAllActions } = await seaport.createOrder(takerOrder, address)
+
+      const orderNumber = finalMakerOrders?.length
+      const order = await executeAllActions()
+      const modeOrderFulfillments: MatchOrdersFulfillment[] = []
+      for (let i = 0; i < orderNumber; i++) {
+        modeOrderFulfillments.push({
+          offerComponents: [{ orderIndex: i, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+        })
+      }
+
+      for (let i = 0; i < orderNumber; i++) {
+        modeOrderFulfillments.push({
+          offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
+        })
+      }
+
+      await sleep(2000)
+      ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -141,73 +142,78 @@ export default function Market() {
           ref?.current?.click()
         }
       }, 5000)
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      setOpen(false)
+      toast.error(e.toString())
     }
 
     setLoading(false)
   }
 
   const fillBidOrder = async () => {
-    if (!signer) return
-    setOpen(true)
-    const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
-      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-    })
-    const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])
-    const offerAmount = finalMakerOrders?.reduce(
-      (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
-      0n,
-    )
-    const startItemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
-    const endItemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].endAmount, 0), 0n)
-
-    const takerOrder = {
-      zone: '0x0000000000000000000000000000000000000000',
-      conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
-      startTime: Math.floor(new Date().getTime() / 1000).toString(),
-      endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
-      offer: [
-        {
-          itemType: ItemType.ERC1155,
-          token: NFTContractAddress,
-          identifier: '0',
-          amount: offerAmount.toString(),
-        },
-      ],
-      consideration: [
-        {
-          amount: startItemAmount.toString(),
-          endAmount: endItemAmount.toString(),
-          token: ERC20_ADDRESS[sepolia.id],
-          recipient: address,
-        },
-      ],
-    }
-
-    const { executeAllActions } = await seaport.createOrder(takerOrder, address)
-
-    const orderNumber = finalMakerOrders?.length
-    const order = await executeAllActions()
-    const modeOrderFulfillments: MatchOrdersFulfillment[] = []
-    for (let i = 0; i < orderNumber; i++) {
-      modeOrderFulfillments.push({
-        offerComponents: [{ orderIndex: i, itemIndex: 0 }],
-        considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
-      })
-    }
-
-    for (let i = 0; i < orderNumber; i++) {
-      modeOrderFulfillments.push({
-        offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
-        considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
-      })
-    }
-
-    await sleep(2000)
-    ref?.current?.click()
     try {
+      if (!signer) return
+      setOpen(true)
+      const seaport = new Seaport(signer, {
+        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+      })
+      const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])
+      const offerAmount = finalMakerOrders?.reduce(
+        (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
+        0n,
+      )
+      const startItemAmount = finalMakerOrders?.reduce(
+        (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0),
+        0n,
+      )
+      const endItemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].endAmount, 0), 0n)
+
+      const takerOrder = {
+        zone: '0x0000000000000000000000000000000000000000',
+        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        startTime: Math.floor(new Date().getTime() / 1000).toString(),
+        endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+        offer: [
+          {
+            itemType: ItemType.ERC1155,
+            token: NFTContractAddress,
+            identifier: '0',
+            amount: offerAmount.toString(),
+          },
+        ],
+        consideration: [
+          {
+            amount: startItemAmount.toString(),
+            endAmount: endItemAmount.toString(),
+            token: ERC20_ADDRESS[sepolia.id],
+            recipient: address,
+          },
+        ],
+      }
+
+      const { executeAllActions } = await seaport.createOrder(takerOrder, address)
+
+      const orderNumber = finalMakerOrders?.length
+      const order = await executeAllActions()
+      const modeOrderFulfillments: MatchOrdersFulfillment[] = []
+      for (let i = 0; i < orderNumber; i++) {
+        modeOrderFulfillments.push({
+          offerComponents: [{ orderIndex: i, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+        })
+      }
+
+      for (let i = 0; i < orderNumber; i++) {
+        modeOrderFulfillments.push({
+          offerComponents: [{ orderIndex: orderNumber, itemIndex: 0 }],
+          considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
+        })
+      }
+
+      await sleep(2000)
+      ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -236,8 +242,10 @@ export default function Market() {
           ref?.current?.click()
         }
       }, 5000)
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      toast.error(e.toString())
+      setOpen(false)
     }
 
     setLoading(false)
