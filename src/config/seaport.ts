@@ -1,5 +1,5 @@
 import { sepolia } from 'viem/chains'
 
 export const SEAPORT_ADDRESS = {
-  [sepolia.id]: '0xd3B2C0B21D63e8b9701c0daFFaADf3d05A642415',
+  [sepolia.id]: '0xde215ceccb5707cad33a9500cede0c585a42fda2',
 }

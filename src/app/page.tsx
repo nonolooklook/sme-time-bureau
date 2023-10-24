@@ -8,23 +8,42 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { InputWithButton } from '@/components/InputWithButton'
 import Link from 'next/link'
-import { useContractRead } from 'wagmi'
+import { erc20ABI, useAccount, useContractRead, useContractReads } from 'wagmi'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { displayBalance } from '@/utils/display'
+import { useApprove } from '@/hooks/useApprove'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { sepolia } from 'viem/chains'
+import { parseEther, parseUnits } from 'viem'
 
 export default function Page() {
+  const { address } = useAccount()
   const [amount, setAmount] = useState('1')
-  const { mint, isMintLoading } = useMint(amount, () => {
-    setOpen(true)
-  })
 
-  const { data: totalSupply } = useContractRead({
-    address: NFTContractAddress,
-    abi: ERC1155ABI,
-    functionName: 'totalSupply',
+  const { data } = useContractReads({
+    contracts: [
+      {
+        address: NFTContractAddress,
+        abi: ERC1155ABI,
+        functionName: 'totalSupply',
+      },
+      {
+        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
+        abi: erc20ABI,
+        functionName: 'allowance',
+        args: [address as `0x${string}`, NFTContractAddress],
+      },
+    ],
     watch: true,
   })
+
+  const totalSupply = data?.[0]?.result
+  const allowance = data?.[1]?.result ?? 0n
+  const shouldApprove = allowance < parseEther(amount as `${number}`) * 10n
+
+  const { mint, isMintLoading } = useMint(amount, !shouldApprove, () => setOpen(true))
+  const { approve, isApproveLoading } = useApprove(() => {})
 
   const [open, setOpen] = useState(false)
 
@@ -62,15 +81,26 @@ export default function Page() {
             </div>
             <div className={'font-semibold text-lg'}>Public Mint:</div>
             <div className={'text-lg font-light'}>Start on 18/10/2023 8:00(UTC)</div>
-            <div className={'text-lg font-light mb-6'}>Price: 10USDT</div>
+            <div className={'text-lg font-light mb-6'}>Price: 10 USDT</div>
 
             <div className={'text-lg font-light'}>Minted: {totalSupply?.toString()}/1000</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
 
-            <button className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
-              {isMintLoading && <Spinner />}
-              Mint
-            </button>
+            {shouldApprove ? (
+              <button
+                className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'}
+                onClick={approve}
+                disabled={!approve || isApproveLoading}
+              >
+                {isApproveLoading && <Spinner />}
+                Approve
+              </button>
+            ) : (
+              <button className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
+                {isMintLoading && <Spinner />}
+                Mint
+              </button>
+            )}
           </div>
         </div>
       </div>

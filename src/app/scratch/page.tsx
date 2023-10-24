@@ -78,22 +78,22 @@ export default function Scratch() {
     const takerOrder = {
       zone: '0x0000000000000000000000000000000000000000',
       conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
-      startTime: Math.floor(new Date().getTime() / 1000).toString(),
+      startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
       endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
-      offer: [
+      consideration: [
         {
-          amount: '4000000000000000000',
-          endAmount: '6000000000000000000',
+          amount: '1000000000000000000',
+          endAmount: '100000000000000000000',
           token: ERC20_ADDRESS[sepolia.id],
           recipient: address,
         },
       ],
-      consideration: [
+      offer: [
         {
           itemType: ItemType.ERC1155,
           token: NFTContractAddress,
           identifier: '0',
-          amount: '2',
+          amount: '1',
         },
       ],
     }
@@ -103,33 +103,13 @@ export default function Scratch() {
     const order = await executeAllActions()
     const modeOrderFulfillments: MatchOrdersFulfillment[] = []
     modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 0,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 1,
-          itemIndex: 0,
-        },
-      ],
+      offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
+      considerationComponents: [{ orderIndex: 1, itemIndex: 0 }],
     })
 
     modeOrderFulfillments.push({
-      offerComponents: [
-        {
-          orderIndex: 1,
-          itemIndex: 0,
-        },
-      ],
-      considerationComponents: [
-        {
-          orderIndex: 0,
-          itemIndex: 0,
-        },
-      ],
+      offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
+      considerationComponents: [{ orderIndex: 0, itemIndex: 0 }],
     })
 
     await sleep(2000)
@@ -143,7 +123,7 @@ export default function Scratch() {
         },
         body: JSON.stringify({
           randomNumberCount: 1,
-          randomStrategy: 0,
+          randomStrategy: 1,
           takerOrders: [order],
           makerOrders: [],
           modeOrderFulfillments: modeOrderFulfillments,

@@ -160,7 +160,8 @@ export default function Market() {
       (acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.consideration?.[0].endAmount, 0),
       0n,
     )
-    const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
+    const startItemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
+    const endItemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].endAmount, 0), 0n)
 
     const takerOrder = {
       zone: '0x0000000000000000000000000000000000000000',
@@ -177,8 +178,8 @@ export default function Market() {
       ],
       consideration: [
         {
-          amount: itemAmount.toString(),
-          endAmount: itemAmount.toString(),
+          amount: startItemAmount.toString(),
+          endAmount: endItemAmount.toString(),
           token: ERC20_ADDRESS[sepolia.id],
           recipient: address,
         },
