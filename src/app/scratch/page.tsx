@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
-import { Address, useAccount, useContractReads } from 'wagmi'
+import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { parseUnits } from 'viem'
@@ -20,7 +20,7 @@ import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import Stepper from 'awesome-react-stepper'
 import { sleep } from '@/utils/sleep'
-import { ellipseAddress } from '@/utils/display'
+import { displayBalance, ellipseAddress } from '@/utils/display'
 
 export default function Scratch() {
   const ref = useRef<HTMLDivElement>(null)
@@ -30,10 +30,6 @@ export default function Scratch() {
   const [remaining, setRemaining] = useState(0)
   const [tops, setTops] = useState<any[]>([])
 
-  const [luckyPoolValue, setLuckyPoolValue] = useState(85.5)
-
-  const price = remaining > 0 ? Number(luckyPoolValue) / remaining : 0
-
   const { data } = useContractReads({
     contracts: [
       {
@@ -42,11 +38,19 @@ export default function Scratch() {
         functionName: 'balanceOf',
         args: [address as Address, 0n],
       },
+      {
+        address: ERC20_ADDRESS[sepolia.id] as Address,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: ['0x28c73A60ccF8c66c14EbA8935984e616Df2926e3'],
+      },
     ],
     watch: true,
   })
 
   const nftBalance = data?.[0]?.result
+  const luckyPoolValue = data?.[1]?.result ?? 0n
+  const price = remaining > 0 ? luckyPoolValue / parseUnits(remaining?.toFixed() as `${number}`, 0) : 0n
 
   useEffect(() => {
     fetch('https://sme-demo.mcglobal.ai/transaction/topWinnings')
@@ -196,7 +200,7 @@ export default function Scratch() {
           <div className={'w-[400px] pt-10'}>
             <div className='flex justify-between'>
               <div>
-                <div className='text-3xl mb-3'>${luckyPoolValue}</div>
+                <div className='text-3xl mb-3'>${displayBalance(luckyPoolValue)}</div>
                 <div className={'text-sm text-gray-500'}>Lucky pool</div>
               </div>
               <div>
@@ -206,7 +210,7 @@ export default function Scratch() {
             </div>
             <div className={'divider'} />
             <div>
-              <div className='text-3xl mb-3'>${price?.toFixed(2)}</div>
+              <div className='text-3xl mb-3'>${displayBalance(price)}</div>
               <div className={'text-sm text-gray-500'}>Real-time fair price</div>
             </div>
             <div className={'divider'} />
