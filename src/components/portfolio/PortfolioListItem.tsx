@@ -3,7 +3,19 @@ import { parseUnits } from 'viem'
 import { useCancelList } from '@/hooks/useCancelList'
 import { Spinner } from '@/components/Spinner'
 
-export const PortfolioListItem = ({ mutate, isBid, order, i }: { mutate: any; isBid: boolean; order: any; i: number }) => {
+export const PortfolioListItem = ({
+  mutate,
+  isBid,
+  order,
+  i,
+  showDivider,
+}: {
+  mutate: any
+  isBid: boolean
+  order: any
+  i: number
+  showDivider: boolean
+}) => {
   const ps = order?.entry.parameters
   const csd = ps.consideration
   const offer = ps.offer
@@ -17,20 +29,24 @@ export const PortfolioListItem = ({ mutate, isBid, order, i }: { mutate: any; is
 
   return (
     <div key={i}>
-      <div className='flex w-full text-gray-900'>
+      <div className='flex w-full text-gray-50 items-center'>
         <div className='w-1/6'>{i + 1}</div>
         <div className='w-1/6'>{count?.toString()}</div>
         <div className='w-1/6'>${displayBalance(min)}</div>
         <div className='w-1/6'>${displayBalance(expected)}</div>
         <div className='w-1/6'>${displayBalance(max)}</div>
         <div>
-          <button className={'btn btn-primary'} onClick={() => cancelList(order)} disabled={isCancelLoading}>
+          <button
+            className={'rounded-full bg-primary px-4 w-[160px] text-lg text-center py-2 '}
+            onClick={() => cancelList(order)}
+            disabled={isCancelLoading}
+          >
             {isCancelLoading && <Spinner />}
             Cancel listing
           </button>
         </div>
       </div>
-      <div className='divider' />
+      {showDivider && <div className='divider' />}
     </div>
   )
 }

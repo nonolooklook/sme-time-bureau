@@ -1,109 +1,48 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import Image from 'next/image'
-import { useState } from 'react'
-import { useMint } from '@/hooks/useMint'
-import * as Dialog from '@radix-ui/react-dialog'
-import { Spinner } from '@/components/Spinner'
-import { InputWithButton } from '@/components/InputWithButton'
+import React from 'react'
+import { useOrders } from '@/hooks/useOrders'
+import { Bebas_Neue } from 'next/font/google'
 import Link from 'next/link'
-import { erc20ABI, useAccount, useContractRead, useContractReads } from 'wagmi'
-import { NFTContractAddress } from '@/config/contract'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { displayBalance } from '@/utils/display'
-import { useApprove } from '@/hooks/useApprove'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { sepolia } from 'viem/chains'
-import { parseEther, parseUnits } from 'viem'
+import { TelegramIcon } from '@/components/icons/Telegram'
+import { MediumIcon } from '@/components/icons/Medium'
+import { TwitterIcon } from '@/components/icons/Twitter'
+import { GithubIcon } from '@/components/icons/Github'
+import { DiscordIcon } from '@/components/icons/Discord'
+
+const bebas = Bebas_Neue({ subsets: ['latin-ext'], weight: '400' })
 
 export default function Page() {
-  const { address } = useAccount()
-  const [amount, setAmount] = useState('1')
-
-  const { data } = useContractReads({
-    contracts: [
-      {
-        address: NFTContractAddress,
-        abi: ERC1155ABI,
-        functionName: 'totalSupply',
-      },
-      {
-        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
-        abi: erc20ABI,
-        functionName: 'allowance',
-        args: [address as `0x${string}`, NFTContractAddress],
-      },
-    ],
-    watch: true,
-  })
-
-  const totalSupply = data?.[0]?.result
-  const allowance = data?.[1]?.result ?? 0n
-  const shouldApprove = allowance < parseEther(amount as `${number}`) * 10n
-
-  const { mint, isMintLoading } = useMint(amount, !shouldApprove, () => setOpen(true))
-  const { approve, isApproveLoading } = useApprove(() => {})
-
-  const [open, setOpen] = useState(false)
-
   return (
-    <>
+    <div
+      className={'relative min-h-screen bg-contain bg-no-repeat'}
+      style={{ background: 'url(/home-bg.png)', backgroundSize: '100% 100%', backgroundPosition: 'center center' }}
+    >
       <Header />
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className={'dialog-overlay'} />
-          <Dialog.Content className={'dialog-content'}>
-            <div className='flex items-center gap-1'>
-              <Image src={'/success.png'} alt={'success'} width={160} height={160} />
-              <div className={'text-2xl font-semibold'}>Mint Successful</div>
-            </div>
-            <div className='flex gap-6 justify-center mt-2'>
-              <Link href={'/scratch'} className='btn btn-outline'>
-                Scratch Now
-              </Link>
-              <Link href={'/portfolio'} className='btn btn-primary'>
-                Check In My Portfolio
-              </Link>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-
-      <div className='container mx-auto mt-32'>
-        <div className={'rounded-xl bg-[#040914] bg-opacity-5 p-8 flex items-start gap-10'}>
-          <Image src={'/demo-1.png'} alt={'demo'} width={350} height={700} className={'-mt-20'} />
-          <div>
-            <div className={'font-bold text-4xl mb-4'}>SCRATCH TICKET</div>
-            <div className={'text-base text-[#040914] font-light mb-4'}>
-              Unlock potential treasures with our scratch-off NFT! For just 10 USDT, dive into an exhilarating experience. Remember, each
-              address can claim up to 5 chances. Scratch it, and you could win up to $100!
-            </div>
-            <div className={'font-semibold text-lg'}>Public Mint:</div>
-            <div className={'text-lg font-light'}>Start on 18/10/2023 8:00(UTC)</div>
-            <div className={'text-lg font-light mb-6'}>Price: 10 USDT</div>
-
-            <div className={'text-lg font-light'}>Minted: {totalSupply?.toString()}/1000</div>
-            <InputWithButton amount={amount} setAmount={setAmount} />
-
-            {shouldApprove ? (
-              <button
-                className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'}
-                onClick={approve}
-                disabled={!approve || isApproveLoading}
-              >
-                {isApproveLoading && <Spinner />}
-                Approve
-              </button>
-            ) : (
-              <button className={'text-xl mt-6 btn btn-primary btn-large w-[220px]'} onClick={mint} disabled={!mint || isMintLoading}>
-                {isMintLoading && <Spinner />}
-                Mint
-              </button>
-            )}
-          </div>
+      <div className={'container mx-auto text-white min-h-screen flex items-center uppercase'}>
+        <div className={'text-[80px] tracking-[2%]'}>
+          <div className={`${bebas.className} -mb-2`}>Time weavers of the</div>
+          <div className={bebas.className}>Stochastic Universe</div>
         </div>
       </div>
-    </>
+      <div className='fixed bottom-0 w-full bg-gradient-to-b from-transparent gap-10 to-black py-10 flex items-center justify-center'>
+        <Link href={'https://t.me/CrustNetwork'} target={'_blank'} className={'link-icon'}>
+          <TelegramIcon />
+        </Link>
+        <Link href={'https://crustnetwork.medium.com/'} target={'_blank'} className={'link-icon'}>
+          <MediumIcon />
+        </Link>
+        <Link href={'https://twitter.com/CrustNetwork'} target={'_blank'} className={'link-icon'}>
+          <TwitterIcon />
+        </Link>
+        <Link href={'https://github.com/crustio'} target={'_blank'} className={'link-icon'}>
+          <GithubIcon />
+        </Link>
+        <Link href={'https://discord.com/invite/Jbw2PAUSCR'} target={'_blank'} className={'link-icon'}>
+          <DiscordIcon />
+        </Link>
+      </div>
+    </div>
   )
 }

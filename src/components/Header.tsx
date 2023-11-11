@@ -1,35 +1,34 @@
-import Image from 'next/image'
 import { ConnectKitButton } from 'connectkit'
 import Link from 'next/link'
+import { useAccount } from 'wagmi'
 import { usePathname } from 'next/navigation'
 
 export const Header = () => {
+  const { address } = useAccount()
   const pathname = usePathname()
   return (
-    <header>
-      <div className='container mx-auto py-8 flex items-center'>
-        <div className={'text-xl font-bold flex items-center gap-2'}>
-          <Image src={'/logo.png'} alt={'logo'} width={36} height={36} />
-          SCRATCH TICKET
+    <header className={'z-10 bg-black bg-opacity-40 text-white border-b border-b-[#DED1B630] fixed top-0 w-full'}>
+      <div className='container mx-auto flex items-center py-5 justify-between'>
+        <Link className='flex items-center gap-2' href={'/'}>
+          <div className={'text-[24px] font-semibold'}>SME</div>
+        </Link>
+        <div className={'flex gap-12 items-center text-[14px]'}>
+          <Link className={`${pathname === '/' ? 'active' : ''} item`} href={'/'}>
+            Home
+          </Link>
+          <Link className={`${pathname === '/capsule' ? 'active' : ''} item`} href={'/capsule'}>
+            Schrödinger`s Time Capsule
+          </Link>
+          <Link className={`${pathname === '/trade' ? 'active' : ''} item`} href={'/trade'}>
+            Trade
+          </Link>
+          {address && (
+            <Link className={'item'} href={'/portfolio'}>
+              Portfolio
+            </Link>
+          )}
         </div>
-
-        <div className={'flex items-center gap-10 ml-24'}>
-          <Link className={`nav-item ${pathname === '/' ? 'active' : ''}`} href={'/'}>
-            Launchpad
-          </Link>
-          <Link className={`nav-item ${pathname === '/scratch' ? 'active' : ''}`} href={'/scratch'}>
-            Scratch
-          </Link>
-          <Link className={`nav-item ${pathname === '/market' ? 'active' : ''}`} href={'/market'}>
-            Market
-          </Link>
-          <Link className={`nav-item ${pathname === '/portfolio' ? 'active' : ''}`} href={'/portfolio'}>
-            My portfolio
-          </Link>
-        </div>
-        <div className='ml-auto'>
-          <ConnectKitButton />
-        </div>
+        <ConnectKitButton />
       </div>
     </header>
   )

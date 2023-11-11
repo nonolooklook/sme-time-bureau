@@ -3,11 +3,14 @@ module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
-      textColor: {
-        primary: '#040616',
+      borderColor: {
+        primary: '#FFAC03',
       },
       backgroundColor: {
-        primary: '#040616',
+        primary: '#FFAC03',
+      },
+      textColor: {
+        primary: '#FFAC03',
       },
     },
   },

@@ -34,13 +34,12 @@ export const BetaD3Chart = ({
   const xPadding = 0
 
   useLayoutEffect(() => {
-    console.log(2222222222, chartRef, svgRef)
     if (!chartRef.current || !svgRef.current) return
     // if (rendered) return
     if (minPrice > 0 && expectedPrice > 0 && maxPrice > 0) {
       rendered = true
       const chartW = chartRef.current.offsetWidth
-      const chartH = 260
+      const chartH = 220
       setChartW(chartW)
       setChartH(chartH)
       const width = chartW - margin.left - margin.right
@@ -53,16 +52,14 @@ export const BetaD3Chart = ({
           .attr('id', 'gradient')
           .attr('x1', '0')
           .attr('y1', '0')
-          .attr('x2', '1')
-          .attr('y2', '0')
+          .attr('x2', '0')
+          .attr('y2', '100%')
 
-        gradient.append('stop').attr('offset', '0%').attr('style', 'stop-color:#82ca9d;stop-opacity:0.8')
-        gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#e9efd2;stop-opacity:0.2')
-        gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#e17ae7;stop-opacity:1')
-        gradient.append('stop').attr('offset', '100%').attr('style', 'stop-color:#e17ae7;stop-opacity:1')
+        gradient.append('stop').attr('offset', '0%').attr('style', 'stop-color:rgba(255,172,3,.85);stop-opacity:0.2')
+        // gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#FFAC034D;stop-opacity:1')
+        gradient.append('stop').attr('offset', '100%').attr('style', 'stop-color:rgba(255,172,3);stop-opacity:0')
       }
 
-      // const svgM = d3.select('#chart').append('svg');
       const svgM = d3.select(svgRef.current)
       const svg = svgM.select('#g')
 
@@ -91,7 +88,7 @@ export const BetaD3Chart = ({
         .attr('stroke-width', '1')
         .style('fill', 'none')
         .style('filter', 'url(#glow)')
-        .attr('stroke', '#000')
+        .attr('stroke', '#fff')
 
       svg.select('.domain').attr('stroke', '#ddd')
 
@@ -103,13 +100,13 @@ export const BetaD3Chart = ({
         .attr('y1', 0)
         .attr('x2', 10)
         .attr('y2', 260)
-        .attr('stroke', '#000')
+        .attr('stroke', '#fff')
         .attr('stroke-width', 1)
         .attr('stroke-dasharray', '4,4')
         .style('opacity', 0)
         .style('pointer-events', 'none')
 
-      const tooltipArrow = svg.select('#tooltip-arrow').attr('points', '0,0 0,0 0,0').attr('fill', 'lightblue')
+      const tooltipArrow = svg.select('#tooltip-arrow').attr('points', '0,0 0,0 0,0').attr('fill', '#fff')
       const tooltipEllipse = svg.select('#tooltip-ellipse')
       const tooltipText = svg.select('#tooltip-text')
       svg
@@ -141,17 +138,18 @@ export const BetaD3Chart = ({
           // .attr('cy', yScale(yAccessor(hoveredIndexData)))
           tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh + 6} ${realX + 6},${dh + 14} ${realX - 6},${dh + 14}`)
 
-          tooltipEllipse
-            .attr('cx', realX)
-            .attr('cy', dh - dy / 2)
-            .attr('opacity', 1)
-            .raise()
+          // tooltipEllipse
+          //   .attr('cx', realX)
+          //   .attr('cy', dh - dy / 2)
+          //   .attr('opacity', 1)
+          //   .raise()
 
           tooltipText
             .attr('x', realX - 15)
-            .attr('y', dh - dy / 2 + 6)
-            .text(displayBalance(dx + minPrice))
+            .attr('y', dh + 30)
+            .text(displayBalance(dx + minPrice, 2))
             .raise()
+          // .attr('y', dh - dy / 2 + 6)
 
           setCx(dx + minPrice)
           setX(x)
@@ -237,7 +235,7 @@ export const BetaD3Chart = ({
         .on('mouseleave', () => {
           dropTooltip.style('opacity', 0)
         })
-      brushG.selectAll('.handle').style('fill', '#000').style('stroke', 'none').style('width', '2px')
+      brushG.selectAll('.handle').style('fill', '#fff').style('stroke', 'none').style('width', '2px')
       brushG.selectAll('.handle').each(function () {
         d3.select(this)
           .append('rect')
@@ -278,22 +276,25 @@ export const BetaD3Chart = ({
   }, [minPrice, expectedPrice, maxPrice, svgRef, chartW, chartH])
 
   return (
-    <div className={'pt-[60px] relative'}>
-      {x > 0 && x <= 1 && (
-        <div className={'flex justify-end mb-8 absolute top-4 left-0'}>
-          <div className={'border border-black rounded-lg p-2 w-[380px] text-sm'}>
-            The probability of a deal occurring above {displayBalance(cx)} is {((1 - x) * 100).toFixed(0)}%.
-          </div>
-        </div>
-      )}
+    <div className={'relative px-16'}>
+      {/*{x > 0 && x <= 1 && (*/}
+      {/*  <div className={'flex justify-end mb-8 absolute top-4 left-0'}>*/}
+      {/*    <div className={'border border-black rounded-lg p-2 w-[380px] text-sm'}>*/}
+      {/*      The probability of a deal occurring above {displayBalance(cx)} is {((1 - x) * 100).toFixed(0)}%.*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*)}*/}
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <>
-            <div className={'absolute px-3 py-1 bg-[rgba(158,184,0,.1)] rounded-full bottom-28 border-primary border'}>
-              {(x * 100).toFixed(0)}%
+            <div className='absolute text-xs bottom-20 -ml-16 flex flex-col items-center'>
+              Random Price &lt; {displayBalance(cx, 2)}
+              <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(0)}%</div>
             </div>
-            <div className={'absolute right-0 px-3 py-1 bg-[rgba(158,184,0,.1)] rounded-full bottom-28 border-primary border'}>
-              {((1 - x) * 100).toFixed(0)}%
+
+            <div className='absolute bottom-20 right-0 text-xs flex flex-col items-center -mr-16'>
+              Random Price &gt; {displayBalance(cx, 2)}
+              <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(0)}%</div>
             </div>
           </>
         )}
@@ -301,35 +302,37 @@ export const BetaD3Chart = ({
         {/*<div id={'chart'} ref={chartRef} className={'bg-grayx'}></div>*/}
         <div id={'chart'} ref={chartRef} className={'bg-grayx'}>
           <svg ref={svgRef} width={chartW} height={chartH + 10}>
-            <rect width={1} height={chartH - margin.top / 2 - margin.bottom} x={chartW / 2} y={margin.top / 2} className={'z-50'} />
-            <text fill={'black'} fontSize={12} x={chartW / 2 - 40} y={20}>
-              Expected price
-            </text>
-            <rect width={chartW} height={1} x={0} y={chartH - 20} />
+            <rect
+              id={'33222'}
+              width={1}
+              height={chartH - margin.top - margin.bottom}
+              x={chartW / 2}
+              y={margin.top}
+              className={'z-50'}
+              stroke={'#fff'}
+              strokeWidth={1}
+              strokeDasharray={'4,4'}
+            />
+            {/*<text fill={'#fff'} fontSize={12} x={chartW / 2 - 40} y={20}>*/}
+            {/*  Expected price*/}
+            {/*</text>*/}
+            <rect width={chartW + 80} height={1} x={0} y={chartH - 20} fill={'#fff'} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />
-              <polygon id={'tooltip-arrow'} fill={'#000'} points={'2,2 2,2 2,2'} />
-              <ellipse ry={16} rx={30} stroke={'#000'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'tooltip-ellipse'} />
-              <text id={'tooltip-text'} fontSize={13} fontWeight={800} />
-              {withBrush && (
-                <text id={'drop-tooltip'} fontSize={12} fontWeight={400} width={20} fill={'#666'} opacity={1}>
-                  <tspan x={chartW - 230} y='10'>
-                    Drag this bar to set your
-                  </tspan>
-                  <tspan x={chartW - 230} y='26'>
-                    price rejection range
-                  </tspan>
-                </text>
-              )}
-              <ellipse ry={16} rx={30} stroke={'#000'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'end-tooltip-ellipse'} />
+              <polygon id={'tooltip-arrow'} fill={'#fff'} points={'2,2 2,2 2,2'} />
+              <ellipse ry={16} rx={30} stroke={'#fff'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'tooltip-ellipse'} />
+              <text id={'tooltip-text'} fontSize={13} fill={'#fff'} />
+              <ellipse ry={16} rx={30} stroke={'#fff'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'end-tooltip-ellipse'} />
               <text id={'end-tooltip-text'} fontSize={13} fontWeight={800} />
             </g>
           </svg>
-          <Image src={'/usdt.svg'} alt={'usdt'} width={16} height={16} className={'absolute right-0 bottom-10'} />
           <div className={'-mt-4 py-2 text-sm flex items-center justify-between mb-4 px-16'}>
-            <div>{displayBalance(minPrice)}</div>
-            <div>{displayBalance(expectedPrice)}</div>
-            <div>{displayBalance(maxPrice)}</div>
+            <div className={'border border-white rounded-full w-[60px] text-center -ml-4'}>{displayBalance(minPrice)}</div>
+            <div className={'flex flex-col items-center text-xs'}>
+              <div className='triangle-up mb-1' />
+              <div>Expected Price</div>
+            </div>
+            <div className={'border border-white rounded-full w-[60px] text-center -mr-4'}>{displayBalance(maxPrice)}</div>
           </div>
         </div>
       </div>

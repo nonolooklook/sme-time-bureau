@@ -6,22 +6,26 @@ import Link from 'next/link'
 
 export const PortfolioAvailable = ({ balance }: { balance: bigint }) => {
   return (
-    <div className={'flex gap-10'}>
-      <Image src={'/demo-1.png'} alt={'demo'} width={300} height={400} />
-      <div className={'flex flex-col'}>
-        <div className='flex text-2xl gap-2 mb-4'>
-          <Image src={'/list.png'} alt={'list'} width={32} height={32} className={'rounded-full'} /> {balance?.toString()}
+    <div>
+      <div
+        className={'w-[360px] max-w-full gap-10 px-10 py-6 border border-gray-700 rounded-2xl bg-gray-700 bg-opacity-20 backdrop-blur-md'}
+      >
+        <div className='flex justify-center'>
+          <Image src={'/capsule-1.png'} alt={'demo'} width={240} height={220} />
         </div>
-        <div className={'text-gray-600'}>Quantity</div>
-        <div className='divider' />
-        <div className='flex text-2xl gap-2 mb-4'>
-          <Image src={'/bid.png'} alt={'list'} width={32} height={32} className={'rounded-full'} />
-          9.32
+        <div className='grid grid-cols-2 gap-4 mt-6'>
+          <div>
+            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>8</div>
+            <div className={'text-gray-400 text-center mt-2'}>Quantity</div>
+          </div>
+          <div>
+            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>$9.32</div>
+            <div className={'text-gray-400 text-center mt-2'}>Real Price</div>
+          </div>
         </div>
-        <div className={'text-gray-600'}>Real-time Fair Price</div>
-        <Link href={'/list'} className={'btn btn-primary w-[200px] mt-auto'}>
-          List for sell
-        </Link>
+        <div className={'flex justify-center mt-4'}>
+          <button className={'btn-primary block mt-2'}>List for sell</button>
+        </div>
       </div>
     </div>
   )

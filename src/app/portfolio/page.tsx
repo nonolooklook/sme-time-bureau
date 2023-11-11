@@ -36,36 +36,45 @@ export default function Portfolio() {
   const { orders: bo } = useUserOrders(true, address ?? '')
 
   return (
-    <>
+    <div
+      className={'relative min-h-screen bg-no-repeat'}
+      style={{ background: 'url(/trade-bg.png)', backgroundSize: '100%', backgroundPosition: 'center center' }}
+    >
       <Header />
 
-      <div className='container mx-auto mt-10 pb-10'>
-        <div className='flex'>
+      <div className='container mx-auto text-white pt-32 pb-24'>
+        <div className='flex gap-8'>
           <div
-            className={`cursor-pointer px-6 rounded-t-lg py-2 ${type === 0 ? 'text-gray-900 bg-primary bg-opacity-5' : ''}`}
+            className={`cursor-pointer px-6 rounded-full border py-2 ${
+              type === 0 ? 'text-primary border-primary' : 'text-white border-white'
+            }`}
             onClick={() => setType(0)}
           >
             Available for listing ({nftBalance?.toString()})
           </div>
           <div
-            className={`cursor-pointer px-6 rounded-t-lg py-2 ${type === 1 ? 'text-gray-900 bg-primary bg-opacity-5' : ''}`}
+            className={`cursor-pointer px-6 rounded-full border py-2 ${
+              type === 1 ? 'text-primary border-primary' : 'text-white border-white'
+            }`}
             onClick={() => setType(1)}
           >
             Listed ({lo?.length})
           </div>
           <div
-            className={`cursor-pointer px-6 rounded-t-lg py-2 ${type === 2 ? 'text-gray-900 bg-primary bg-opacity-5' : ''}`}
+            className={`cursor-pointer px-6 rounded-full border py-2 ${
+              type === 2 ? 'text-primary border-primary' : 'text-white border-white'
+            }`}
             onClick={() => setType(2)}
           >
             My bidding ({bo?.length})
           </div>
         </div>
-        <div className={`bg-primary bg-opacity-5 px-8 pt-8 rounded-2xl ${type === 0 ? 'rounded-tl-sm' : ''}`}>
+        <div className={`pt-8 ${type === 0 ? 'rounded-tl-sm' : ''}`}>
           {type === 0 && <PortfolioAvailable balance={nftBalance ?? 0n} />}
           {type === 1 && <PortfolioListed isBid={false} />}
           {type === 2 && <PortfolioListed isBid={true} />}
         </div>
       </div>
-    </>
+    </div>
   )
 }

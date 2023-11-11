@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 body {
-    @apply bg-gray-50;
+    @apply bg-black;
+    font-family: montserrat, serif;
 }
+
 .nav-item {
     @apply font-semibold text-lg text-[#040914] relative;
 }
@@ -18,7 +20,7 @@ body {
 }
 
 .divider {
-    @apply h-[1px] w-full bg-gray-200 my-4;
+    @apply h-[1px] w-full bg-gray-600 my-4;
 }
 
 .btn {
@@ -30,7 +32,11 @@ body {
 }
 
 .btn-primary {
-    @apply bg-primary rounded-xl py-3 text-white px-4 text-sm;
+    @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center;
+}
+
+.btn-primary:disabled {
+    @apply opacity-50;
 }
 
 .btn-large {
@@ -41,6 +47,10 @@ body {
     @apply border border-solid border-gray-800 rounded-xl py-3 px-4 text-sm;
 }
 
+.dialog-title {
+    @apply text-xl font-semibold;
+}
+
 .dialog-overlay {
     background-color: rgba(0, 0, 0, .3);
     position: fixed;
@@ -49,7 +59,7 @@ body {
 }
 
 .dialog-content {
-    @apply rounded-2xl border border-2 border-gray-800;
+    @apply rounded-2xl border border-2 border-gray-800 h-[700px] max-h-[800px] overflow-auto;
     background-color: white;
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
     position: fixed;
@@ -58,7 +68,6 @@ body {
     transform: translate(-50%, -50%);
     width: 90vw;
     max-width: 450px;
-    max-height: 85vh;
     padding: 25px;
     z-index: 10000000000000;
     animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -85,4 +94,82 @@ button {
 
 .card-shadow {
     box-shadow: 0 0 70px #f0f0f0;
+}
+
+.item {
+    @apply relative;
+}
+
+.item.active {
+    @apply text-primary;
+}
+
+.item.active:after {
+    content: '';
+    background: linear-gradient(270.01deg, #FFAC03 23.25%, rgba(255, 255, 255, 0) 100%, rgba(255, 172, 3, 0) 100%);
+    @apply block h-[1px] w-full  absolute -bottom-[30px];
+}
+
+.capsule-title {
+    @apply text-[40px] font-semibold;
+}
+.capsule-desc {
+    @apply text-white text-opacity-50 text-sm;
+}
+
+.sidebar-item {
+    @apply flex -ml-[10px] items-start cursor-pointer;
+}
+
+.sidebar-item .bar {
+    @apply w-[60px] h-[1px] -ml-6 bg-gradient-to-r from-[#ffffff22] to-[#fff];
+}
+
+.sidebar-item.active {
+    @apply text-primary;
+}
+
+.sidebar-item.active .bar {
+    @apply  bg-gradient-to-r from-[#FFAC0333] to-[#FFAC03];
+}
+
+.trade-card {
+    @apply p-6 border border-gray-600 rounded-xl bg-gray-700 bg-opacity-30 text-sm backdrop-blur-sm;
+}
+
+.dialog-overlay {
+    @apply bg-black bg-opacity-20 backdrop-blur-sm fixed;
+    inset: 0;
+    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialog-content {
+    @apply bg-[#242424] border border-[#484848] rounded-xl fixed text-white;
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 680px;
+    max-width: 800px;
+    max-height: 85vh;
+    padding: 25px;
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.DialogContent:focus {
+    outline: none;
+}
+
+.triangle-up {
+    @apply w-0 h-0 border-l-[6px] border-l-transparent border-b-[8px]  border-r-[6px] border-r-transparent;
+    @apply border-b-white;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
 }

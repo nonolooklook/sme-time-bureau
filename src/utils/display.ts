@@ -12,11 +12,12 @@ export const ellipseAddress = (address: string | null | undefined, width = 4): s
   return `${address.slice(0, width)}...${address.slice(-width)}`
 }
 
-export const displayBalance = (balance: bigint | undefined, toFixed: number = 3): string => {
+export const displayBalance = (balance: bigint | undefined, toFixed: number = 2): string => {
   if (!balance) return '0.000'
   const N = 10 ** toFixed
   return (Math.floor(Number(formatEther(balance)) * N) / N).toLocaleString('en-US', {
     maximumFractionDigits: toFixed,
+    minimumFractionDigits: toFixed,
   })
   // return Number(formatEther(balance)).toLocaleString('en-US', {
   //   maximumFractionDigits: 3,
