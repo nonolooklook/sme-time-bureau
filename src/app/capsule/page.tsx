@@ -6,6 +6,10 @@ import { Bebas_Neue } from 'next/font/google'
 import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
 import { Dot } from '@/components/icons/dot'
+import { useTops } from '@/hooks/useTops'
+import { ellipseAddress } from '@/utils/display'
+import { CircleProgress } from '@/components/CircleProgress'
+import { useCountdown } from '@/hooks/useCountdown'
 
 const bebas = Bebas_Neue({ subsets: ['latin-ext'], weight: '400' })
 
@@ -13,28 +17,21 @@ export default function Page() {
   const [amount, setAmount] = useState('1')
   const [mintCount, setMintCount] = useState(36)
   const [total, setTotal] = useState(100)
-  const lengthClassname = `w-[${(100 * mintCount) / total}%]`
-  const leftClassname = `left-[${(100 * mintCount) / total}%]`
-
   const [scrollPosition, setScrollPosition] = useState(0)
-  const handleScroll = () => {
-    const position = window.pageYOffset
-    setScrollPosition(position)
-  }
 
+  const handleScroll = () => setScrollPosition(window.pageYOffset)
   const scrollTo = useCallback((i: number) => window.scrollTo({ left: 0, top: i === 0 ? 0 : i === 1 ? 660 : 1100, behavior: 'smooth' }), [])
-
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const index = scrollPosition < 660 ? 0 : scrollPosition > 1100 ? 2 : 1
 
-  console.log(scrollPosition)
+  const { tops } = useTops()
+  console.log(tops)
+  const [days, hours, minutes, seconds] = useCountdown(1699867318000)
+  console.log(days, hours, minutes, seconds)
 
   return (
     <div
@@ -72,7 +69,36 @@ export default function Page() {
                   </div>
                 </div>
                 <div>
-                  <div className={'text-gray-200 text-sm'}>• End countdown</div>
+                  <div className={'text-gray-200 text-sm mb-3'}>• End countdown</div>
+                  <div className={'flex gap-2'}>
+                    <CircleProgress ratio={days / 30}>
+                      <div className={'flex flex-col items-center justify-center h-full'}>
+                        <div className={'text-lg -mb-1'}>{days}</div>
+                        <div className={'text-xs text-gray-400'}>DAYS</div>
+                      </div>
+                    </CircleProgress>
+                    <div className={'text-2xl mx-1 mt-3'}>:</div>
+                    <CircleProgress ratio={hours / 24}>
+                      <div className={'flex flex-col items-center justify-center h-full'}>
+                        <div className={'text-lg -mb-1'}>{hours}</div>
+                        <div className={'text-xs text-gray-400'}>HRS</div>
+                      </div>
+                    </CircleProgress>
+                    <div className={'text-2xl mx-1 mt-3'}>:</div>
+                    <CircleProgress ratio={minutes / 60}>
+                      <div className={'flex flex-col items-center justify-center h-full'}>
+                        <div className={'text-lg -mb-1'}>{minutes}</div>
+                        <div className={'text-xs text-gray-400'}>MINS</div>
+                      </div>
+                    </CircleProgress>
+                    <div className={'text-2xl mx-1 mt-3'}>:</div>
+                    <CircleProgress ratio={seconds / 60}>
+                      <div className={'flex flex-col items-center justify-center h-full'}>
+                        <div className={'text-lg -mb-1'}>{seconds}</div>
+                        <div className={'text-xs text-gray-400'}>SECS</div>
+                      </div>
+                    </CircleProgress>
+                  </div>
                 </div>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
@@ -143,7 +169,36 @@ export default function Page() {
               <div className={'capsule-desc mb-8'}>
                 After the event, Stochastic Universe will retrieve all Schrödinger`s Time Capsules at a fixed price, i.e. Time Reset Trade.
               </div>
-              <div className={'text-gray-200 text-sm'}>• End countdown</div>
+              <div className={'text-gray-200 text-sm mb-3'}>• End countdown</div>
+              <div className={'flex gap-2'}>
+                <CircleProgress ratio={0.3}>
+                  <div className={'flex flex-col items-center justify-center h-full'}>
+                    <div className={'text-lg -mb-1'}>03</div>
+                    <div className={'text-xs text-gray-400'}>DAYS</div>
+                  </div>
+                </CircleProgress>
+                <div className={'text-2xl mx-1 mt-3'}>:</div>
+                <CircleProgress ratio={10 / 24}>
+                  <div className={'flex flex-col items-center justify-center h-full'}>
+                    <div className={'text-lg -mb-1'}>10</div>
+                    <div className={'text-xs text-gray-400'}>HRS</div>
+                  </div>
+                </CircleProgress>
+                <div className={'text-2xl mx-1 mt-3'}>:</div>
+                <CircleProgress ratio={42 / 60}>
+                  <div className={'flex flex-col items-center justify-center h-full'}>
+                    <div className={'text-lg -mb-1'}>42</div>
+                    <div className={'text-xs text-gray-400'}>MINS</div>
+                  </div>
+                </CircleProgress>
+                <div className={'text-2xl mx-1 mt-3'}>:</div>
+                <CircleProgress ratio={18 / 60}>
+                  <div className={'flex flex-col items-center justify-center h-full'}>
+                    <div className={'text-lg -mb-1'}>18</div>
+                    <div className={'text-xs text-gray-400'}>SECS</div>
+                  </div>
+                </CircleProgress>
+              </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
                 • Used: {mintCount} / {total}
               </div>
@@ -178,10 +233,10 @@ export default function Page() {
               <div className={'bg-black bg-opacity-70 px-6 py-4 rounded-2xl'}>
                 <div className={'text-[20px] mb-4'}>Top 10 winnings</div>
                 <div className='flex flex-col gap-2'>
-                  {Array.from(Array(10)).map((i) => (
-                    <div className={'bg-white bg-opacity-10 px-3 py-1 flex items-center justify-between'} key={i}>
-                      0x22222..222222
-                      <div className={'text-primary'}>$23.45</div>
+                  {tops?.map((top) => (
+                    <div className={'bg-white bg-opacity-10 px-3 py-1 flex items-center justify-between'} key={top.orderHash}>
+                      {ellipseAddress(top?.orderHash, 6)}
+                      <div className={'text-primary'}>${top?.price}</div>
                     </div>
                   ))}
                 </div>

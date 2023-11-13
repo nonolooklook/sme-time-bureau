@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { sepolia } from 'viem/chains'
@@ -18,8 +18,12 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useAccount } from 'wagmi'
 import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
+import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { FetcherContext } from '@/contexts/FetcherContext'
+import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
+  const { collateralBalance } = useContext(FetcherContext)
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -113,8 +117,8 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
-        <Dialog.Content className='dialog-content'>
-          <div className='flex items-center justify-between mb-6'>
+        <Dialog.Content className='dialog-content w-[660px]'>
+          <div className='flex items-center justify-between mb-4'>
             <div className='dialog-title'>Time-Weaving Privilege Trade</div>
             <Dialog.Close asChild>
               <button className='IconButton' aria-label='Close'>
@@ -122,30 +126,14 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               </button>
             </Dialog.Close>
           </div>
-          <div className='flex bg-[#282828] rounded-xl px-8 py-4 gap-4'>
-            <Image src={'/capsule-1.png'} alt={'capsule'} width={50} height={100} />
-            <div className={'w-full text-gray-300'}>
-              <div className={'text-lg font-light flex items-center justify-between mb-2'}>
-                Schrödinger`s time capsules
-                <div className='flex text-2xl font-semibold ml-auto gap-1'>
-                  <Image src={'/usdc.svg'} alt={'usdc'} width={28} height={28} />
-                  9.32
-                </div>
-              </div>
-              <div className={'text-lg font-light flex items-center justify-between'}>
-                Stochastic Universe
-                <div>Market price</div>
-              </div>
-            </div>
-          </div>
-
+          <CapsuleCard />
           <div className={'mt-6 mb-4'}>Get rewards from Time-Weaving</div>
           <div className='flex flex-col gap-4'>
             <div className='border border-gray-600 rounded-2xl p-4'>
               <div className='flex justify-between items-center'>
                 <div>
                   <div className={'text-2xl'}>Common</div>
-                  <div className={'flex items-end'}>
+                  <div className={'flex items-center'}>
                     Probability：<div className={'text-2xl'}>99.98%</div>
                   </div>
                 </div>
@@ -156,7 +144,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               <div className='flex justify-between items-center'>
                 <div>
                   <div className={'text-2xl'}>Epic</div>
-                  <div className={'flex items-end'}>
+                  <div className={'flex items-center'}>
                     Probability：<div className={'text-2xl'}>0.1%</div>
                   </div>
                 </div>
@@ -167,7 +155,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               <div className='flex justify-between items-center'>
                 <div>
                   <div className={'text-2xl'}>Legendary</div>
-                  <div className={'flex items-end'}>
+                  <div className={'flex items-center'}>
                     Probability：<div className={'text-2xl'}>0.01%</div>
                   </div>
                 </div>
@@ -175,21 +163,20 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               </div>
             </div>
           </div>
-          <div className='flex justify-center mb-6 mt-6'>
-            <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>9</div>
+          <div className='px-10'>
+            <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6 mt-6'>
+              <div>Quantity</div>
+              <InputWithButton amount={amount} setAmount={setAmount} />
+              <div>20 USDC</div>
+            </div>
+            <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
+              <div className={'text-white'}>Total price maximum: 2020 USDC</div>
+              Transaction fees: 0.5%
+            </div>
           </div>
-          <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
-            <div>Quantity</div>
-            <InputWithButton amount={amount} setAmount={setAmount} />
-            <div>20 USDC</div>
-          </div>
-          <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
-            <div className={'text-white'}>Authorization required for 20 USDC</div>
-            USDC Balance: 2980
-          </div>
-          <div className='flex justify-center'>
+          <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={false}>
-              Buy
+              Trade
             </button>
           </div>
 
@@ -210,9 +197,9 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                   backBtn={<></>}
                   continueBtn={<div ref={ref} />}
                   submitBtn={<></>}
-                  fillStroke={'#000'}
-                  activeColor={'#000'}
-                  activeProgressBorder={'#000'}
+                  fillStroke={'#FFAC03'}
+                  activeColor={'#FFAC03'}
+                  activeProgressBorder={'#FFAC03'}
                   contentBoxClassName={'text-sm text-center mb-10'}
                 >
                   <div className={'mt-10 flex items-center gap-2 justify-center'}>

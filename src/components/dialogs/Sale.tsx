@@ -5,6 +5,7 @@ import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
 import { useState } from 'react'
+import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
 export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any }) => {
   const [min, setMin] = useState<`${number}`>('8')
@@ -15,7 +16,7 @@ export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any })
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
-        <Dialog.Content className='dialog-content'>
+        <Dialog.Content className='dialog-content w-[660px]'>
           <div className='flex items-center justify-between mb-6'>
             <div className='dialog-title'>Approve sale</div>
             <Dialog.Close asChild>
@@ -24,22 +25,7 @@ export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any })
               </button>
             </Dialog.Close>
           </div>
-          <div className='flex bg-[#282828] rounded-xl px-8 py-4 gap-4'>
-            <Image src={'/capsule-1.png'} alt={'capsule'} width={50} height={100} />
-            <div className={'w-full text-gray-300'}>
-              <div className={'text-lg font-light flex items-center justify-between mb-2'}>
-                Schrödinger`s time capsules
-                <div className='flex text-2xl font-semibold ml-auto gap-1'>
-                  <Image src={'/usdc.svg'} alt={'usdc'} width={28} height={28} />
-                  9.32
-                </div>
-              </div>
-              <div className={'text-lg font-light flex items-center justify-between'}>
-                Stochastic Universe
-                <div>Market price</div>
-              </div>
-            </div>
-          </div>
+          <CapsuleCard />
 
           <div className={'-mt-6'}>
             <BetaD3Chart minPrice={parseEther(min)} expectedPrice={parseEther('9')} maxPrice={parseEther(max)} />
@@ -56,7 +42,7 @@ export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any })
             <div className={'text-white'}>Total price maximum: 20 USDC</div>
             Transaction fees：0.5%
           </div>
-          <div className='flex justify-center'>
+          <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'}>Accept</button>
           </div>
         </Dialog.Content>

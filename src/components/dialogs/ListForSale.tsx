@@ -19,6 +19,7 @@ import { Spinner } from '@/components/Spinner'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { displayBalance } from '@/utils/display'
 import { calculateMidPriceFromBigInt } from '@/utils/price'
+import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
 export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }) => {
   const { nftBalance } = useContext(FetcherContext)
@@ -90,7 +91,7 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
-        <Dialog.Content className='dialog-content'>
+        <Dialog.Content className='dialog-content w-[660px]'>
           <div className='flex items-center justify-between mb-6'>
             <div className='dialog-title'>List NFT</div>
             <Dialog.Close asChild>
@@ -99,22 +100,7 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
               </button>
             </Dialog.Close>
           </div>
-          <div className='flex bg-[#282828] rounded-xl px-8 py-4 gap-4'>
-            <Image src={'/capsule-1.png'} alt={'capsule'} width={50} height={100} />
-            <div className={'w-full text-gray-300'}>
-              <div className={'text-lg font-light flex items-center justify-between mb-2'}>
-                Schrödinger`s time capsules
-                <div className='flex text-2xl font-semibold ml-auto gap-1'>
-                  <Image src={'/usdc.svg'} alt={'usdc'} width={28} height={28} />
-                  9.32
-                </div>
-              </div>
-              <div className={'text-lg font-light flex items-center justify-between'}>
-                Stochastic Universe
-                <div>Market price</div>
-              </div>
-            </div>
-          </div>
+          <CapsuleCard />
 
           <div className={'-mt-6'}>
             <BetaD3Chart minPrice={parseEther(min)} expectedPrice={parseEther('9')} maxPrice={parseEther(max)} />
@@ -150,7 +136,7 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
             <div>Max({nftBalance?.toString()})</div>
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>Transaction fees: 0.5%</div>
-          <div className='flex justify-center'>
+          <div className='flex justify-center my-4'>
             <button className={'btn-primary w-[100px]'} disabled={loading} onClick={createOrder}>
               {loading && <Spinner />}
               List

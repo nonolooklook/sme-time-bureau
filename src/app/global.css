@@ -33,6 +33,7 @@ body {
 
 .btn-primary {
     @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center;
+    box-shadow: 0px 8px 30px 0px rgba(255, 172, 3, 0.4);
 }
 
 .btn-primary:disabled {
@@ -59,33 +60,26 @@ body {
 }
 
 .dialog-content {
-    @apply rounded-2xl border border-2 border-gray-800 h-[700px] max-h-[800px] overflow-auto;
-    background-color: white;
+    @apply max-w-[700px] max-h-[700px];
+    @apply bg-[#242424] border border-[#484848] rounded-xl fixed text-white p-5 overflow-auto z-50;
+    @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-[46%];
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw;
-    max-width: 450px;
-    padding: 25px;
-    z-index: 10000000000000;
     animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.DialogContent:focus {
+    outline: none;
 }
 .dialog-content:focus {
     outline: none;
 }
 
-.CheckboxRoot {
-    @apply w-[14px] h-[14px] rounded-md flex items-center justify-center cursor-pointer;
+.checkbox-root {
+    @apply w-[20px] h-[20px] rounded-md flex items-center justify-center cursor-pointer;
     border: 1px solid #999;
 }
-.CheckboxRoot:hover {
-    background-color: #f0f0f0;
-}
 
-.CheckboxIndicator {
-    color: #000;
+.checkbox-indicator {
+    @apply text-gray-400;
 }
 
 button {
@@ -143,22 +137,6 @@ button {
     animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dialog-content {
-    @apply bg-[#242424] border border-[#484848] rounded-xl fixed text-white;
-    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 680px;
-    max-width: 800px;
-    max-height: 85vh;
-    padding: 25px;
-    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.DialogContent:focus {
-    outline: none;
-}
-
 .triangle-up {
     @apply w-0 h-0 border-l-[6px] border-l-transparent border-b-[8px]  border-r-[6px] border-r-transparent;
     @apply border-b-white;
@@ -172,4 +150,31 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
     -moz-appearance: textfield; /* Firefox */
+}
+
+::-webkit-scrollbar {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #a0a0a0;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar {
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+    height: 50px;
+}
+
+.index-scroll div {
+    @apply transition-all duration-300;
+}
+.index-scroll .active {
+    @apply text-[22px] text-white;
 }
