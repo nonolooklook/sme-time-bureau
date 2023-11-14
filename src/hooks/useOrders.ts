@@ -9,8 +9,11 @@ export const useOrders = (isBid: boolean): { orders: any[]; mutate: any; isLoadi
   const url = `/orders?type=${isBid ? 2 : 1}`
   const { data, mutate, error, isLoading } = useSWR({ url, isBid: isBid }, fetcher)
 
+  let orders = data?.data
+  if (!orders) return { orders: [], mutate, isLoading }
+
   return {
-    orders: data?.data,
+    orders: isBid ? orders : [...orders]?.reverse(),
     mutate,
     isLoading,
   }

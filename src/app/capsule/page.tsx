@@ -1,7 +1,7 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Bebas_Neue } from 'next/font/google'
 import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
@@ -10,12 +10,16 @@ import { useTops } from '@/hooks/useTops'
 import { ellipseAddress } from '@/utils/display'
 import { CircleProgress } from '@/components/CircleProgress'
 import { useCountdown } from '@/hooks/useCountdown'
-
-const bebas = Bebas_Neue({ subsets: ['latin-ext'], weight: '400' })
+import { parseEther, parseUnits } from 'viem'
+import { FetcherContext } from '@/contexts/FetcherContext'
+import { useMint } from '@/hooks/useMint'
+import { Spinner } from '@/components/Spinner'
+import { toast } from 'sonner'
+import { useApprove } from '@/hooks/useApprove'
 
 export default function Page() {
+  const { mintedCount, allowance4nft } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
-  const [mintCount, setMintCount] = useState(36)
   const [total, setTotal] = useState(100)
   const [scrollPosition, setScrollPosition] = useState(0)
 
@@ -29,9 +33,10 @@ export default function Page() {
   const index = scrollPosition < 660 ? 0 : scrollPosition > 1100 ? 2 : 1
 
   const { tops } = useTops()
-  console.log(tops)
   const [days, hours, minutes, seconds] = useCountdown(1699867318000)
-  console.log(days, hours, minutes, seconds)
+  const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint succesffuly'))
+  const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
+  const { approve, isApproveLoading } = useApprove(() => {})
 
   return (
     <div
@@ -102,23 +107,36 @@ export default function Page() {
                 </div>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Used: {mintCount} / {total}
+                • Used: {mintedCount} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(mintCount / total) * 100}%` }}
+                  style={{ width: `${(mintedCount / total) * 100}%` }}
                 ></div>
                 <div
                   className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(mintCount / total) * 100}%` }}
+                  style={{ left: `${(mintedCount / total) * 100}%` }}
                 />
               </div>
               <div className='flex gap-10'>
                 <InputWithButton amount={amount} setAmount={setAmount} />
-                <button className={'bg-primary rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl'}>
-                  Mint
-                </button>
+                {shouldApprove && (
+                  <button className={'btn-primary w-[120px]'} onClick={approve} disabled={!approve || isApproveLoading}>
+                    {isApproveLoading && <Spinner />}
+                    Approve
+                  </button>
+                )}
+                {!shouldApprove && (
+                  <button
+                    className={'btn-primary w-[120px]'}
+                    onClick={mint}
+                    disabled={!mint || isMintLoading || parseUnits(amount as `${number}`, 0) > 5}
+                  >
+                    {isMintLoading && <Spinner />}
+                    Mint
+                  </button>
+                )}
               </div>
             </div>
             <div className={'w-[260px] grow shrink-0 pl-14'}>
@@ -200,16 +218,16 @@ export default function Page() {
                 </CircleProgress>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Used: {mintCount} / {total}
+                • Used: {mintedCount} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(mintCount / total) * 100}%` }}
+                  style={{ width: `${(mintedCount / total) * 100}%` }}
                 ></div>
                 <div
                   className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(mintCount / total) * 100}%` }}
+                  style={{ left: `${(mintedCount / total) * 100}%` }}
                 />
               </div>
               <div className='flex gap-10 items-center'>

@@ -21,7 +21,7 @@ import { displayBalance } from '@/utils/display'
 import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
-export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }) => {
+export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const { nftBalance } = useContext(FetcherContext)
   const signer = useEthersSigner()
   const { address } = useAccount()
@@ -31,7 +31,8 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
   const [amount, setAmount] = useState('1')
 
   const createOrder = useCallback(async () => {
-    if (min >= max) {
+    if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
+      console.log(min, max)
       toast.error('Min price can`t be greater than max price')
       return
     }
@@ -80,6 +81,9 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
           type: 1,
         }),
       }).catch((e) => console.error(e))
+      toast.success('List successfully')
+      mutate?.()
+      onChange?.(false)
     } catch (e: any) {
       console.error(e)
       toast.error(e?.toString())
@@ -95,7 +99,7 @@ export const ListForSale = ({ open, onChange }: { open: boolean; onChange: any }
           <div className='flex items-center justify-between mb-6'>
             <div className='dialog-title'>List NFT</div>
             <Dialog.Close asChild>
-              <button className='IconButton' aria-label='Close'>
+              <button className='IconButton cursor-pointer' aria-label='Close'>
                 <Cross2Icon />
               </button>
             </Dialog.Close>

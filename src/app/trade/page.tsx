@@ -12,6 +12,8 @@ import { useOrders } from '@/hooks/useOrders'
 import { calculateMidPrice } from '@/utils/price'
 import { parseUnits } from 'viem'
 import { displayBalance } from '@/utils/display'
+import * as HoverCard from '@radix-ui/react-hover-card'
+import Cookies from 'ts-cookies'
 
 export default function Page() {
   const [openBid, setOpenBid] = useState(false)
@@ -19,10 +21,11 @@ export default function Page() {
 
   const [openBuy, setOpenBuy] = useState(false)
   const [openSale, setOpenSale] = useState(false)
+  const [selected, setSelected] = useState<any>({ min: '8', max: '10', mid: '9', count: 1 })
 
-  const { orders: listOrders } = useOrders(false)
-  const { orders: bidOrders } = useOrders(true)
-  console.log(listOrders)
+  const { orders: listOrders, mutate: mutateList } = useOrders(false)
+  const { orders: bidOrders, mutate: mutateBid } = useOrders(true)
+  const [index, setIndex] = useState(0)
 
   return (
     <div
@@ -30,8 +33,8 @@ export default function Page() {
       style={{ background: 'url(/trade-bg.png)', backgroundSize: '100%', backgroundPosition: 'center center' }}
     >
       <Header />
-      <BuyDialog open={openBuy} onChange={setOpenBuy} />
-      <SaleDialog open={openSale} onChange={setOpenSale} />
+      <BuyDialog open={openBuy} onChange={setOpenBuy} selected={selected} />
+      <SaleDialog open={openSale} onChange={setOpenSale} selected={selected} />
 
       <div className={'container mx-auto text-white pt-40 pb-36'}>
         <div className='flex items-center'>
@@ -66,15 +69,49 @@ export default function Page() {
                   const wc = `${50n * count}px`
 
                   return (
-                    <div className={'relative py-1'} key={order?.hash} onClick={() => setOpenBuy(true)}>
-                      <div className='grid grid-cols-4 text-gray-200'>
-                        <div>{count?.toString()}</div>
-                        <div className={'text-center'}>${displayBalance(parseUnits(maxP, 0) / count)}</div>
-                        <div className={'text-center'}>${displayBalance(parseUnits(minP, 0) / count)}</div>
-                        <div className={'text-right pr-2'}>${displayBalance(realMid)}</div>
-                      </div>
-                      <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
-                    </div>
+                    <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
+                      <HoverCard.Trigger asChild>
+                        <div
+                          className={'relative py-1 cursor-pointer'}
+                          key={order?.hash}
+                          onClick={() => {
+                            setOpenBuy(true)
+                            setSelected({
+                              min: displayBalance(parseUnits(minP, 0) / count),
+                              max: displayBalance(parseUnits(maxP, 0) / count),
+                              mid: displayBalance(realMid),
+                              count: count?.toString(),
+                              order: order,
+                            })
+                          }}
+                        >
+                          <div className='grid grid-cols-4 text-gray-200'>
+                            <div>{count?.toString()}</div>
+                            <div className={'text-center'}>${displayBalance(parseUnits(maxP, 0) / count)}</div>
+                            <div className={'text-center'}>${displayBalance(parseUnits(minP, 0) / count)}</div>
+                            <div className={'text-right pr-2'}>${displayBalance(realMid)}</div>
+                          </div>
+                          <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
+                        </div>
+                      </HoverCard.Trigger>
+                      <HoverCard.Portal>
+                        <HoverCard.Content
+                          className={`bg-white p-4 rounded-2xl ${Cookies.get('trade-tutorial') === 'true' ? 'hidden' : ''}`}
+                        >
+                          <HoverCard.Arrow />
+                          <div className={'text-center'}>Click on the order to trade</div>
+                          <div
+                            className={'text-center underline cursor-pointer'}
+                            onClick={() => {
+                              Cookies.set('trade-tutorial', 'true')
+                              setIndex(index + 1)
+                            }}
+                          >
+                            Got it
+                          </div>
+                        </HoverCard.Content>
+                      </HoverCard.Portal>
+                    </HoverCard.Root>
                   )
                 })}
               </div>
@@ -82,7 +119,7 @@ export default function Page() {
                 <button className={'btn-primary mt-8 w-[160px] opacity-90 cursor-pointer'} onClick={() => setOpenBid(true)}>
                   Place a bid
                 </button>
-                <PlaceABid open={openBid} onChange={setOpenBid} />
+                <PlaceABid open={openBid} onChange={setOpenBid} mutate={mutateBid} />
               </div>
             </div>
           </div>
@@ -109,15 +146,48 @@ export default function Page() {
                   const wc = `${50n * count}px`
 
                   return (
-                    <div className={'relative py-1'} onClick={() => setOpenSale(true)} key={order?.hash}>
-                      <div className='grid grid-cols-4 text-gray-200'>
-                        <div className={'pl-2'}>${displayBalance(realMid)}</div>
-                        <div className={'text-center'}>${displayBalance(parseUnits(minp, 0) / count)}</div>
-                        <div className={'text-center'}>${displayBalance(parseUnits(maxp, 0) / count)}</div>
-                        <div className={'text-right'}>{count?.toString()}</div>
-                      </div>
-                      <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
-                    </div>
+                    <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
+                      <HoverCard.Trigger asChild>
+                        <div
+                          className={'relative py-1 cursor-pointer'}
+                          onClick={() => {
+                            setOpenSale(true)
+                            setSelected({
+                              min: displayBalance(parseUnits(minp, 0) / count),
+                              max: displayBalance(parseUnits(maxp, 0) / count),
+                              mid: displayBalance(realMid),
+                              count: count?.toString(),
+                            })
+                          }}
+                          key={order?.hash}
+                        >
+                          <div className='grid grid-cols-4 text-gray-200'>
+                            <div className={'pl-2'}>${displayBalance(realMid)}</div>
+                            <div className={'text-center'}>${displayBalance(parseUnits(minp, 0) / count)}</div>
+                            <div className={'text-center'}>${displayBalance(parseUnits(maxp, 0) / count)}</div>
+                            <div className={'text-right'}>{count?.toString()}</div>
+                          </div>
+                          <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
+                        </div>
+                      </HoverCard.Trigger>
+                      <HoverCard.Portal>
+                        <HoverCard.Content
+                          className={`bg-white p-4 rounded-2xl ${Cookies.get('trade-tutorial') === 'true' ? 'hidden' : ''}`}
+                        >
+                          <HoverCard.Arrow />
+                          <div className={'text-center'}>Click on the order to trade</div>
+                          <div
+                            className={'text-center underline cursor-pointer'}
+                            onClick={() => {
+                              Cookies.set('trade-tutorial', 'true')
+                              setIndex(index + 1)
+                            }}
+                          >
+                            Got it
+                          </div>
+                        </HoverCard.Content>
+                      </HoverCard.Portal>
+                    </HoverCard.Root>
                   )
                 })}
               </div>
@@ -125,7 +195,7 @@ export default function Page() {
                 <button className={'btn-primary mt-8 w-[160px] opacity-90 cursor-pointer'} onClick={() => setOpenList(true)}>
                   List for sale
                 </button>
-                <ListForSale open={openList} onChange={setOpenList} />
+                <ListForSale open={openList} onChange={setOpenList} mutate={mutateList} />
               </div>
             </div>
           </div>

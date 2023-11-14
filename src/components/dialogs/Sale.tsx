@@ -4,14 +4,13 @@ import Image from 'next/image'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
-export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any }) => {
-  const [min, setMin] = useState<`${number}`>('8')
-  const [max, setMax] = useState<`${number}`>('10')
-
+export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const [amount, setAmount] = useState('1')
+  useEffect(() => setAmount(selected?.count?.toString()), [selected])
+
   return (
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
@@ -28,10 +27,16 @@ export const SaleDialog = ({ open, onChange }: { open: boolean; onChange: any })
           <CapsuleCard />
 
           <div className={'-mt-6'}>
-            <BetaD3Chart minPrice={parseEther(min)} expectedPrice={parseEther('9')} maxPrice={parseEther(max)} />
+            <BetaD3Chart
+              minPrice={parseEther(selected?.min)}
+              expectedPrice={parseEther(selected?.mid)}
+              maxPrice={parseEther(selected?.max)}
+            />
           </div>
           <div className='flex justify-center mb-6'>
-            <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>9</div>
+            <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
+              {selected?.mid}
+            </div>
           </div>
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>

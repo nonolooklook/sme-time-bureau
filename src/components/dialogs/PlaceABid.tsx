@@ -21,7 +21,7 @@ import { useAccount } from 'wagmi'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
-export const PlaceABid = ({ open, onChange }: { open: boolean; onChange: any }) => {
+export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
   const { collateralBalance } = useContext(FetcherContext)
   const { address } = useAccount()
@@ -75,7 +75,10 @@ export const PlaceABid = ({ open, onChange }: { open: boolean; onChange: any }) 
           entry: order,
           type: 2,
         }),
-      }).catch((e) => console.error(e))
+      })
+      toast.success('Place a bid successfully')
+      mutate?.()
+      onChange?.(false)
     } catch (e) {
       console.error(e)
       toast.error(e?.toString())
