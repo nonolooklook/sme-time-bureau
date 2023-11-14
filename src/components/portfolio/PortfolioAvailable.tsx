@@ -3,8 +3,19 @@ import { Address, useAccount, useContractReads } from 'wagmi'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import Link from 'next/link'
+import { useContext, useState } from 'react'
+import { FetcherContext } from '@/contexts/FetcherContext'
+import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 
-export const PortfolioAvailable = ({ balance }: { balance: bigint }) => {
+export const PortfolioAvailable = () => {
+  const { nftBalance, listedCount, bidCount } = useContext(FetcherContext)
+  const { orders } = useOrderDistribution()
+
+  const minPrice = orders?.minPrice ?? 0
+  const maxPrice = orders?.maxPrice ?? 0
+
+  const mid = Math.round((minPrice + maxPrice) * 50) / 100
+
   return (
     <div>
       <div
@@ -15,16 +26,20 @@ export const PortfolioAvailable = ({ balance }: { balance: bigint }) => {
         </div>
         <div className='grid grid-cols-2 gap-4 mt-6'>
           <div>
-            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>8</div>
+            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>
+              {nftBalance - listedCount}
+            </div>
             <div className={'text-gray-400 text-center mt-2'}>Quantity</div>
           </div>
           <div>
-            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>$9.32</div>
+            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>${mid}</div>
             <div className={'text-gray-400 text-center mt-2'}>Real Price</div>
           </div>
         </div>
         <div className={'flex justify-center mt-4'}>
-          <button className={'btn-primary block mt-2'}>List for sell</button>
+          <Link href={'/trade?type=list'} className={'btn-primary block mt-2'}>
+            List for sell
+          </Link>
         </div>
       </div>
     </div>

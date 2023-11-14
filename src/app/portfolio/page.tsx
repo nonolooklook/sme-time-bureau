@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/Header'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
@@ -14,26 +14,11 @@ import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { displayBalance } from '@/utils/display'
 import { useUserOrders } from '@/hooks/useUserOrders'
+import { FetcherContext } from '@/contexts/FetcherContext'
 
 export default function Portfolio() {
+  const { nftBalance, listedCount, bidCount } = useContext(FetcherContext)
   const [type, setType] = useState(0)
-  const { address } = useAccount()
-  const { data } = useContractReads({
-    contracts: [
-      {
-        address: NFTContractAddress,
-        abi: ERC1155ABI,
-        functionName: 'balanceOf',
-        args: [address as Address, 0n],
-      },
-    ],
-    watch: true,
-  })
-
-  const nftBalance = data?.[0]?.result
-
-  const { orders: lo } = useUserOrders(false, address ?? '')
-  const { orders: bo } = useUserOrders(true, address ?? '')
 
   return (
     <div
@@ -50,7 +35,7 @@ export default function Portfolio() {
             }`}
             onClick={() => setType(0)}
           >
-            Available for listing ({nftBalance?.toString()})
+            Available for listing ({(nftBalance - listedCount).toString()})
           </div>
           <div
             className={`cursor-pointer px-6 rounded-full border py-2 ${
@@ -58,7 +43,7 @@ export default function Portfolio() {
             }`}
             onClick={() => setType(1)}
           >
-            Listed ({lo?.length})
+            Listed ({listedCount})
           </div>
           <div
             className={`cursor-pointer px-6 rounded-full border py-2 ${
@@ -66,11 +51,11 @@ export default function Portfolio() {
             }`}
             onClick={() => setType(2)}
           >
-            My bidding ({bo?.length})
+            My bidding ({bidCount})
           </div>
         </div>
         <div className={`pt-8 ${type === 0 ? 'rounded-tl-sm' : ''}`}>
-          {type === 0 && <PortfolioAvailable balance={nftBalance ?? 0n} />}
+          {type === 0 && <PortfolioAvailable />}
           {type === 1 && <PortfolioListed isBid={false} />}
           {type === 2 && <PortfolioListed isBid={true} />}
         </div>

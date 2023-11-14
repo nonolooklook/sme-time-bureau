@@ -1,9 +1,4 @@
-import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import { displayBalance } from '@/utils/display'
-import { parseUnits } from 'viem'
-import exp from 'constants'
-import { useCancelList } from '@/hooks/useCancelList'
 import { PortfolioListItem } from '@/components/portfolio/PortfolioListItem'
 import { useUserOrders } from '@/hooks/useUserOrders'
 

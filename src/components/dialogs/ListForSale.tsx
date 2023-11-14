@@ -22,13 +22,15 @@ import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 
 export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
-  const { nftBalance } = useContext(FetcherContext)
+  const { nftBalance, listedCount } = useContext(FetcherContext)
   const signer = useEthersSigner()
   const { address } = useAccount()
   const [min, setMin] = useState<`${number}`>('8')
   const [max, setMax] = useState<`${number}`>('10')
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState('1')
+
+  const enabled = Number(amount) <= nftBalance - listedCount
 
   const createOrder = useCallback(async () => {
     if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
@@ -137,11 +139,11 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
-            <div>Max({nftBalance?.toString()})</div>
+            <div>Max({nftBalance - listedCount})</div>
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>Transaction fees: 0.5%</div>
           <div className='flex justify-center my-4'>
-            <button className={'btn-primary w-[100px]'} disabled={loading} onClick={createOrder}>
+            <button className={'btn-primary w-[100px]'} disabled={loading || !enabled} onClick={createOrder}>
               {loading && <Spinner />}
               List
             </button>

@@ -2,7 +2,17 @@ import React, { useState } from 'react'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 
-export const PriceChart = () => {
+export const PriceChart = ({
+  selectedPrice,
+  selectedIsBid,
+  setSelectedIsBid,
+  setSelectedPrice,
+}: {
+  selectedPrice: number
+  selectedIsBid: boolean
+  setSelectedIsBid: any
+  setSelectedPrice: any
+}) => {
   const { orders } = useOrderDistribution()
   const [open, setOpen] = useState(false)
 
@@ -34,26 +44,50 @@ export const PriceChart = () => {
       })
     }
   }
-  console.log(maxValue)
 
   const step = maxValue / 5
   const values = Array.from({ length: 6 }, (_, index) => Math.round(index * step * 100) / 100).reverse()
-  console.log(values)
 
   return (
     <>
       <PrivilegeTrade open={open} onChange={setOpen} />
       <div className='flex'>
-        <div className={'w-[60px] flex flex-col justify-between pb-6 text-gray-400 text-xs'}>{values?.map((v) => <div>{v}</div>)}</div>
+        <div className={'w-[60px] flex flex-col justify-between pb-6 text-gray-400 text-xs'}>
+          {values?.map((v) => <div key={v}>{v}</div>)}
+        </div>
         <div className={'grow'}>
           <div className='flex'>
             {data?.map((d, i) => (
               <div className={'w-[3.3%] grid grid-cols-2'} key={i}>
-                <div className={'flex gap-1 flex-col-reverse cursor-pointer'} onClick={() => setOpen(true)}>
-                  {d.bidAmount > 0 && Array.from(Array(d.bidAmount)).map((i) => <div className={'h-[3px] w-full bg-green-400'} key={i} />)}
+                <div
+                  className={`flex gap-1 flex-col-reverse cursor-pointer`}
+                  onClick={() => {
+                    setSelectedPrice(d.price)
+                    setSelectedIsBid(true)
+                  }}
+                >
+                  {d.bidAmount > 0 &&
+                    Array.from(Array(d.bidAmount)).map((i) => (
+                      <div
+                        className={`h-[3px] w-full ${selectedIsBid && selectedPrice === d.price ? 'bg-green-50' : 'bg-green-400'}`}
+                        key={i}
+                      />
+                    ))}
                 </div>
-                <div className={'flex flex-col-reverse gap-1 cursor-pointer'}>
-                  {d.listAmount > 0 && Array.from(Array(d.listAmount)).map((i) => <div className={'h-[2px] w-full bg-red-400'} key={i} />)}
+                <div
+                  className={'flex flex-col-reverse gap-1 cursor-pointer'}
+                  onClick={() => {
+                    setSelectedPrice(d.price)
+                    setSelectedIsBid(false)
+                  }}
+                >
+                  {d.listAmount > 0 &&
+                    Array.from(Array(d.listAmount)).map((i) => (
+                      <div
+                        className={`h-[2px] w-full ${!selectedIsBid && selectedPrice === d.price ? 'bg-red-50' : 'bg-red-400'}`}
+                        key={i}
+                      />
+                    ))}
                 </div>
               </div>
             ))}
