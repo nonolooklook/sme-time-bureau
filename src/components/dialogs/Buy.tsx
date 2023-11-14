@@ -35,40 +35,41 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
   const [wrongMsg, setWrongMsg] = useState('')
   useEffect(() => setAmount(selected?.count?.toString()), [selected])
 
-  const fillBidOrder = async () => {
+  const fillSellOrder = async () => {
     try {
       if (!signer) return
-      setO(true)
       const seaport = new Seaport(signer, {
         overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
+      setO(true)
       const order = selected?.order
-      const offerAmount = order.entry?.parameters?.consideration?.[0].endAmount
-      const startItemAmount = order.entry?.parameters?.offer?.[0].startAmount
-      const endItemAmount = order?.entry?.parameters?.offer?.[0].endAmount
-
+      const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount
+      const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0xd445b75f9b129e90d8eca89df86fe8a27b805460aaaaaaaaaaaaaaaaaaaaaaaa',
+        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         offer: [
           {
-            itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
-            identifier: '0',
             amount: offerAmount.toString(),
-          },
-        ],
-        consideration: [
-          {
-            amount: startItemAmount.toString(),
-            endAmount: endItemAmount.toString(),
+            endAmount: offerAmount.toString(),
             token: ERC20_ADDRESS[sepolia.id],
             recipient: address,
           },
         ],
+        consideration: [
+          {
+            itemType: ItemType.ERC1155,
+            token: NFTContractAddress,
+            identifier: '0',
+            amount: itemAmount.toString(),
+          },
+        ],
+        extraData: '0x',
+        numeratror: 1,
+        denominator: 1,
       }
 
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
@@ -89,6 +90,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         })
       }
 
+      console.log(order.entry)
+      console.log(finalOrder)
       await sleep(2000)
       ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
@@ -99,8 +102,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         body: JSON.stringify({
           randomNumberCount: 1,
           randomStrategy: 0,
-          takerOrders: [order],
-          makerOrders: order?.entry,
+          takerOrders: [finalOrder],
+          makerOrders: [order?.entry],
           modeOrderFulfillments: modeOrderFulfillments,
         }),
       }).then((r) => r.json())
@@ -121,8 +124,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       }, 5000)
     } catch (e: any) {
       console.error(e)
-      toast.error(e.toString())
       setO(false)
+      toast.error(e.toString())
     }
 
     setLoading(false)
@@ -169,9 +172,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
               USDC Balance: {displayBalance(collateralBalance)}
             </div>
             <div className='flex justify-center mb-4 mt-6'>
-              <button className={'btn-primary w-[100px]'} onClick={fillBidOrder}>
-                Buy
-              </button>
+              <button className={'btn-primary w-[100px]'}>Buy</button>
             </div>
           </Dialog.Content>
         </Dialog.Portal>

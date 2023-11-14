@@ -78,7 +78,7 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
         body: JSON.stringify({
           hash: hash,
           entry: order,
-          type: 1,
+          type: 2,
         }),
       }).catch((e) => console.error(e))
       toast.success('List successfully')

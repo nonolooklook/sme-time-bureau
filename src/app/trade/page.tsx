@@ -75,7 +75,7 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           key={order?.hash}
                           onClick={() => {
-                            setOpenBuy(true)
+                            setOpenSale(true)
                             setSelected({
                               min: displayBalance(parseUnits(minP, 0) / count),
                               max: displayBalance(parseUnits(maxP, 0) / count),
@@ -151,7 +151,7 @@ export default function Page() {
                         <div
                           className={'relative py-1 cursor-pointer'}
                           onClick={() => {
-                            setOpenSale(true)
+                            setOpenBuy(true)
                             setSelected({
                               min: displayBalance(parseUnits(minp, 0) / count),
                               max: displayBalance(parseUnits(maxp, 0) / count),

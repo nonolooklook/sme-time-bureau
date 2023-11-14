@@ -1,12 +1,12 @@
 import useSWR from 'swr'
 
 const fetcher = async ({ url, isBid }: any) => {
-  let res = await fetch(`https://sme-demo.mcglobal.ai/order?type=${isBid ? 2 : 1}`)
+  let res = await fetch(`https://sme-demo.mcglobal.ai/order?type=${isBid ? 1 : 2}`)
   return await res.json()
 }
 
 export const useOrders = (isBid: boolean): { orders: any[]; mutate: any; isLoading: boolean } => {
-  const url = `/orders?type=${isBid ? 2 : 1}`
+  const url = `/orders?type=${isBid ? 1 : 2}`
   const { data, mutate, error, isLoading } = useSWR({ url, isBid: isBid }, fetcher)
 
   let orders = data?.data

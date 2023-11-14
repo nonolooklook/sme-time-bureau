@@ -65,6 +65,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
 
       const order = await executeAllActions()
       const hash = seaport.getOrderHash(order.parameters)
+      console.log(hash)
       await fetch('https://sme-demo.mcglobal.ai/order', {
         method: 'POST',
         headers: {
@@ -73,7 +74,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
         body: JSON.stringify({
           hash: hash,
           entry: order,
-          type: 2,
+          type: 1,
         }),
       })
       toast.success('Place a bid successfully')
