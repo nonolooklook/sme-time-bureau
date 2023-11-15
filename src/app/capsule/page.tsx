@@ -25,7 +25,7 @@ export default function Page() {
   const [scrollPosition, setScrollPosition] = useState(0)
 
   const handleScroll = () => setScrollPosition(window.pageYOffset)
-  const scrollTo = useCallback((i: number) => window.scrollTo({ left: 0, top: i === 0 ? 0 : i === 1 ? 660 : 1100, behavior: 'smooth' }), [])
+  const scrollTo = useCallback((i: number) => window.scrollTo({ left: 0, top: i === 0 ? 0 : i === 1 ? 660 : 1600, behavior: 'smooth' }), [])
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -42,7 +42,7 @@ export default function Page() {
   return (
     <div
       className={'relative min-h-screen bg-no-repeat'}
-      style={{ background: 'url(/capsule-bg.png)', backgroundSize: '100% auto', backgroundPosition: 'center center' }}
+      style={{ background: 'url(/capsule-bg.png)', backgroundSize: '100% 100%', backgroundPosition: 'center center' }}
     >
       <Header />
       <div className={'container mx-auto text-white pt-40 pb-36'}>
