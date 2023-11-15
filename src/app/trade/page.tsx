@@ -18,12 +18,14 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useInterval } from 'usehooks-ts'
 import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 
 export default function Page() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
 
+  const [openPrivilege, setOpenPrivilege] = useState(false)
   const [openBid, setOpenBid] = useState(false)
   const [openList, setOpenList] = useState(false)
   const [selectedPrice, setSelectedPrice] = useState(0)
@@ -49,6 +51,10 @@ export default function Page() {
   useInterval(() => {
     if (type === 'list') {
       setOpenList(true)
+      router.push('/trade')
+    }
+    if (type === 'privilege') {
+      setOpenPrivilege(true)
       router.push('/trade')
     }
   }, 500)
@@ -183,6 +189,7 @@ export default function Page() {
                               max: displayBalance(parseUnits(maxp, 0) / count),
                               mid: displayBalance(realMid),
                               count: count?.toString(),
+                              order: order,
                             })
                           }}
                           key={order?.hash}
@@ -265,6 +272,7 @@ export default function Page() {
             />
           </div>
         </div>
+        <PrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} />
       </div>
     </div>
   )

@@ -16,9 +16,10 @@ import { useMint } from '@/hooks/useMint'
 import { Spinner } from '@/components/Spinner'
 import { toast } from 'sonner'
 import { useApprove } from '@/hooks/useApprove'
+import Link from 'next/link'
 
 export default function Page() {
-  const { mintedCount, allowance4nft } = useContext(FetcherContext)
+  const { mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
   const [total, setTotal] = useState(100)
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -231,15 +232,16 @@ export default function Page() {
                 />
               </div>
               <div className='flex gap-10 items-center'>
-                <button
+                <Link
+                  href={'/trade?type=privilege'}
                   className={
-                    'bg-primary rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
+                    'bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
                   }
                 >
                   TRADE
-                </button>
+                </Link>
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
-                  You have 21 capsules
+                  You have {Math.min(nftBalance, listedCount)} capsules
                 </div>
               </div>
             </div>

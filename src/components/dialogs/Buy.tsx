@@ -43,9 +43,12 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       setO(true)
+      console.log(1)
       const order = selected?.order
+      console.log(order)
       const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount
       const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount
+      console.log(offerAmount, itemAmount)
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
         conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
@@ -72,9 +75,24 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         denominator: 1,
       }
 
+      console.log(takerOrder)
+      let entry = { ...order?.entry }
+      entry.extraData = '0x'
+      entry.numerator = Number(amount)
+      entry.denominator = selected?.count
+      console.log(entry)
+
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
-      const finalOrder = await executeAllActions()
+      const fo = await executeAllActions()
+      let finalOrder = { ...fo }
+      // @ts-ignore
+      finalOrder.extraData = '0x'
+      // @ts-ignore
+      finalOrder.numerator = 1
+      // @ts-ignore
+      finalOrder.denominator = 1
+
       const modeOrderFulfillments: MatchOrdersFulfillment[] = []
       for (let i = 0; i < 1; i++) {
         modeOrderFulfillments.push({
@@ -103,7 +121,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
           randomNumberCount: 1,
           randomStrategy: 0,
           takerOrders: [finalOrder],
-          makerOrders: [order?.entry],
+          makerOrders: [entry],
           modeOrderFulfillments: modeOrderFulfillments,
         }),
       }).then((r) => r.json())
@@ -172,7 +190,9 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
               USDC Balance: {displayBalance(collateralBalance)}
             </div>
             <div className='flex justify-center mb-4 mt-6'>
-              <button className={'btn-primary w-[100px]'}>Buy</button>
+              <button className={'btn-primary w-[100px]'} onClick={fillSellOrder}>
+                Buy
+              </button>
             </div>
           </Dialog.Content>
         </Dialog.Portal>
@@ -194,9 +214,9 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
               backBtn={<></>}
               continueBtn={<div ref={ref} />}
               submitBtn={<></>}
-              fillStroke={'#000'}
-              activeColor={'#000'}
-              activeProgressBorder={'#000'}
+              fillStroke={'#FFAC03'}
+              activeColor={'#FFAC03'}
+              activeProgressBorder={'#FFAC03'}
               contentBoxClassName={'text-sm text-center mb-10'}
             >
               <div className={'mt-10 flex items-center gap-2 justify-center'}>
@@ -207,7 +227,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
                 <Spinner />
                 <h1>Waiting for Chainlink to return a random number</h1>
               </div>
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
+              <div className={'w-[370px] mt-10 flex items-center gap-2 justify-center'}>
                 <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
               </div>
             </Stepper>

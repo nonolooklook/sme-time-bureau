@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import Image from 'next/image'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther } from 'viem'
+import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
 import React, { useContext, useRef, useState } from 'react'
 import { Seaport } from '@opensea/seaport-js'
@@ -23,13 +23,15 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
-  const { collateralBalance } = useContext(FetcherContext)
+  const { nftBalance, listedCount } = useContext(FetcherContext)
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
   const [amount, setAmount] = useState('1')
   const [wrongMsg, setWrongMsg] = useState('')
   const [o, setO] = useState(false)
+
+  const enabled = Number(amount) <= Math.min(nftBalance, listedCount)
 
   const fillBidOrder = async () => {
     if (!signer) return
@@ -167,7 +169,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6 mt-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>20 USDC</div>
+              <div>Max({Math.min(nftBalance, listedCount)})</div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>Total price maximum: 2020 USDC</div>
@@ -175,7 +177,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
             </div>
           </div>
           <div className='flex justify-center mb-4 mt-6'>
-            <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={false}>
+            <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!enabled}>
               Trade
             </button>
           </div>

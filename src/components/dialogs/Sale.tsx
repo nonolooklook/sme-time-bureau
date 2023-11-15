@@ -72,8 +72,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
 
       let entry = { ...order?.entry }
       entry.extraData = '0x'
-      entry.numerator = 1
-      entry.denominator = 1
+      entry.numerator = Number(amount)
+      entry.denominator = selected?.count
 
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
@@ -205,9 +205,9 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
               backBtn={<></>}
               continueBtn={<div ref={ref} />}
               submitBtn={<></>}
-              fillStroke={'#000'}
-              activeColor={'#000'}
-              activeProgressBorder={'#000'}
+              fillStroke={'#FFAC03'}
+              activeColor={'#FFAC03'}
+              activeProgressBorder={'#FFAC03'}
               contentBoxClassName={'text-sm text-center mb-10'}
             >
               <div className={'mt-10 flex items-center gap-2 justify-center'}>

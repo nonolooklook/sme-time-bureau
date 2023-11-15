@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 
@@ -46,14 +46,14 @@ export const PriceChart = ({
   }
 
   const step = maxValue / 5
-  const values = Array.from({ length: 6 }, (_, index) => Math.round(index * step * 100) / 100).reverse()
+  const values = useMemo(() => Array.from({ length: 6 }, (_, index) => Math.round(index * step * 100) / 100).reverse(), [step])
+  console.log(values)
 
   return (
     <>
-      <PrivilegeTrade open={open} onChange={setOpen} />
       <div className='flex'>
-        <div className={'w-[60px] flex flex-col justify-between pb-6 text-gray-400 text-xs'}>
-          {values?.map((v) => <div key={v}>{v}</div>)}
+        <div className={'w-[36px] flex flex-col justify-between pb-6 text-gray-400 text-xs'}>
+          {values?.map((v, i) => <div key={i}>{v}</div>)}
         </div>
         <div className={'grow'}>
           <div className='flex'>
