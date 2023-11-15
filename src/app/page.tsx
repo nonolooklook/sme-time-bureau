@@ -104,10 +104,10 @@ export default function Page() {
               <div className={`${index === 2 ? 'active' : ''} min-h-[72px] flex items-center`}>
                 As with all co-builders, you want to profit from trading Schrödinger`s Time Capsules.
               </div>
-              <div className={`${index === 3 ? 'text-white text-[20px]' : ''} min-h-[99px] flex items-center`}>
+              <div className={`${index === 3 ? 'text-white text-[19px]' : ''} min-h-[99px] flex items-center`}>
                 You have 5 chances to unearth the enigmatic Schrödinger`s Time Capsule from the Stochastic universe.
               </div>
-              <div className={`${index === 4 ? 'text-white text-[18px]' : ''} min-h-[132px] flex items-center`}>
+              <div className={`${index === 4 ? 'text-white text-[17px]' : ''} min-h-[132px] -mx-2 flex items-center`}>
                 After Mint Schrödinger`s Time Capsule, you can sell Schrödinger`s Time Capsule to Stochastic Universe Time Management. You
                 can also wait for the last Time Reset Trade.
               </div>
