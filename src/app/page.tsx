@@ -28,11 +28,11 @@ export default function Page() {
   const [index, setIndex] = useState(0)
 
   useInterval(() => {
-    if (!ref.current || s > 380) return
+    if (!ref.current || s > 480) return
     s += 0.5
-    if (s > 380) {
+    if (s > 450) {
       setIndex(6)
-    } else if (s > 340) {
+    } else if (s > 400) {
       setIndex(5)
     } else if (s > 260) {
       setIndex(4)
@@ -90,7 +90,7 @@ export default function Page() {
               </Dialog.Close>
             </div>
             <div
-              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-14 pb-20 px-10 ${
+              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-14 pb-36 px-10 ${
                 end ? 'overflow-hidden' : 'overflow-hidden'
               }`}
               ref={ref}
