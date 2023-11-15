@@ -176,5 +176,5 @@ input[type="number"] {
     @apply transition-all duration-300;
 }
 .index-scroll .active {
-    @apply text-[22px] text-white;
+    @apply text-[20px] text-white;
 }

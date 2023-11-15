@@ -28,15 +28,15 @@ export default function Page() {
   const [index, setIndex] = useState(0)
 
   useInterval(() => {
-    if (!ref.current || s > 480) return
-    s += 0.5
-    if (s > 450) {
+    if (!ref.current || s > 520) return
+    s += 0.6
+    if (s > 490) {
       setIndex(6)
-    } else if (s > 400) {
+    } else if (s > 420) {
       setIndex(5)
-    } else if (s > 260) {
+    } else if (s > 280) {
       setIndex(4)
-    } else if (s > 170) {
+    } else if (s > 180) {
       setIndex(3)
     } else if (s > 100) {
       setIndex(2)
@@ -90,13 +90,17 @@ export default function Page() {
               </Dialog.Close>
             </div>
             <div
-              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-14 pb-36 px-10 ${
+              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-16 pb-36 px-10 ${
                 end ? 'overflow-hidden' : 'overflow-hidden'
               }`}
               ref={ref}
             >
-              <div className={`${index === 0 ? 'active' : ''} min-h-[48px] flex items-center`}>Welcome to Stochastic Universe.</div>
-              <div className={`${index === 1 ? 'active' : ''} min-h-[48px] flex items-center`}>You are a co-builder of this universe.</div>
+              <div className={`${index === 0 ? 'active' : ''} min-h-[60px] flex items-center justify-center`}>
+                Welcome to Stochastic Universe.
+              </div>
+              <div className={`${index === 1 ? 'active' : ''} min-h-[60px] flex items-center justify-center`}>
+                You are a co-builder of this universe.
+              </div>
               <div className={`${index === 2 ? 'active' : ''} min-h-[72px] flex items-center`}>
                 As with all co-builders, you want to profit from trading Schrödinger`s Time Capsules.
               </div>
