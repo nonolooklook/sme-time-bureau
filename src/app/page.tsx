@@ -29,7 +29,7 @@ export default function Page() {
 
   useInterval(() => {
     if (!ref.current || s > 380) return
-    s += 1
+    s += 0.5
     if (s > 380) {
       setIndex(6)
     } else if (s > 340) {
@@ -60,7 +60,10 @@ export default function Page() {
       <Dialog.Root open={open && shouldShow} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className='dialog-overlay' />
-          <Dialog.Content className='border-none dialog-content w-[660px] h-[330px]'>
+          <Dialog.Content
+            className='border-none dialog-content w-[780px] h-[330px] backdrop-blur-sm'
+            style={{ background: 'rgba(0, 0, 0, .85)' }}
+          >
             <div className='flex items-center justify-between mb-6 gap-4'>
               <div className={'ml-auto flex gap-2 items-center'}>
                 <Checkbox.Root checked={checked} onCheckedChange={(e: any) => setChecked(e)} className='checkbox-root' id='c1'>
@@ -72,7 +75,12 @@ export default function Page() {
                   Don`t show again
                 </label>
               </div>
-              <Dialog.Close asChild onClick={() => Cookies.set('tutorial', 'true')}>
+              <Dialog.Close
+                asChild
+                onClick={() => {
+                  if (checked) Cookies.set('tutorial', 'true')
+                }}
+              >
                 <div
                   className={'w-[80px] cursor-pointer h-[24px] rounded-full flex items-center justify-center'}
                   style={{ boxShadow: '0px 4px 8px 0px rgba(255, 255, 255, 0.25) inset' }}
@@ -82,7 +90,7 @@ export default function Page() {
               </Dialog.Close>
             </div>
             <div
-              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-14 pb-20 ${
+              className={`index-scroll flex flex-col items-center text-gray-400 text-center h-[240px] pt-14 pb-20 px-10 ${
                 end ? 'overflow-hidden' : 'overflow-hidden'
               }`}
               ref={ref}
