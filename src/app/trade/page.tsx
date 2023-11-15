@@ -1,7 +1,7 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Image from 'next/image'
 import { PriceChart } from '@/components/PriceChart'
 import { PlaceABid } from '@/components/dialogs/PlaceABid'
@@ -19,8 +19,10 @@ import { useInterval } from 'usehooks-ts'
 import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
+import { FetcherContext } from '@/contexts/FetcherContext'
 
 export default function Page() {
+  const { currentPrice } = useContext(FetcherContext)
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
@@ -74,7 +76,7 @@ export default function Page() {
           <div className={'text-[38px] font-semibold ml-8 text-gray-200 uppercase'}>Schrödinger`s Time Capsules / USDC</div>
           <div className='flex items-center text-2xl gap-2 ml-auto'>
             <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} />
-            9.32
+            {currentPrice}
           </div>
         </div>
         <div className='grid grid-cols-2 gap-8 mt-10'>

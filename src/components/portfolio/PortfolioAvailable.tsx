@@ -8,13 +8,7 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 
 export const PortfolioAvailable = () => {
-  const { nftBalance, listedCount, bidCount } = useContext(FetcherContext)
-  const { orders } = useOrderDistribution()
-
-  const minPrice = orders?.minPrice ?? 0
-  const maxPrice = orders?.maxPrice ?? 0
-
-  const mid = Math.round((minPrice + maxPrice) * 50) / 100
+  const { nftBalance, listedCount, currentPrice } = useContext(FetcherContext)
 
   return (
     <div>
@@ -32,7 +26,9 @@ export const PortfolioAvailable = () => {
             <div className={'text-gray-400 text-center mt-2'}>Quantity</div>
           </div>
           <div>
-            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>${mid}</div>
+            <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>
+              ${currentPrice}
+            </div>
             <div className={'text-gray-400 text-center mt-2'}>Real Price</div>
           </div>
         </div>

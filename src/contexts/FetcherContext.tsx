@@ -5,6 +5,7 @@ import { sepolia } from 'viem/chains'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
+import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 
 interface FetcherContextArgs {
   collateralBalance: bigint
@@ -13,6 +14,8 @@ interface FetcherContextArgs {
   bidCount: number
   mintedCount: number
   allowance4nft: bigint
+  currentPrice: number
+  currentMaxPrice: number
 }
 
 const FetcherContext = React.createContext<FetcherContextArgs>({
@@ -22,6 +25,8 @@ const FetcherContext = React.createContext<FetcherContextArgs>({
   bidCount: 0,
   mintedCount: 0,
   allowance4nft: 0n,
+  currentPrice: 0,
+  currentMaxPrice: 0,
 })
 
 // This context maintain 2 counters that can be used as a dependencies on other hooks to force a periodic refresh
@@ -33,6 +38,12 @@ const FetcherContextProvider = ({ children }: any) => {
 
   const listedCount = listOrders?.reduce((count: number, cv: any) => Number(cv?.entry.parameters?.offer?.[0]?.startAmount) + count, 0)
   const bidCount = bidOrders?.reduce((count: number, cv: any) => Number(cv?.entry.parameters?.consideration?.[0]?.startAmount) + count, 0)
+
+  const { orders } = useOrderDistribution()
+
+  const minPrice = orders?.minPrice ?? 0
+  const maxPrice = orders?.maxPrice ?? 0
+  const mid = Math.round((minPrice + maxPrice) * 50) / 100
 
   const { data } = useContractReads({
     contracts: [
@@ -72,6 +83,8 @@ const FetcherContextProvider = ({ children }: any) => {
         bidCount: bidCount,
         mintedCount: Number(data?.[2]?.result) ?? 0,
         allowance4nft: data?.[3]?.result ?? 0n,
+        currentPrice: mid,
+        currentMaxPrice: maxPrice,
       }}
     >
       {children}

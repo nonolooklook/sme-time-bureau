@@ -23,7 +23,7 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
-  const { nftBalance, listedCount } = useContext(FetcherContext)
+  const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -172,7 +172,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               <div>Max({Math.min(nftBalance, listedCount)})</div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
-              <div className={'text-white'}>Total price maximum: 2020 USDC</div>
+              <div className={'text-white'}>Total price maximum: {currentMaxPrice * Number(amount)} USDC</div>
               Transaction fees: 0.5%
             </div>
           </div>
