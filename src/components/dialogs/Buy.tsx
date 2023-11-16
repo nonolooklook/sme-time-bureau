@@ -46,6 +46,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       console.log(1)
       const order = selected?.order
       console.log(order)
+      const startOfferAmount = order?.entry?.parameters?.consideration?.[0].startAmount
       const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount
       const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount
       console.log(offerAmount, itemAmount)
@@ -56,7 +57,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         offer: [
           {
-            amount: offerAmount.toString(),
+            amount: startOfferAmount.toString(),
             endAmount: offerAmount.toString(),
             token: ERC20_ADDRESS[sepolia.id],
             recipient: address,
