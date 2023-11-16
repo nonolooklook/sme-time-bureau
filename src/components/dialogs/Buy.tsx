@@ -43,12 +43,11 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       setO(true)
-      console.log(1)
       const order = selected?.order
       console.log(order)
-      const startOfferAmount = order?.entry?.parameters?.consideration?.[0].startAmount
-      const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount
-      const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount
+      const startOfferAmount = order?.entry?.parameters?.consideration?.[0].startAmount * (Number(amount) / selected?.count)
+      const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount * (Number(amount) / selected?.count)
+      const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount * (Number(amount) / selected?.count)
       console.log(offerAmount, itemAmount)
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',

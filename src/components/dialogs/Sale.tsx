@@ -43,9 +43,9 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       })
       console.log(seaport)
       const order = selected?.order
-      const offerAmount = order.entry?.parameters?.consideration?.[0].endAmount
-      const startItemAmount = order.entry?.parameters?.offer?.[0].startAmount
-      const endItemAmount = order?.entry?.parameters?.offer?.[0].endAmount
+      const offerAmount = order.entry?.parameters?.consideration?.[0].endAmount * (Number(amount) / selected?.count)
+      const startItemAmount = order.entry?.parameters?.offer?.[0].startAmount * (Number(amount) / selected?.count)
+      const endItemAmount = order?.entry?.parameters?.offer?.[0].endAmount * (Number(amount) / selected?.count)
 
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
