@@ -9,9 +9,9 @@ import { toast } from 'sonner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { NFTContractAddress } from '@/config/contract'
+import { NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useAccount } from 'wagmi'
@@ -48,14 +48,14 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
 
       const makerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        conduitKey: CONDUIT_KEY,
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 2 * 30 * 24 * 60 * 60).toString(),
         offer: [
           {
             itemType: ItemType.ERC1155,
             token: NFTContractAddress,
-            identifier: '0',
+            identifier: TokenId?.toString(),
             amount: amount,
           },
         ],

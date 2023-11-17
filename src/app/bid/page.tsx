@@ -3,15 +3,8 @@
 import { Header } from '@/components/Header'
 import Image from 'next/image'
 import { useState } from 'react'
-import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Spinner } from '@/components/Spinner'
-import { Address, useAccount, useContractReads } from 'wagmi'
-import { NFTContractAddress } from '@/config/contract'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { InputWithButton } from '@/components/InputWithButton'
-import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { PriceInput } from '@/components/PriceInput'
+import { useAccount } from 'wagmi'
 import { ChevronLeftIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import { PlaceBid } from '@/components/market/PlaceBid'
@@ -21,20 +14,6 @@ export default function Bid() {
   const [type, setType] = useState(0)
   const { address } = useAccount()
   const [open, setOpen] = useState(false)
-
-  const { data } = useContractReads({
-    contracts: [
-      {
-        address: NFTContractAddress,
-        abi: ERC1155ABI,
-        functionName: 'balanceOf',
-        args: [address as Address, 0n],
-      },
-    ],
-    watch: true,
-  })
-
-  const nftBalance = data?.[0]?.result
 
   return (
     <>
