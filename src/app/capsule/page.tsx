@@ -21,7 +21,7 @@ import Link from 'next/link'
 export default function Page() {
   const { mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
-  const [total, setTotal] = useState(100)
+  const [total, setTotal] = useState(1000)
   const [scrollPosition, setScrollPosition] = useState(0)
 
   const handleScroll = () => setScrollPosition(window.pageYOffset)
@@ -108,7 +108,7 @@ export default function Page() {
                 </div>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Used: {mintedCount} / {total}
+                • Minted: {mintedCount} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
