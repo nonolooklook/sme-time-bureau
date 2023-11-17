@@ -3,7 +3,6 @@
 import { Header } from '@/components/Header'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
-import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
@@ -12,7 +11,7 @@ import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { parseUnits } from 'viem'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
@@ -39,7 +38,7 @@ export default function Scratch() {
         args: [address as Address, 0n],
       },
       {
-        address: ERC20_ADDRESS[sepolia.id] as Address,
+        address: ERC20_ADDRESS[arbitrumGoerli.id] as Address,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: ['0x28c73A60ccF8c66c14EbA8935984e616Df2926e3'],
@@ -76,7 +75,7 @@ export default function Scratch() {
     if (!signer) return
     setOpen(true)
     const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+      overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
       conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
     })
     const takerOrder = {
@@ -88,7 +87,7 @@ export default function Scratch() {
         {
           amount: '1000000000000000000',
           endAmount: '100000000000000000000',
-          token: ERC20_ADDRESS[sepolia.id],
+          token: ERC20_ADDRESS[arbitrumGoerli.id],
           recipient: address,
         },
       ],

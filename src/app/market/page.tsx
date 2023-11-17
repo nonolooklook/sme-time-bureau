@@ -15,7 +15,7 @@ import Stepper from 'awesome-react-stepper'
 import { Seaport } from '@opensea/seaport-js'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { parseUnits } from 'viem'
@@ -59,7 +59,7 @@ export default function Market() {
     try {
       if (!signer) return
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       setOpen(true)
@@ -79,7 +79,7 @@ export default function Market() {
           {
             amount: offerAmount.toString(),
             endAmount: offerAmount.toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],
@@ -156,7 +156,7 @@ export default function Market() {
       if (!signer) return
       setOpen(true)
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])
@@ -187,7 +187,7 @@ export default function Market() {
           {
             amount: startItemAmount.toString(),
             endAmount: endItemAmount.toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],

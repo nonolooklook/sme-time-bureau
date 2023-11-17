@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { useAccount } from 'wagmi'
 
 export const useCancelList = (order: any, onSuccess?: any) => {
@@ -16,7 +16,7 @@ export const useCancelList = (order: any, onSuccess?: any) => {
         console.log(hash)
         setIsCancelLoading(true)
         if (!signer || !address || !order) return
-        const seaport = new Seaport(signer, { overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] } })
+        const seaport = new Seaport(signer, { overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] } })
         console.log(seaport)
         console.log(order)
         const { transact } = seaport.cancelOrders([order?.entry?.parameters], address)

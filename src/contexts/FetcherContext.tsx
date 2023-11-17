@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
@@ -48,7 +48,7 @@ const FetcherContextProvider = ({ children }: any) => {
   const { data } = useContractReads({
     contracts: [
       {
-        address: ERC20_ADDRESS[sepolia.id] as Address,
+        address: ERC20_ADDRESS[arbitrumGoerli.id] as Address,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [address as Address],
@@ -62,10 +62,10 @@ const FetcherContextProvider = ({ children }: any) => {
       {
         address: NFTContractAddress,
         abi: ERC1155ABI,
-        functionName: 'totalSupply',
+        functionName: 'getMintInfo',
       },
       {
-        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
+        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
         args: [address as `0x${string}`, NFTContractAddress],
@@ -73,6 +73,7 @@ const FetcherContextProvider = ({ children }: any) => {
     ],
     watch: true,
   })
+  console.log(data?.[2])
 
   return (
     <FetcherContext.Provider
@@ -81,7 +82,7 @@ const FetcherContextProvider = ({ children }: any) => {
         nftBalance: Number(data?.[1]?.result) ?? 0,
         listedCount: listedCount,
         bidCount: bidCount,
-        mintedCount: Number(data?.[2]?.result) ?? 0,
+        mintedCount: Number(data?.[2]?.result?.total) ?? 0,
         allowance4nft: data?.[3]?.result ?? 0n,
         currentPrice: mid,
         currentMaxPrice: maxPrice,

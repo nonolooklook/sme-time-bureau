@@ -7,7 +7,7 @@ import { parseEther, parseUnits } from 'viem'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -56,7 +56,7 @@ export const AvailableListing = () => {
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
@@ -77,7 +77,7 @@ export const AvailableListing = () => {
           {
             amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
             endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],

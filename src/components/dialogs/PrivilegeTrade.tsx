@@ -1,13 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import Image from 'next/image'
-import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
 import React, { useContext, useRef, useState } from 'react'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
@@ -20,7 +18,6 @@ import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
-import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
@@ -37,7 +34,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
     if (!signer) return
     setO(true)
     const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+      overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
       conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
     })
     const takerOrder = {
@@ -49,7 +46,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
         {
           amount: '1000000000000000000',
           endAmount: '100000000000000000000',
-          token: ERC20_ADDRESS[sepolia.id],
+          token: ERC20_ADDRESS[arbitrumGoerli.id],
           recipient: address,
         },
       ],

@@ -1,6 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import Image from 'next/image'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
@@ -9,7 +8,7 @@ import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { displayBalance } from '@/utils/display'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { NFTContractAddress } from '@/config/contract'
@@ -38,7 +37,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       if (!signer) return
       setO(true)
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       console.log(seaport)
@@ -64,7 +63,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
           {
             amount: startItemAmount.toString(),
             endAmount: endItemAmount.toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],

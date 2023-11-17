@@ -8,14 +8,13 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { InputWithButton } from '@/components/InputWithButton'
 import Link from 'next/link'
-import { erc20ABI, useAccount, useContractRead, useContractReads } from 'wagmi'
+import { erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { displayBalance } from '@/utils/display'
 import { useApprove } from '@/hooks/useApprove'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { sepolia } from 'viem/chains'
-import { parseEther, parseUnits } from 'viem'
+import { arbitrumGoerli } from 'viem/chains'
+import { parseEther } from 'viem'
 
 export default function Page() {
   const { address } = useAccount()
@@ -29,7 +28,7 @@ export default function Page() {
         functionName: 'totalSupply',
       },
       {
-        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
+        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
         args: [address as `0x${string}`, NFTContractAddress],

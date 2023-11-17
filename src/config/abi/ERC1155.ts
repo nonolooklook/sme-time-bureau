@@ -5,6 +5,61 @@ export const ERC1155ABI = [
     type: 'constructor',
   },
   {
+    inputs: [],
+    name: 'getMintInfo',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'total',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'supply',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'start',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'end',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'price',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'token',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'permax',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'receiver',
+            type: 'address',
+          },
+        ],
+        internalType: 'struct TimeNFT.MintInfo',
+        name: '',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'address',
@@ -135,17 +190,23 @@ export const ERC1155ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'id',
+        name: 'count',
         type: 'uint256',
       },
       {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
       },
     ],
     name: 'mint',
-    outputs: [],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },

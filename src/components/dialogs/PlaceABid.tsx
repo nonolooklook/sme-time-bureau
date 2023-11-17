@@ -5,12 +5,12 @@ import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
 import React, { useCallback, useContext, useState } from 'react'
-import { calculateMidPrice, calculateMidPriceFromBigInt } from '@/utils/price'
+import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { displayBalance } from '@/utils/display'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
@@ -35,7 +35,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
@@ -48,7 +48,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
           {
             amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
             endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],

@@ -4,22 +4,18 @@ import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { PriceInput } from '@/components/PriceInput'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { parseEther, parseUnits } from 'viem'
-import * as Dialog from '@radix-ui/react-dialog'
-import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useRouter } from 'next/navigation'
-import { Cross1Icon } from '@radix-ui/react-icons'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { sepolia } from 'viem/chains'
+import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { NFTContractAddress } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { displayBalance } from '@/utils/display'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useApprove } from '@/hooks/useApprove'
 import { toast } from 'sonner'
 
@@ -40,7 +36,7 @@ export const PlaceBid = () => {
   const { data } = useContractReads({
     contracts: [
       {
-        address: ERC20_ADDRESS[sepolia.id] as `0x${string}`,
+        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
         args: [address as `0x${string}`, NFTContractAddress],
@@ -61,7 +57,7 @@ export const PlaceBid = () => {
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[sepolia.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
@@ -76,7 +72,7 @@ export const PlaceBid = () => {
           {
             amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
             endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            token: ERC20_ADDRESS[sepolia.id],
+            token: ERC20_ADDRESS[arbitrumGoerli.id],
             recipient: address,
           },
         ],

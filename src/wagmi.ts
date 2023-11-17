@@ -1,13 +1,14 @@
 import { getDefaultConfig } from 'connectkit'
-import { createConfig, sepolia } from 'wagmi'
+import { createConfig } from 'wagmi'
+import { arbitrum, arbitrumGoerli } from 'viem/chains'
 
 const walletConnectProjectId = '2222222'
 
 export const config = createConfig(
   getDefaultConfig({
     autoConnect: true,
-    appName: 'My wagmi + ConnectKit App',
-    chains: [sepolia],
+    appName: 'Scratch',
+    chains: [arbitrumGoerli, arbitrum],
     walletConnectProjectId,
-  })
+  }),
 )
