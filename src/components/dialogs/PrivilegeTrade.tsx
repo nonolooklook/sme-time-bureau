@@ -9,7 +9,7 @@ import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { NFTContractAddress, TokenId } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import { sleep } from '@/utils/sleep'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
@@ -34,26 +34,26 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
     if (!signer) return
     setO(true)
     const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+      overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
       conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
     })
     const takerOrder = {
       zone: '0x0000000000000000000000000000000000000000',
-      conduitKey: CONDUIT_KEY,
+      conduitKey: CONDUIT_KEY[getCurrentChainId()],
       startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
       endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
       consideration: [
         {
           amount: '1000000000000000000',
           endAmount: '100000000000000000000',
-          token: ERC20_ADDRESS[arbitrumGoerli.id],
+          token: ERC20_ADDRESS[getCurrentChainId()],
           recipient: address,
         },
       ],
       offer: [
         {
           itemType: ItemType.ERC1155,
-          token: NFTContractAddress,
+          token: NFTContractAddress[getCurrentChainId()],
           identifier: TokenId.toString(),
           amount: '1',
         },

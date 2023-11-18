@@ -12,7 +12,7 @@ import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { NFTContractAddress, TokenId } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import { sleep } from '@/utils/sleep'
@@ -38,33 +38,31 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
     try {
       if (!signer) return
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       setO(true)
       const order = selected?.order
-      console.log(order)
       const startOfferAmount = order?.entry?.parameters?.consideration?.[0].startAmount * (Number(amount) / selected?.count)
       const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount * (Number(amount) / selected?.count)
       const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount * (Number(amount) / selected?.count)
-      console.log(offerAmount, itemAmount)
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: CONDUIT_KEY,
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         offer: [
           {
             amount: startOfferAmount.toString(),
             endAmount: offerAmount.toString(),
-            token: ERC20_ADDRESS[arbitrumGoerli.id],
+            token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
           },
         ],
         consideration: [
           {
             itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
+            token: NFTContractAddress[getCurrentChainId()],
             identifier: TokenId?.toString(),
             amount: itemAmount.toString(),
           },
@@ -74,12 +72,10 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         denominator: 1,
       }
 
-      console.log(takerOrder)
       let entry = { ...order?.entry }
       entry.extraData = '0x'
       entry.numerator = Number(amount)
       entry.denominator = selected?.count
-      console.log(entry)
 
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
@@ -107,8 +103,6 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         })
       }
 
-      console.log(order.entry)
-      console.log(finalOrder)
       await sleep(2000)
       ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {

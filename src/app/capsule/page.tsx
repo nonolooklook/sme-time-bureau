@@ -34,10 +34,12 @@ export default function Page() {
   const index = scrollPosition < 660 ? 0 : scrollPosition > 1100 ? 2 : 1
 
   const { tops } = useTops()
-  const [days, hours, minutes, seconds] = useCountdown(1699867318000)
-  const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint succesffuly'))
+  const [days, hours, minutes, seconds] = useCountdown(1701130328000)
+  const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
+
+  console.log(mint)
 
   return (
     <div
@@ -151,7 +153,7 @@ export default function Page() {
                   <div className={'ml-2'}>
                     <div className={'mb-3'}>Mint Time Capsules</div>
                     <div>Start on</div>
-                    <div>18/10/2023 8:00(UTC)</div>
+                    <div>18/11/2023 8:00(UTC)</div>
                   </div>
                 </div>
 

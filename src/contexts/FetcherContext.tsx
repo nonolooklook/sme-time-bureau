@@ -2,7 +2,7 @@ import React from 'react'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { arbitrumGoerli } from 'viem/chains'
-import { NFTContractAddress } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
@@ -48,27 +48,27 @@ const FetcherContextProvider = ({ children }: any) => {
   const { data } = useContractReads({
     contracts: [
       {
-        address: ERC20_ADDRESS[arbitrumGoerli.id] as Address,
+        address: ERC20_ADDRESS[getCurrentChainId()] as Address,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: NFTContractAddress,
+        address: NFTContractAddress[getCurrentChainId()] as Address,
         abi: ERC1155ABI,
         functionName: 'balanceOf',
         args: [address as Address, 0n],
       },
       {
-        address: NFTContractAddress,
+        address: NFTContractAddress[getCurrentChainId()] as Address,
         abi: ERC1155ABI,
         functionName: 'getMintInfo',
       },
       {
-        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
+        address: ERC20_ADDRESS[getCurrentChainId()] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
-        args: [address as `0x${string}`, NFTContractAddress],
+        args: [address as `0x${string}`, NFTContractAddress[getCurrentChainId()] as Address],
       },
     ],
     watch: true,

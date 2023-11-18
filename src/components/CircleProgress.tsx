@@ -4,7 +4,7 @@ export const CircleProgress = ({ ratio, children }: { ratio: number; children: R
   return (
     <div className={'relative'}>
       <svg width='60' height='60' viewBox='0 0 60 60' className={'-rotate-90'}>
-        <circle cx='30' cy='30' r='28' fill='none' stroke='transparent' stroke-width='1' />
+        <circle cx='30' cy='30' r='28' fill='none' stroke='transparent' strokeWidth='1' />
         <circle
           strokeDasharray={100}
           strokeDashoffset={100 - ratio * 100}
@@ -13,7 +13,7 @@ export const CircleProgress = ({ ratio, children }: { ratio: number; children: R
           r='28'
           fill='none'
           stroke='#fff'
-          stroke-width='2'
+          strokeWidth='2'
           pathLength='100'
         />
       </svg>
