@@ -6,13 +6,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
-import { NFTContractAddress } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { parseUnits } from 'viem'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
@@ -32,7 +32,7 @@ export default function Scratch() {
   const { data } = useContractReads({
     contracts: [
       {
-        address: NFTContractAddress,
+        address: NFTContractAddress[getCurrentChainId()] as Address,
         abi: ERC1155ABI,
         functionName: 'balanceOf',
         args: [address as Address, 0n],
@@ -75,27 +75,27 @@ export default function Scratch() {
     if (!signer) return
     setOpen(true)
     const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+      overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
       conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
     })
     const takerOrder = {
       zone: '0x0000000000000000000000000000000000000000',
-      conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+      conduitKey: CONDUIT_KEY[getCurrentChainId()],
       startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
       endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
       consideration: [
         {
           amount: '1000000000000000000',
           endAmount: '100000000000000000000',
-          token: ERC20_ADDRESS[arbitrumGoerli.id],
+          token: ERC20_ADDRESS[getCurrentChainId()],
           recipient: address,
         },
       ],
       offer: [
         {
           itemType: ItemType.ERC1155,
-          token: NFTContractAddress,
-          identifier: '0',
+          token: NFTContractAddress[getCurrentChainId()],
+          identifier: '1',
           amount: '1',
         },
       ],

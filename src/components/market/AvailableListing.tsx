@@ -8,8 +8,8 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
-import { NFTContractAddress } from '@/config/contract'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { Address, useAccount, useContractReads } from 'wagmi'
 import { useRouter } from 'next/navigation'
@@ -32,7 +32,7 @@ export const AvailableListing = () => {
   const { data } = useContractReads({
     contracts: [
       {
-        address: NFTContractAddress,
+        address: NFTContractAddress[getCurrentChainId()] as Address,
         abi: ERC1155ABI,
         functionName: 'balanceOf',
         args: [address as Address, 0n],
@@ -56,20 +56,20 @@ export const AvailableListing = () => {
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
       const makerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 2 * 30 * 24 * 60 * 60).toString(),
         offer: [
           {
             itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
-            identifier: '0',
+            token: NFTContractAddress[getCurrentChainId()],
+            identifier: 1,
             amount: amount,
           },
         ],
@@ -77,7 +77,7 @@ export const AvailableListing = () => {
           {
             amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
             endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            token: ERC20_ADDRESS[arbitrumGoerli.id],
+            token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
           },
         ],

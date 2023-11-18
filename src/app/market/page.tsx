@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
 import { Address, useAccount, useContractReads } from 'wagmi'
-import { NFTContractAddress } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import * as Checkbox from '@radix-ui/react-checkbox'
 import { CheckIcon } from '@radix-ui/react-icons'
@@ -16,7 +16,7 @@ import { Seaport } from '@opensea/seaport-js'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { parseUnits } from 'viem'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -30,19 +30,6 @@ import { toast } from 'sonner'
 export default function Market() {
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
-
-  const { data } = useContractReads({
-    contracts: [
-      {
-        address: NFTContractAddress,
-        abi: ERC1155ABI,
-        functionName: 'balanceOf',
-        args: [address as Address, 0n],
-      },
-    ],
-    watch: true,
-  })
-
   const [open, setOpen] = useState(false)
   const [checkedLists, setCheckedLists] = useState<boolean[]>()
   const [checkedBids, setCheckedBids] = useState<boolean[]>()
@@ -59,7 +46,7 @@ export default function Market() {
     try {
       if (!signer) return
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       setOpen(true)
@@ -72,21 +59,21 @@ export default function Market() {
       const itemAmount = finalMakerOrders?.reduce((acc, cv, i) => acc + parseUnits(cv?.entry?.parameters?.offer?.[0].startAmount, 0), 0n)
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         offer: [
           {
             amount: offerAmount.toString(),
             endAmount: offerAmount.toString(),
-            token: ERC20_ADDRESS[arbitrumGoerli.id],
+            token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
           },
         ],
         consideration: [
           {
             itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
+            token: NFTContractAddress[getCurrentChainId()],
             identifier: '0',
             amount: itemAmount.toString(),
           },
@@ -172,14 +159,14 @@ export default function Market() {
 
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         offer: [
           {
             itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
-            identifier: '0',
+            token: NFTContractAddress[getCurrentChainId()],
+            identifier: TokenId?.toString(),
             amount: offerAmount.toString(),
           },
         ],
@@ -187,7 +174,7 @@ export default function Market() {
           {
             amount: startItemAmount.toString(),
             endAmount: endItemAmount.toString(),
-            token: ERC20_ADDRESS[arbitrumGoerli.id],
+            token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
           },
         ],

@@ -10,11 +10,11 @@ import { useRouter } from 'next/navigation'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { NFTContractAddress } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { erc20ABI, useAccount, useContractReads } from 'wagmi'
+import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { displayBalance } from '@/utils/display'
 import { useApprove } from '@/hooks/useApprove'
 import { toast } from 'sonner'
@@ -36,10 +36,10 @@ export const PlaceBid = () => {
   const { data } = useContractReads({
     contracts: [
       {
-        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
+        address: ERC20_ADDRESS[getCurrentChainId()] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
-        args: [address as `0x${string}`, NFTContractAddress],
+        args: [address as `0x${string}`, NFTContractAddress[getCurrentChainId()] as Address],
       },
     ],
     watch: true,
@@ -57,7 +57,7 @@ export const PlaceBid = () => {
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
@@ -65,22 +65,22 @@ export const PlaceBid = () => {
       console.log('amount', amount)
       const makerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
-        conduitKey: '0x28c73a60ccf8c66c14eba8935984e616df2926e3aaaaaaaaaaaaaaaaaaaaaa00',
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 2 * 30 * 24 * 60 * 60).toString(),
         offer: [
           {
             amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
             endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            token: ERC20_ADDRESS[arbitrumGoerli.id],
+            token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
           },
         ],
         consideration: [
           {
             itemType: ItemType.ERC1155,
-            token: NFTContractAddress,
-            identifier: '0',
+            token: NFTContractAddress[getCurrentChainId()],
+            identifier: TokenId.toString(),
             amount: amount,
           },
         ],
