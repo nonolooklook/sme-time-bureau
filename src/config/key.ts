@@ -1,6 +1,7 @@
-import { arbitrum, arbitrumGoerli } from 'viem/chains'
+import { arbitrum, arbitrumGoerli, sepolia } from 'viem/chains'
 
 export const CONDUIT_KEY = {
+  [sepolia.id]: '0xFE18Aa1EFa652660F36Ab84F122CD36108f903B6aaaaaaaaaaaaaaaaaaaaaaaa',
   [arbitrum.id]: '0xFE18Aa1EFa652660F36Ab84F122CD36108f903B6aaaaaaaaaaaaaaaaaaaaaaaa',
   [arbitrumGoerli.id]: '0xd445b75f9b129e90d8eca89df86fe8a27b805460aaaaaaaaaaaaaaaaaaaaaaaa',
 }
