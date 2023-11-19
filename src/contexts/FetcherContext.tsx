@@ -2,7 +2,7 @@ import React from 'react'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { arbitrumGoerli } from 'viem/chains'
-import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
+import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
@@ -57,7 +57,7 @@ const FetcherContextProvider = ({ children }: any) => {
         address: NFTContractAddress[getCurrentChainId()] as Address,
         abi: ERC1155ABI,
         functionName: 'balanceOf',
-        args: [address as Address, 0n],
+        args: [address as Address, TokenId],
       },
       {
         address: NFTContractAddress[getCurrentChainId()] as Address,
@@ -73,7 +73,7 @@ const FetcherContextProvider = ({ children }: any) => {
     ],
     watch: true,
   })
-  console.log(data?.[2])
+  console.log(data?.[1]?.result, listedCount)
 
   return (
     <FetcherContext.Provider
