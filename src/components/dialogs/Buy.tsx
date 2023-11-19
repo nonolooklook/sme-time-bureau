@@ -67,9 +67,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
             amount: itemAmount.toString(),
           },
         ],
-        extraData: '0x',
-        numeratror: 1,
-        denominator: 1,
+        orderType: Number(amount) === selected?.count ? 0 : 1,
       }
 
       let entry = { ...order?.entry }

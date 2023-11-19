@@ -67,6 +67,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
             recipient: address,
           },
         ],
+        orderType: Number(amount) === selected?.count ? 0 : 1,
       }
 
       let entry = { ...order?.entry }
