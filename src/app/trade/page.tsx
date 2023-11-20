@@ -120,7 +120,7 @@ export default function Page() {
                           }}
                         >
                           <div className='grid grid-cols-4 text-gray-200'>
-                            <div>{count?.toString()}</div>
+                            <div>{order?.remainingQuantity}</div>
                             <div className={'text-center'}>${displayBalance(parseUnits(maxP, 0) / count)}</div>
                             <div className={'text-center'}>${displayBalance(parseUnits(minP, 0) / count)}</div>
                             <div className={'text-right pr-2'}>${displayBalance(realMid)}</div>
@@ -200,7 +200,7 @@ export default function Page() {
                             <div className={'pl-2'}>${displayBalance(realMid)}</div>
                             <div className={'text-center'}>${displayBalance(parseUnits(minp, 0) / count)}</div>
                             <div className={'text-center'}>${displayBalance(parseUnits(maxp, 0) / count)}</div>
-                            <div className={'text-right'}>{count?.toString()}</div>
+                            <div className={'text-right'}>{order?.remainingQuantity}</div>
                           </div>
                           <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
                         </div>
