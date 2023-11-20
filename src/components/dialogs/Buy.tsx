@@ -68,6 +68,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
           },
         ],
         orderType: Number(amount) === selected?.count ? 0 : 1,
+        allowPartialFills: Number(amount) !== selected?.count,
       }
 
       let entry = { ...order?.entry }
