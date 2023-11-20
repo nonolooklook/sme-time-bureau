@@ -74,6 +74,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       entry.extraData = '0x'
       entry.numerator = Number(amount)
       entry.denominator = selected?.count
+      entry.orderType = Number(amount) === selected?.count ? 0 : 1
 
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
