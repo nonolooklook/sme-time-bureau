@@ -67,6 +67,7 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
             recipient: address,
           },
         ],
+        allowPartialFills: Number(amount) > 1,
       }
       const { executeAllActions } = await seaport.createOrder(makerOrder, address)
 

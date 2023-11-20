@@ -67,15 +67,12 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
             recipient: address,
           },
         ],
-        orderType: Number(amount) === selected?.count ? 0 : 1,
-        allowPartialFills: Number(amount) !== selected?.count,
       }
 
       let entry = { ...order?.entry }
       entry.extraData = '0x'
       entry.numerator = Number(amount)
       entry.denominator = selected?.count
-      entry.orderType = Number(amount) === selected?.count ? 0 : 1
 
       const { executeAllActions } = await seaport.createOrder(takerOrder, address)
 
@@ -87,8 +84,6 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       finalOrder.numerator = 1
       // @ts-ignore
       finalOrder.denominator = 1
-      // @ts-ignore
-      finalOrder.orderType = Number(amount) === selected?.count ? 0 : 1
 
       const modeOrderFulfillments: MatchOrdersFulfillment[] = []
       for (let i = 0; i < 1; i++) {
@@ -104,7 +99,6 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
           considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
         })
       }
-      console.log(finalOrder)
 
       await sleep(2000)
       ref?.current?.click()

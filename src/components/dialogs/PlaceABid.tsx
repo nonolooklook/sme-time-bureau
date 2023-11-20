@@ -60,6 +60,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
             amount: amount,
           },
         ],
+        allowPartialFills: Number(amount) > 1,
       }
       const { executeAllActions } = await seaport.createOrder(makerOrder, address)
 
