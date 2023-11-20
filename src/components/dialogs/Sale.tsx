@@ -87,6 +87,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       finalOrder.numerator = 1
       // @ts-ignore
       finalOrder.denominator = 1
+      // @ts-ignore
+      finalOrder.orderType = Number(amount) === selected?.count ? 0 : 1
 
       const modeOrderFulfillments: MatchOrdersFulfillment[] = []
       for (let i = 0; i < 1; i++) {

@@ -71,6 +71,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         allowPartialFills: Number(amount) !== selected?.count,
       }
 
+      console.log(takerOrder)
       let entry = { ...order?.entry }
       entry.extraData = '0x'
       entry.numerator = Number(amount)
@@ -87,6 +88,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       finalOrder.numerator = 1
       // @ts-ignore
       finalOrder.denominator = 1
+      // @ts-ignore
+      finalOrder.orderType = Number(amount) === selected?.count ? 0 : 1
 
       const modeOrderFulfillments: MatchOrdersFulfillment[] = []
       for (let i = 0; i < 1; i++) {
