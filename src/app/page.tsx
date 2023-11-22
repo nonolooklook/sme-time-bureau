@@ -26,6 +26,7 @@ export default function Page() {
   const [end, setEnd] = useState(false)
 
   const [index, setIndex] = useState(0)
+  const [update, setUpdate] = useState(0)
 
   useInterval(() => {
     if (!ref.current || s > 520) return
@@ -125,6 +126,16 @@ export default function Page() {
         <div className={'text-[80px] tracking-[2%]'}>
           <div className={`${bebas.className} -mb-2`}>Time weavers of the</div>
           <div className={bebas.className}>Stochastic Universe</div>
+          <div
+            className='btn-primary w-[180px]'
+            onClick={() => {
+              Cookies.remove('tutorial')
+              setUpdate(update + 1)
+              setOpen(true)
+            }}
+          >
+            Story
+          </div>
         </div>
       </div>
       <div className='fixed bottom-0 w-full bg-gradient-to-b from-transparent gap-10 to-black py-10 flex items-center justify-center'>
