@@ -258,7 +258,7 @@ export default function Page() {
                   {tops?.map((top) => (
                     <div className={'bg-white bg-opacity-10 px-3 py-1 flex items-center justify-between'} key={top.orderHash}>
                       {ellipseAddress(top?.orderHash, 6)}
-                      <div className={'text-primary'}>${top?.price}</div>
+                      <div className={'text-primary'}>${Number(top?.price)?.toFixed(2)}</div>
                     </div>
                   ))}
                 </div>
