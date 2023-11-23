@@ -42,11 +42,11 @@ export default function Page() {
   const [index, setIndex] = useState(0)
 
   const finalBidOrders =
-    selectedIsBid && selectedPrice > 0
+    selectedPrice > 0
       ? bidOrders.filter((o: any) => getBidOrderMinPrice(o) < selectedPrice && getBidOrderMaxPrice(o) > selectedPrice)
       : bidOrders
   const finalListOrders =
-    !selectedIsBid && selectedPrice > 0
+    selectedPrice > 0
       ? listOrders.filter((o: any) => getListOrderMinPrice(o) < selectedPrice && getListOrderMaxPrice(o) > selectedPrice)
       : listOrders
 
