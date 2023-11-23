@@ -29,7 +29,7 @@ export const Listed = () => {
                 <div className='w-1/6'>$10.23</div>
                 <div className='w-1/6'>$11.23</div>
                 <div>
-                  <button className={'btn btn-primary'}>Cancel listing</button>
+                  <button className={'btn btn-primary'}>Cancel</button>
                 </div>
               </div>
               <div className='divider' />

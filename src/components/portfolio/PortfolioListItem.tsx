@@ -42,7 +42,7 @@ export const PortfolioListItem = ({
             disabled={isCancelLoading}
           >
             {isCancelLoading && <Spinner />}
-            Cancel listing
+            Cancel
           </button>
         </div>
       </div>
