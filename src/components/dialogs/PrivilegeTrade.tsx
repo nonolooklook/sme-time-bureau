@@ -184,7 +184,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
-              <div className={'text-white'}>Total price maximum: {currentMaxPrice * Number(amount)} USDC</div>
+              <div className={'text-white'}>Total price maximum: {1010 * Number(amount)} USDC</div>
               Transaction fees: 0.5%
             </div>
           </div>
