@@ -32,6 +32,10 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
 
   const createOrder = useCallback(async () => {
     if (!signer) return
+    if (parseUnits(min, 0) > parseUnits(max, 0)) {
+      toast.error('Min price can`t be greater than max price')
+      return
+    }
     setLoading(true)
     try {
       const seaport = new Seaport(signer, {
@@ -88,6 +92,8 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
     setLoading(false)
   }, [signer, min, max, amount])
 
+  const canBuy = collateralBalance >= parseUnits(amount as `${number}`, 0) * parseEther(amount as `${number}`)
+
   return (
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
@@ -137,9 +143,9 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>USDC Balance: {displayBalance(collateralBalance)}</div>
           <div className='flex justify-center my-4'>
-            <button className={'btn-primary w-[100px]'} disabled={loading} onClick={createOrder}>
+            <button className={'btn-primary w-[170px]'} disabled={loading || !canBuy} onClick={createOrder}>
               {loading && <Spinner />}
-              Bid
+              {canBuy ? 'Bid' : 'Not enough'}
             </button>
           </div>
         </Dialog.Content>

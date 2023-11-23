@@ -166,7 +166,14 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6 mt-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>Max({Math.min(nftBalance, listedCount)})</div>
+              <div
+                className={'cursor-pointer'}
+                onClick={() => {
+                  setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+                }}
+              >
+                Max({Math.min(nftBalance, listedCount)})
+              </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>Total price maximum: {currentMaxPrice * Number(amount)} USDC</div>

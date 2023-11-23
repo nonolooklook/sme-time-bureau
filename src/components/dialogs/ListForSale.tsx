@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
-import { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { toast } from 'sonner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
@@ -140,7 +140,14 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
-            <div>Max({nftBalance - listedCount})</div>
+            <div
+              className={'cursor-pointer'}
+              onClick={() => {
+                setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+              }}
+            >
+              Max({nftBalance - listedCount})
+            </div>
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>Transaction fees: 0.5%</div>
           <div className='flex justify-center my-4'>

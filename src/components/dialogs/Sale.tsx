@@ -174,7 +174,14 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>Max({nftBalance - listedCount})</div>
+              <div
+                className={'cursor-pointer'}
+                onClick={() => {
+                  setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+                }}
+              >
+                Max({nftBalance - listedCount})
+              </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>
