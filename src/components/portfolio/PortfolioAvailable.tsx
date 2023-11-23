@@ -6,9 +6,11 @@ import Link from 'next/link'
 import { useContext, useState } from 'react'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export const PortfolioAvailable = () => {
-  const { nftBalance, listedCount, currentPrice } = useContext(FetcherContext)
+  const { currentPrice } = useContext(FetcherContext)
+  const { availableAmount } = useAvailableAmount()
 
   return (
     <div>
@@ -21,7 +23,7 @@ export const PortfolioAvailable = () => {
         <div className='grid grid-cols-2 gap-4 mt-6'>
           <div>
             <div className={'h-[46px] bg-gray-700 bg-opacity-80 rounded-full flex items-center justify-center text-2xl'}>
-              {nftBalance - listedCount}
+              {availableAmount}
             </div>
             <div className={'text-gray-400 text-center mt-2'}>Quantity</div>
           </div>

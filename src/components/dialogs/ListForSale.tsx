@@ -20,9 +20,10 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { displayBalance } from '@/utils/display'
 import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
-  const { nftBalance, listedCount } = useContext(FetcherContext)
+  const { availableAmount } = useAvailableAmount()
   const signer = useEthersSigner()
   const { address } = useAccount()
   const [min, setMin] = useState<`${number}`>('8')
@@ -30,7 +31,7 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState('1')
 
-  const enabled = Number(amount) <= nftBalance - listedCount
+  const enabled = Number(amount) <= availableAmount
 
   const createOrder = useCallback(async () => {
     if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
@@ -143,10 +144,10 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
             <div
               className={'cursor-pointer'}
               onClick={() => {
-                setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+                setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
               }}
             >
-              Max({nftBalance - listedCount})
+              Max({availableAmount})
             </div>
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>Transaction fees: 0.5%</div>

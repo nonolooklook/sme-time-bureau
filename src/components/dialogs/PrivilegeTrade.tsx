@@ -18,9 +18,11 @@ import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
+  const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -169,7 +171,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
               <div
                 className={'cursor-pointer'}
                 onClick={() => {
-                  setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+                  setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
                 }}
               >
                 Max({Math.min(nftBalance, listedCount)})

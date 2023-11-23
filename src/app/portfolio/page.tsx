@@ -15,9 +15,11 @@ import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { displayBalance } from '@/utils/display'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import { FetcherContext } from '@/contexts/FetcherContext'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export default function Portfolio() {
   const { nftBalance, listedCount, bidCount } = useContext(FetcherContext)
+  const { availableAmount } = useAvailableAmount()
   const [type, setType] = useState(0)
 
   return (
@@ -35,7 +37,7 @@ export default function Portfolio() {
             }`}
             onClick={() => setType(0)}
           >
-            Available for listing ({(nftBalance - listedCount).toString()})
+            Available for listing ({availableAmount})
           </div>
           <div
             className={`cursor-pointer px-6 rounded-full border py-2 ${

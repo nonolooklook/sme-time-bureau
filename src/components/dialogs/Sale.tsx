@@ -21,9 +21,11 @@ import { useAccount } from 'wagmi'
 import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { FetcherContext } from '@/contexts/FetcherContext'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { nftBalance, listedCount } = useContext(FetcherContext)
+  const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -33,7 +35,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   const [amount, setAmount] = useState('1')
   const [o, setO] = useState(false)
 
-  const canAccept = nftBalance - listedCount >= Number(amount)
+  const canAccept = availableAmount >= Number(amount)
 
   useEffect(() => setAmount(selected?.count?.toString()), [selected])
   const fillBidOrder = async () => {
@@ -177,10 +179,10 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
               <div
                 className={'cursor-pointer'}
                 onClick={() => {
-                  setAmount(nftBalance - listedCount <= 0 ? '1' : (nftBalance - listedCount).toFixed())
+                  setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
                 }}
               >
-                Max({nftBalance - listedCount})
+                Max({availableAmount})
               </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
