@@ -6,12 +6,14 @@ import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contrac
 import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
+import { TimeNFT } from '@/config/abi/TimeNFT'
 
 interface FetcherContextArgs {
   collateralBalance: bigint
   nftBalance: number
   listedCount: number
   bidCount: number
+  totalMintedCount: number
   mintedCount: number
   allowance4nft: bigint
   currentPrice: number
@@ -23,6 +25,7 @@ const FetcherContext = React.createContext<FetcherContextArgs>({
   nftBalance: 0,
   listedCount: 0,
   bidCount: 0,
+  totalMintedCount: 0,
   mintedCount: 0,
   allowance4nft: 0n,
   currentPrice: 0,
@@ -61,7 +64,7 @@ const FetcherContextProvider = ({ children }: any) => {
       },
       {
         address: NFTContractAddress[getCurrentChainId()] as Address,
-        abi: ERC1155ABI,
+        abi: TimeNFT,
         functionName: 'getMintInfo',
       },
       {
@@ -70,11 +73,15 @@ const FetcherContextProvider = ({ children }: any) => {
         functionName: 'allowance',
         args: [address as `0x${string}`, NFTContractAddress[getCurrentChainId()] as Address],
       },
+      {
+        address: NFTContractAddress[getCurrentChainId()] as Address,
+        abi: TimeNFT,
+        functionName: 'minted',
+        args: [address as Address],
+      },
     ],
     watch: true,
   })
-  console.log(data)
-  console.log(data?.[1]?.result, listedCount)
 
   return (
     <FetcherContext.Provider
@@ -83,7 +90,8 @@ const FetcherContextProvider = ({ children }: any) => {
         nftBalance: Number(data?.[1]?.result) ?? 0,
         listedCount: listedCount,
         bidCount: bidCount,
-        mintedCount: Number(data?.[2]?.result?.total) ?? 0,
+        totalMintedCount: Number(data?.[2]?.result?.total) ?? 0,
+        mintedCount: Number(data?.[4]?.result) ?? 0,
         allowance4nft: data?.[3]?.result ?? 0n,
         currentPrice: mid,
         currentMaxPrice: maxPrice,

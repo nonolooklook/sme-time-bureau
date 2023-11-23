@@ -5,7 +5,6 @@ import { TimeNFT } from '@/config/abi/TimeNFT'
 
 export const useMint = (amount: string, enabled: boolean, onSuccess: any) => {
   const { address } = useAccount()
-  console.log(NFTContractAddress[getCurrentChainId()] as Address, enabled, amount, address)
   const { config } = usePrepareContractWrite({
     address: NFTContractAddress[getCurrentChainId()] as Address,
     abi: TimeNFT,

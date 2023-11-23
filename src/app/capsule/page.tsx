@@ -19,7 +19,7 @@ import { useApprove } from '@/hooks/useApprove'
 import Link from 'next/link'
 
 export default function Page() {
-  const { mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
+  const { collateralBalance, totalMintedCount, mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
   const [total, setTotal] = useState(1000)
   const [scrollPosition, setScrollPosition] = useState(0)
@@ -38,7 +38,10 @@ export default function Page() {
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
-  const canMint = mint && isMintLoading && parseUnits(amount as `${number}`, 0) > 10
+  const canMint = !!mint && !isMintLoading && mintedCount < 5
+
+  console.log('You had minted: ', mintedCount, collateralBalance)
+
   return (
     <div
       className={'relative min-h-screen bg-no-repeat'}
@@ -108,28 +111,28 @@ export default function Page() {
                 </div>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Minted: {mintedCount} / {total}
+                • Minted: {totalMintedCount} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(mintedCount / total) * 100}%` }}
+                  style={{ width: `${(totalMintedCount / total) * 100}%` }}
                 ></div>
                 <div
                   className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(mintedCount / total) * 100}%` }}
+                  style={{ left: `${(totalMintedCount / total) * 100}%` }}
                 />
               </div>
               <div className='flex gap-10'>
                 <InputWithButton amount={amount} setAmount={setAmount} />
                 {shouldApprove && (
-                  <button className={'btn-primary w-[120px]'} onClick={approve} disabled={!approve || isApproveLoading}>
+                  <button className={'btn-primary w-[140px]'} onClick={approve} disabled={!approve || isApproveLoading}>
                     {isApproveLoading && <Spinner />}
                     Approve
                   </button>
                 )}
                 {!shouldApprove && (
-                  <button className={'btn-primary w-[120px]'} onClick={mint} disabled={!canMint}>
+                  <button className={'btn-primary w-[140px]'} onClick={mint} disabled={!canMint}>
                     {isMintLoading && <Spinner />}
                     Mint
                   </button>
@@ -215,16 +218,16 @@ export default function Page() {
                 </CircleProgress>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Used: {mintedCount} / {total}
+                • Used: {totalMintedCount} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(mintedCount / total) * 100}%` }}
+                  style={{ width: `${(totalMintedCount / total) * 100}%` }}
                 ></div>
                 <div
                   className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(mintedCount / total) * 100}%` }}
+                  style={{ left: `${(totalMintedCount / total) * 100}%` }}
                 />
               </div>
               <div className='flex gap-10 items-center'>
@@ -297,7 +300,6 @@ export default function Page() {
                 </div>
               </div>
             </div>
-
             <div className={'w-[260px] grow shrink-0'} />
           </div>
         </div>
