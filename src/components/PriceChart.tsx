@@ -47,7 +47,6 @@ export const PriceChart = ({
 
   const step = maxValue / 5
   const values = useMemo(() => Array.from({ length: 6 }, (_, index) => Math.round(index * step * 100) / 100).reverse(), [step])
-  console.log(values)
 
   return (
     <>

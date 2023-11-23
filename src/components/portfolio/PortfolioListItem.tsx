@@ -37,7 +37,9 @@ export const PortfolioListItem = ({
         <div className='w-1/6'>${displayBalance(max)}</div>
         <div>
           <button
-            className={'rounded-full bg-primary px-4 w-[160px] text-lg text-center py-2 '}
+            className={
+              'rounded-full bg-primary w-[140px] text-lg text-center py-2 flex items-center justify-center gap-2 disabled:bg-red-400 disabled:opacity-50 cursor-pointer'
+            }
             onClick={() => cancelList(order)}
             disabled={isCancelLoading}
           >

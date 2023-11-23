@@ -37,7 +37,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
 
   const canAccept = availableAmount >= Number(amount)
 
-  useEffect(() => setAmount(selected?.count?.toString()), [selected])
+  useEffect(() => setAmount(selected?.order?.remainingQuantity?.toFixed() ?? '1'), [selected])
   const fillBidOrder = async () => {
     try {
       if (!signer) return
