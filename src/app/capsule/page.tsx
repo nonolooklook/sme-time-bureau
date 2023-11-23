@@ -38,9 +38,7 @@ export default function Page() {
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
-
-  console.log(mint)
-
+  const canMint = mint && isMintLoading && parseUnits(amount as `${number}`, 0) > 10
   return (
     <div
       className={'relative min-h-screen bg-no-repeat'}
@@ -131,11 +129,7 @@ export default function Page() {
                   </button>
                 )}
                 {!shouldApprove && (
-                  <button
-                    className={'btn-primary w-[120px]'}
-                    onClick={mint}
-                    disabled={!mint || isMintLoading || parseUnits(amount as `${number}`, 0) > 5}
-                  >
+                  <button className={'btn-primary w-[120px]'} onClick={mint} disabled={!canMint}>
                     {isMintLoading && <Spinner />}
                     Mint
                   </button>

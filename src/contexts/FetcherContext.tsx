@@ -73,6 +73,7 @@ const FetcherContextProvider = ({ children }: any) => {
     ],
     watch: true,
   })
+  console.log(data)
   console.log(data?.[1]?.result, listedCount)
 
   return (

@@ -34,6 +34,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
   const [wrongMsg, setWrongMsg] = useState('')
   useEffect(() => setAmount(selected?.count?.toString()), [selected])
 
+  const canBuy = collateralBalance >= parseUnits(amount as `${number}`, 0) * parseEther(selected?.max)
+
   const fillSellOrder = async () => {
     try {
       if (!signer) return
@@ -180,8 +182,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
               USDC Balance: {displayBalance(collateralBalance)}
             </div>
             <div className='flex justify-center mb-4 mt-6'>
-              <button className={'btn-primary w-[100px]'} onClick={fillSellOrder}>
-                Buy
+              <button className={'btn-primary w-[170px]'} onClick={fillSellOrder} disabled={!canBuy}>
+                {canBuy ? 'Buy' : 'Not enough'}
               </button>
             </div>
           </Dialog.Content>

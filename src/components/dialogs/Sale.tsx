@@ -3,7 +3,7 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { parseEther, parseUnits } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { displayBalance } from '@/utils/display'
 import { Seaport } from '@opensea/seaport-js'
@@ -20,8 +20,10 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useAccount } from 'wagmi'
 import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
+import { FetcherContext } from '@/contexts/FetcherContext'
 
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
+  const { nftBalance, listedCount } = useContext(FetcherContext)
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -30,6 +32,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   const [wrongMsg, setWrongMsg] = useState('')
   const [amount, setAmount] = useState('1')
   const [o, setO] = useState(false)
+
+  const canAccept = nftBalance - listedCount >= Number(amount)
 
   useEffect(() => setAmount(selected?.count?.toString()), [selected])
   const fillBidOrder = async () => {
@@ -170,7 +174,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>{displayBalance(parseUnits(amount as `${number}`, 0) * parseEther(selected?.max))} USDC</div>
+              <div>Max({nftBalance - listedCount})</div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>
@@ -179,7 +183,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
               Transaction fees：0.5%
             </div>
             <div className='flex justify-center mb-4 mt-6'>
-              <button className={'btn-primary w-[100px]'} onClick={fillBidOrder}>
+              <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!canAccept}>
                 Accept
               </button>
             </div>
