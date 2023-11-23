@@ -138,7 +138,9 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                     Probability：<div className={'text-2xl'}>99.98%</div>
                   </div>
                 </div>
-                <Image src={'/tp-1.png'} alt={'tp'} width={240} height={100} />
+                <div className={'w-[280px] flex justify-center'}>
+                  <img src={'/tp-1.png'} alt={'tp'} width={246} height={100} />
+                </div>
               </div>
             </div>
             <div className='border border-gray-600 rounded-2xl p-4'>
@@ -149,7 +151,9 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                     Probability：<div className={'text-2xl'}>0.1%</div>
                   </div>
                 </div>
-                <Image src={'/tp-2.png'} alt={'tp'} width={240} height={100} />
+                <div className={'w-[280px] flex justify-center'}>
+                  <img src={'/tp-2.png'} alt={'tp'} width={260} height={102} />
+                </div>
               </div>
             </div>
             <div className='border border-gray-600 rounded-2xl p-4'>
@@ -160,7 +164,9 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                     Probability：<div className={'text-2xl'}>0.01%</div>
                   </div>
                 </div>
-                <Image src={'/tp-3.png'} alt={'tp'} width={240} height={100} />
+                <div className={'w-[280px] flex justify-center'}>
+                  <img src={'/tp-3.png'} alt={'tp'} width={280} height={100} />
+                </div>
               </div>
             </div>
           </div>
