@@ -34,7 +34,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   const [amount, setAmount] = useState('1')
   const [o, setO] = useState(false)
 
-  const maxAmount = !!availableAmount && !!selected ? Math.min(availableAmount, selected?.order?.remainingQuantity) : 0
+  const maxAmount = !!availableAmount && !!selected?.order ? Math.min(availableAmount, selected?.order?.remainingQuantity) : 0
   const canAccept = maxAmount >= Number(amount)
   useEffect(() => setAmount(maxAmount?.toFixed() ?? '1'), [selected])
   const fillBidOrder = async () => {
