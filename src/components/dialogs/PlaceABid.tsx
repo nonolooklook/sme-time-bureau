@@ -98,7 +98,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className='dialog-overlay' />
-        <Dialog.Content className='dialog-content w-[660px]'>
+        <Dialog.Content className='dialog-content w-[660px]' onPointerDownOutside={(e) => e.preventDefault()}>
           <div className='flex items-center justify-between mb-4'>
             <div className='dialog-title'>Place a bid</div>
             <Dialog.Close asChild>

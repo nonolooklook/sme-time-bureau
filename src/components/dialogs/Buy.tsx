@@ -147,7 +147,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       <Dialog.Root open={open} onOpenChange={onChange}>
         <Dialog.Portal>
           <Dialog.Overlay className='dialog-overlay' />
-          <Dialog.Content className='dialog-content w-[660px]'>
+          <Dialog.Content className='dialog-content w-[660px]' onPointerDownOutside={(e) => e.preventDefault()}>
             <div className='flex items-center justify-between mb-6'>
               <div className='dialog-title'>Buy</div>
               <Dialog.Close asChild>
@@ -193,7 +193,14 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       <Dialog.Root open={o} onOpenChange={() => setO(false)}>
         <Dialog.Portal>
           <Dialog.Overlay className={'dialog-overlay'} />
-          <Dialog.Content className={'dialog-content'}>
+          <Dialog.Content className={'dialog-content'} onPointerDownOutside={(e) => e.preventDefault()}>
+            <div className='text-right'>
+              <Dialog.Close asChild>
+                <button className='IconButton' aria-label='Close'>
+                  <Cross2Icon />
+                </button>
+              </Dialog.Close>
+            </div>
             <div
               onClick={() => {
                 if (ref.current) {
