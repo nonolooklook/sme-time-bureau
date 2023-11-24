@@ -135,7 +135,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                 <div>
                   <div className={'text-2xl'}>Common</div>
                   <div className={'flex items-center'}>
-                    Probability：<div className={'text-2xl'}>99.98%</div>
+                    Probability：<div className={'text-2xl'}>99.89%</div>
                   </div>
                 </div>
                 <div className={'w-[280px] flex justify-center'}>
