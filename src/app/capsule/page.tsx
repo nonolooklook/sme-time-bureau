@@ -7,22 +7,28 @@ import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
 import { Dot } from '@/components/icons/dot'
 import { useTops } from '@/hooks/useTops'
-import { ellipseAddress } from '@/utils/display'
+import { displayBalance, ellipseAddress } from '@/utils/display'
 import { CircleProgress } from '@/components/CircleProgress'
 import { useCountdown } from '@/hooks/useCountdown'
-import { parseEther, parseUnits } from 'viem'
+import { Address, parseEther, parseUnits } from 'viem'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useMint } from '@/hooks/useMint'
 import { Spinner } from '@/components/Spinner'
 import { toast } from 'sonner'
 import { useApprove } from '@/hooks/useApprove'
 import Link from 'next/link'
+import { useQuantity } from '@/hooks/useQuantity'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { useOfficialAddress } from '@/hooks/useOfficialAddress'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { getCurrentChainId } from '@/config/contract'
+import { erc20ABI, useContractRead } from 'wagmi'
 
 export default function Page() {
   const { collateralBalance, totalMintedCount, mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
-  const [total, setTotal] = useState(1000)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const { total, used } = useQuantity()
 
   const handleScroll = () => setScrollPosition(window.pageYOffset)
   const scrollTo = useCallback((i: number) => window.scrollTo({ left: 0, top: i === 0 ? 0 : i === 1 ? 660 : 1600, behavior: 'smooth' }), [])
@@ -41,6 +47,19 @@ export default function Page() {
   const canMint = !!mint && !isMintLoading && mintedCount < 5
 
   console.log('You had minted: ', mintedCount, collateralBalance)
+
+  const { availableAmount } = useAvailableAmount()
+
+  const { remaining } = useQuantity()
+  const { officialAddress } = useOfficialAddress()
+
+  const { data: officialBalance } = useContractRead({
+    address: ERC20_ADDRESS[getCurrentChainId()] as Address,
+    abi: erc20ABI,
+    functionName: 'balanceOf',
+    args: [officialAddress as Address],
+    enabled: !!officialAddress,
+  })
 
   return (
     <div
@@ -110,9 +129,7 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-              <div className={'text-gray-200 mb-3 mt-10'}>
-                • Minted: {totalMintedCount} / {total}
-              </div>
+              <div className={'text-gray-200 mb-3 mt-10'}>• Minted: {totalMintedCount} / 1000</div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
@@ -218,17 +235,14 @@ export default function Page() {
                 </CircleProgress>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>
-                • Used: {totalMintedCount} / {total}
+                • Used: {used} / {total}
               </div>
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(totalMintedCount / total) * 100}%` }}
+                  style={{ width: `${(used / total) * 100}%` }}
                 ></div>
-                <div
-                  className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(totalMintedCount / total) * 100}%` }}
-                />
+                <div className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`} style={{ left: `${(used / total) * 100}%` }} />
               </div>
               <div className='flex gap-10 items-center'>
                 <Link
@@ -240,7 +254,7 @@ export default function Page() {
                   TRADE
                 </Link>
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
-                  You have {Math.min(nftBalance, listedCount)} capsules
+                  You have {availableAmount} capsules
                 </div>
               </div>
             </div>
@@ -275,16 +289,18 @@ export default function Page() {
                 <div className='flex items-center'>
                   • Fund pool:
                   <Image src={'/usdc.svg'} alt={'timer'} width={20} height={20} className={'mx-2'} />
-                  <div className={'text-xl text-white'}>8765.32</div>
+                  <div className={'text-xl text-white'}>{displayBalance(officialBalance)}</div>
                 </div>
                 <div className='flex items-center'>
                   • Unused capsules:
-                  <div className={'text-xl text-white ml-2'}>900</div>
+                  <div className={'text-xl text-white ml-2'}>{remaining}</div>
                 </div>
                 <div className='flex items-center'>
                   • Real-price:
                   <Image src={'/usdc.svg'} alt={'timer'} width={20} height={20} className={'mx-2'} />
-                  <div className={'text-xl text-white'}>9.74</div>
+                  <div className={'text-xl text-white'}>
+                    {!!officialBalance ? displayBalance(officialBalance / BigInt(remaining)) : '0.00'}
+                  </div>
                 </div>
               </div>
               <div className='flex gap-10 mt-12 items-center'>
@@ -296,7 +312,7 @@ export default function Page() {
                   SELL
                 </button>
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
-                  You have 21 capsules
+                  You have {availableAmount} capsules
                 </div>
               </div>
             </div>
