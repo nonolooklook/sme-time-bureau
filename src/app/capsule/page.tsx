@@ -133,11 +133,11 @@ export default function Page() {
               <div className='border border-gray-400 rounded-full h-[24px] relative mb-8'>
                 <div
                   className={`bg-gradient-to-r from-[#FFAC03aa] to-[#FFAC03ff] h-[22px] rounded-l-full`}
-                  style={{ width: `${(totalMintedCount / total) * 100}%` }}
+                  style={{ width: `${(totalMintedCount / 1000) * 100}%` }}
                 ></div>
                 <div
                   className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`}
-                  style={{ left: `${(totalMintedCount / total) * 100}%` }}
+                  style={{ left: `${(totalMintedCount / 1000) * 100}%` }}
                 />
               </div>
               <div className='flex gap-10'>
