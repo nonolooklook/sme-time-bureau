@@ -24,7 +24,6 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
-  const { nftBalance, listedCount } = useContext(FetcherContext)
   const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
@@ -35,9 +34,9 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   const [amount, setAmount] = useState('1')
   const [o, setO] = useState(false)
 
-  const canAccept = availableAmount >= Number(amount)
-
-  useEffect(() => setAmount(selected?.order?.remainingQuantity?.toFixed() ?? '1'), [selected])
+  const maxAmount = !!availableAmount && !!selected ? Math.min(availableAmount, selected?.order?.remainingQuantity) : 0
+  const canAccept = maxAmount >= Number(amount)
+  useEffect(() => setAmount(maxAmount?.toFixed() ?? '1'), [selected])
   const fillBidOrder = async () => {
     try {
       if (!signer) return
@@ -179,15 +178,15 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
               <div
                 className={'cursor-pointer'}
                 onClick={() => {
-                  setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
+                  setAmount(maxAmount <= 0 ? '1' : maxAmount.toFixed())
                 }}
               >
-                Max({availableAmount})
+                Max({maxAmount})
               </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>
-                Total price maximum: {displayBalance(parseUnits(amount as `${number}`, 0) * parseEther(selected?.max))} USDC
+                Total price maximum: {displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)} USDC
               </div>
               Transaction fees：0.5%
             </div>
