@@ -139,7 +139,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>
             <InputWithButton amount={amount} setAmount={setAmount} />
-            <div>{displayBalance(parseUnits(max as `${number}`, 0) * parseEther(amount as `${number}`))} USDC</div>
+            <div>{displayBalance((parseEther(max as `${number}`) * parseEther(amount as `${number}`)) / 10n ** 18n)} USDC</div>
           </div>
           <div className='my-3 text-gray-400 pl-4 text-sm'>USDC Balance: {displayBalance(collateralBalance)}</div>
           <div className='flex justify-center my-4'>
