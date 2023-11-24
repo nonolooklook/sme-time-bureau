@@ -32,9 +32,10 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
   const [wrongMsg, setWrongMsg] = useState('')
-  useEffect(() => setAmount(selected?.order?.remainingQuantity?.toFixed() ?? '1'), [selected])
+  const maxAmount = selected?.order?.remainingQuantity ?? 0
+  useEffect(() => setAmount(maxAmount.toFixed() ?? '1'), [selected])
 
-  const canBuy = collateralBalance >= parseUnits(amount as `${number}`, 0) * parseEther(selected?.max)
+  const canBuy = collateralBalance >= parseUnits(amount as `${number}`, 0) * parseEther(selected?.max) && Number(amount) <= maxAmount
 
   const fillSellOrder = async () => {
     try {
