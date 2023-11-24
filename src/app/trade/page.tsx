@@ -133,9 +133,9 @@ export default function Page() {
                         >
                           <div className='grid grid-cols-4 text-gray-200'>
                             <div>{order?.remainingQuantity}</div>
-                            <div className={'text-center'}>${displayBalance(parseUnits(maxP, 0) / count)}</div>
-                            <div className={'text-center'}>${displayBalance(parseUnits(minP, 0) / count)}</div>
-                            <div className={'text-right pr-2'}>${displayBalance(realMid)}</div>
+                            <div className={'text-center'}>${displayBalance(BigInt(maxP) / count)}</div>
+                            <div className={'text-center'}>${displayBalance(BigInt(minP) / count)}</div>
+                            <div className={'text-right pr-2'}>${order?.type === '3' ? '8.19' : displayBalance(realMid)}</div>
                           </div>
                           <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
                         </div>
@@ -203,8 +203,8 @@ export default function Page() {
                             }
                             setOpenBuy(true)
                             setSelected({
-                              min: displayBalance(parseUnits(minp, 0) / count),
-                              max: displayBalance(parseUnits(maxp, 0) / count),
+                              min: displayBalance(BigInt(minp) / count),
+                              max: displayBalance(BigInt(maxp) / count),
                               mid: displayBalance(realMid),
                               count: count?.toString(),
                               order: order,
