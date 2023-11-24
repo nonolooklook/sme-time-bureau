@@ -20,6 +20,8 @@ import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getList
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { FetcherContext } from '@/contexts/FetcherContext'
+import { useQuantity } from '@/hooks/useQuantity'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
 export default function Page() {
   const { currentPrice } = useContext(FetcherContext)
@@ -36,6 +38,7 @@ export default function Page() {
   const [openBuy, setOpenBuy] = useState(false)
   const [openSale, setOpenSale] = useState(false)
   const [selected, setSelected] = useState<any>({ min: '8', max: '10', mid: '9', count: 1 })
+  const [privilegeCount, setPrivilegeCount] = useState(0)
 
   const { orders: listOrders, mutate: mutateList } = useOrders(false)
   const { orders: bidOrders, mutate: mutateBid } = useOrders(true)
@@ -50,6 +53,9 @@ export default function Page() {
       ? listOrders.filter((o: any) => getListOrderMinPrice(o) < selectedPrice && getListOrderMaxPrice(o) > selectedPrice)
       : listOrders
 
+  const { remaining } = useQuantity()
+  const { availableAmount } = useAvailableAmount()
+
   useInterval(() => {
     if (type === 'list') {
       setOpenList(true)
@@ -57,6 +63,7 @@ export default function Page() {
     }
     if (type === 'privilege') {
       setOpenPrivilege(true)
+      setPrivilegeCount(Math.min(remaining, availableAmount))
       router.push('/trade')
     }
   }, 500)
@@ -110,6 +117,7 @@ export default function Page() {
                           key={order?.hash}
                           onClick={() => {
                             if (order?.type === '3') {
+                              setPrivilegeCount(order?.remainingQuantity)
                               setOpenPrivilege(true)
                               return
                             }
@@ -282,7 +290,7 @@ export default function Page() {
             />
           </div>
         </div>
-        <PrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} />
+        <PrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} maxCount={privilegeCount} />
       </div>
     </div>
   )

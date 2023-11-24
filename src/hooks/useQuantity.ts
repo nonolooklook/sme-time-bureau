@@ -9,9 +9,9 @@ export const useQuantity = (): { total: number; used: number; remaining: number;
   const { data, mutate, error, isLoading } = useSWR('/quantity', fetcher)
 
   return {
-    total: data?.data?.totalQuantity,
-    used: data?.data?.usedQuantity,
-    remaining: data?.data?.remainingQuantity,
+    total: data?.data?.totalQuantity ?? 0,
+    used: data?.data?.usedQuantity ?? 0,
+    remaining: data?.data?.remainingQuantity ?? 0,
     mutate,
     isLoading,
   }

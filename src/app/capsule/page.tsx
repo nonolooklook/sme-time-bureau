@@ -299,7 +299,7 @@ export default function Page() {
                   • Real-price:
                   <Image src={'/usdc.svg'} alt={'timer'} width={20} height={20} className={'mx-2'} />
                   <div className={'text-xl text-white'}>
-                    {!!officialBalance ? displayBalance(officialBalance / BigInt(remaining)) : '0.00'}
+                    {!!officialBalance && !!remaining ? displayBalance(officialBalance / BigInt(remaining)) : '0.00'}
                   </div>
                 </div>
               </div>

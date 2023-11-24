@@ -20,7 +20,7 @@ import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 
-export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: any }) => {
+export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
   const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
@@ -30,7 +30,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
   const [wrongMsg, setWrongMsg] = useState('')
   const [o, setO] = useState(false)
 
-  const enabled = Number(amount) <= Math.min(nftBalance, listedCount)
+  const enabled = Number(amount) <= Math.min(availableAmount, maxCount)
 
   const fillBidOrder = async () => {
     if (!signer) return
@@ -180,7 +180,7 @@ export const PrivilegeTrade = ({ open, onChange }: { open: boolean; onChange: an
                   setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
                 }}
               >
-                Max({Math.min(nftBalance, listedCount)})
+                Max({Math.min(maxCount, availableAmount)})
               </div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
