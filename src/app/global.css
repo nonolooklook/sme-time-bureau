@@ -178,3 +178,7 @@ input[type="number"] {
 .index-scroll .active {
     @apply text-[20px] text-white;
 }
+
+.IconButton {
+    @apply cursor-pointer;
+}
