@@ -105,7 +105,8 @@ export default function Page() {
                   const minP = order?.entry?.parameters?.offer?.[0]?.startAmount
                   const maxP = order?.entry?.parameters?.offer?.[0]?.endAmount
                   const mid = calculateMidPrice(minP, maxP)
-                  const count = parseUnits(order?.entry?.parameters?.consideration?.[0]?.startAmount, 0)
+                  let count = BigInt(order?.entry?.parameters?.consideration?.[0]?.startAmount)
+                  count = count === 0n ? 1n : count
                   const realMid = mid / count
                   const wc = `${50n * count}px`
 
@@ -187,7 +188,8 @@ export default function Page() {
                   const minp = order?.entry?.parameters?.consideration?.[0]?.startAmount
                   const maxp = order?.entry?.parameters?.consideration?.[0]?.endAmount
                   const mid = calculateMidPrice(minp, maxp)
-                  const count = parseUnits(order?.entry?.parameters?.offer?.[0]?.startAmount, 0)
+                  let count = BigInt(order?.entry?.parameters?.offer?.[0]?.startAmount)
+                  count = count === 0n ? 1n : count
                   const realMid = mid / count
                   const wc = `${50n * count}px`
 
