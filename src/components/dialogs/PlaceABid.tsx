@@ -37,7 +37,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
         return
       }
       if (!signer) return
-      if (parseUnits(min, 0) > parseUnits(max, 0)) {
+      if (parseEther(min) >= parseEther(max)) {
         toast.error('Min price can`t be greater than max price')
         return
       }

@@ -39,8 +39,7 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
         toast.error("Amount can't be less than or equal to 0")
         return
       }
-      if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
-        console.log(min, max)
+      if (parseEther(min) >= parseEther(max)) {
         toast.error('Min price can`t be greater than max price')
         return
       }
