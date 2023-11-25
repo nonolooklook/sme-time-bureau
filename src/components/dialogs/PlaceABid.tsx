@@ -97,7 +97,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
     setLoading(false)
   }, [signer, min, max, amount])
 
-  const canBuy = collateralBalance >= (parseEther(amount as `${number}`) * parseEther(amount as `${number}`)) / 10n ** 18n
+  const canBuy = collateralBalance >= (parseEther(max as `${number}`) * parseEther(amount as `${number}`)) / 10n ** 18n
 
   return (
     <Dialog.Root open={open} onOpenChange={onChange}>
