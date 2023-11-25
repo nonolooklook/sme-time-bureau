@@ -39,7 +39,9 @@ export default function Page() {
   const index = scrollPosition < 660 ? 0 : scrollPosition > 1100 ? 2 : 1
 
   const { tops } = useTops()
-  const [days, hours, minutes, seconds] = useCountdown(1701130328000)
+  const endTime = 1701130328000
+  const shouldCountdown = endTime > new Date().getTime()
+  const [days, hours, minutes, seconds] = useCountdown(endTime)
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
@@ -97,35 +99,38 @@ export default function Page() {
                 </div>
                 <div>
                   <div className={'text-gray-200 text-sm mb-3'}>• End countdown</div>
-                  <div className={'flex gap-2'}>
-                    <CircleProgress ratio={days / 30}>
-                      <div className={'flex flex-col items-center justify-center h-full'}>
-                        <div className={'text-lg -mb-1'}>{days}</div>
-                        <div className={'text-xs text-gray-400'}>DAYS</div>
-                      </div>
-                    </CircleProgress>
-                    <div className={'text-2xl mx-1 mt-3'}>:</div>
-                    <CircleProgress ratio={hours / 24}>
-                      <div className={'flex flex-col items-center justify-center h-full'}>
-                        <div className={'text-lg -mb-1'}>{hours}</div>
-                        <div className={'text-xs text-gray-400'}>HRS</div>
-                      </div>
-                    </CircleProgress>
-                    <div className={'text-2xl mx-1 mt-3'}>:</div>
-                    <CircleProgress ratio={minutes / 60}>
-                      <div className={'flex flex-col items-center justify-center h-full'}>
-                        <div className={'text-lg -mb-1'}>{minutes}</div>
-                        <div className={'text-xs text-gray-400'}>MINS</div>
-                      </div>
-                    </CircleProgress>
-                    <div className={'text-2xl mx-1 mt-3'}>:</div>
-                    <CircleProgress ratio={seconds / 60}>
-                      <div className={'flex flex-col items-center justify-center h-full'}>
-                        <div className={'text-lg -mb-1'}>{seconds}</div>
-                        <div className={'text-xs text-gray-400'}>SECS</div>
-                      </div>
-                    </CircleProgress>
-                  </div>
+                  {!shouldCountdown && <div className={'text-[30px] mt-6'}>Mint Ended</div>}
+                  {shouldCountdown && (
+                    <div className={'flex gap-2'}>
+                      <CircleProgress ratio={days / 30}>
+                        <div className={'flex flex-col items-center justify-center h-full'}>
+                          <div className={'text-lg -mb-1'}>{days}</div>
+                          <div className={'text-xs text-gray-400'}>DAYS</div>
+                        </div>
+                      </CircleProgress>
+                      <div className={'text-2xl mx-1 mt-3'}>:</div>
+                      <CircleProgress ratio={hours / 24}>
+                        <div className={'flex flex-col items-center justify-center h-full'}>
+                          <div className={'text-lg -mb-1'}>{hours}</div>
+                          <div className={'text-xs text-gray-400'}>HRS</div>
+                        </div>
+                      </CircleProgress>
+                      <div className={'text-2xl mx-1 mt-3'}>:</div>
+                      <CircleProgress ratio={minutes / 60}>
+                        <div className={'flex flex-col items-center justify-center h-full'}>
+                          <div className={'text-lg -mb-1'}>{minutes}</div>
+                          <div className={'text-xs text-gray-400'}>MINS</div>
+                        </div>
+                      </CircleProgress>
+                      <div className={'text-2xl mx-1 mt-3'}>:</div>
+                      <CircleProgress ratio={seconds / 60}>
+                        <div className={'flex flex-col items-center justify-center h-full'}>
+                          <div className={'text-lg -mb-1'}>{seconds}</div>
+                          <div className={'text-xs text-gray-400'}>SECS</div>
+                        </div>
+                      </CircleProgress>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className={'text-gray-200 mb-3 mt-10'}>• Minted: {totalMintedCount} / 1000</div>
