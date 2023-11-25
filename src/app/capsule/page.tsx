@@ -139,7 +139,7 @@ export default function Page() {
                   style={{ left: `${(totalMintedCount / 1000) * 100}%` }}
                 />
               </div>
-              <div className='flex gap-10'>
+              <div className='flex gap-10 items-center'>
                 <InputWithButton amount={amount} setAmount={setAmount} />
                 {shouldApprove && (
                   <button className={'btn-primary w-[140px]'} onClick={approve} disabled={!approve || isApproveLoading}>
@@ -153,6 +153,13 @@ export default function Page() {
                     Mint
                   </button>
                 )}
+                <div className={'cursor-pointer'} onClick={() => setAmount((5 - mintedCount).toFixed())}>
+                  Max({5 - mintedCount})
+                </div>
+              </div>
+              <div className='flex items-center gap-2 mt-6 text-sm text-gray-300'>
+                <Image src={'/usdc.svg'} alt={'timer'} width={20} height={20} />
+                <div>Balance: {displayBalance(collateralBalance)}</div>
               </div>
             </div>
             <div className={'w-[260px] grow shrink-0 pl-14'}>
