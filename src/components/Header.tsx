@@ -23,7 +23,7 @@ export const Header = () => {
             Trade
           </Link>
           {address && (
-            <Link className={'item'} href={'/portfolio'}>
+            <Link className={`${pathname === '/portfolio' ? 'active' : ''} item`} href={'/portfolio'}>
               Portfolio
             </Link>
           )}
