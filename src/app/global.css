@@ -91,7 +91,7 @@ button {
 }
 
 .item {
-    @apply relative;
+    @apply relative py-6 text-center;
 }
 
 .item.active {
@@ -101,7 +101,7 @@ button {
 .item.active:after {
     content: '';
     background: linear-gradient(270.01deg, #FFAC03 23.25%, rgba(255, 255, 255, 0) 100%, rgba(255, 172, 3, 0) 100%);
-    @apply block h-[1px] w-full  absolute -bottom-[30px];
+    @apply block h-[1px] w-full  absolute bottom-0;
 }
 
 .capsule-title {

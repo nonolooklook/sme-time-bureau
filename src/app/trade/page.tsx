@@ -96,7 +96,7 @@ export default function Page() {
                 <div>Quantity</div>
                 <div className={'text-center'}>Max Price</div>
                 <div className={'text-center'}>Min Price</div>
-                <div className={'text-right'}>Exp Price</div>
+                <div className={'text-right'}>Expected Price</div>
               </div>
               <div className={'h-[1px] w-full bg-gray-500 my-6'} />
               <div className='flex flex-col gap-4 h-[424px] overflow-y-auto'>
@@ -176,7 +176,7 @@ export default function Page() {
             </div>
             <div className='trade-card'>
               <div className='grid grid-cols-4 text-gray-400'>
-                <div>Exp Price</div>
+                <div>Expected Price</div>
                 <div className={'text-center'}>Min Price</div>
                 <div className={'text-center'}>Max Price</div>
                 <div className={'text-right'}>Quantity</div>

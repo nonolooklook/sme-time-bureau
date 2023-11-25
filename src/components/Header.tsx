@@ -8,11 +8,11 @@ export const Header = () => {
   const pathname = usePathname()
   return (
     <header className={'z-10 bg-black bg-opacity-40 text-white border-b border-b-[#DED1B630] fixed top-0 w-full'}>
-      <div className='container mx-auto flex items-center py-5 justify-between'>
+      <div className='container mx-auto flex items-center justify-between'>
         <Link className='flex items-center gap-2' href={'/'}>
           <div className={'text-[24px] font-semibold'}>SME</div>
         </Link>
-        <div className={'flex gap-12 items-center text-[14px]'}>
+        <div className={'flex gap-10 items-center text-[14px]'}>
           <Link className={`${pathname === '/' ? 'active' : ''} item`} href={'/'}>
             Home
           </Link>
