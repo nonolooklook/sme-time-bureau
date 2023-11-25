@@ -66,7 +66,7 @@ export const PriceChart = ({
                   }}
                 >
                   {d.bidAmount > 0 &&
-                    Array.from(Array(d.bidAmount)).map((i) => (
+                    Array.from(Array(d.bidAmount)).map((_, i) => (
                       <div className={`h-[3px] w-full ${selectedPrice === d.price ? 'bg-white' : 'bg-green-400'}`} key={i} />
                     ))}
                 </div>
@@ -78,7 +78,7 @@ export const PriceChart = ({
                   }}
                 >
                   {d.listAmount > 0 &&
-                    Array.from(Array(d.listAmount)).map((i) => (
+                    Array.from(Array(d.listAmount)).map((_, i) => (
                       <div className={`h-[2px] w-full ${selectedPrice === d.price ? 'bg-white' : 'bg-red-400'}`} key={i} />
                     ))}
                 </div>

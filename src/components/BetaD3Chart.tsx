@@ -36,7 +36,7 @@ export const BetaD3Chart = ({
   useLayoutEffect(() => {
     if (!chartRef.current || !svgRef.current) return
     // if (rendered) return
-    if (minPrice > 0 && expectedPrice > 0 && maxPrice > 0) {
+    if (minPrice >= 0 && expectedPrice >= 0 && maxPrice >= 0) {
       rendered = true
       const chartW = chartRef.current.offsetWidth
       const chartH = 220
