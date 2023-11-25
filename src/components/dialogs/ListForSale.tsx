@@ -34,14 +34,19 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
   const enabled = Number(amount) <= availableAmount
 
   const createOrder = useCallback(async () => {
-    if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
-      console.log(min, max)
-      toast.error('Min price can`t be greater than max price')
-      return
-    }
-    if (!signer) return
-    setLoading(true)
     try {
+      if (Number(amount) <= 0) {
+        toast.error("Amount can't be less than or equal to 0")
+        return
+      }
+      if (parseUnits(min as `${number}`, 0) >= parseUnits(max as `${number}`, 0)) {
+        console.log(min, max)
+        toast.error('Min price can`t be greater than max price')
+        return
+      }
+      if (!signer) return
+      setLoading(true)
+
       const seaport = new Seaport(signer, {
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
