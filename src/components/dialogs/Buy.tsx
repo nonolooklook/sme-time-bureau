@@ -35,10 +35,15 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
   const maxAmount = selected?.order?.remainingQuantity ?? 0
   useEffect(() => setAmount(maxAmount.toFixed() ?? '1'), [selected])
 
-  const canBuy = collateralBalance >= parseUnits(amount as `${number}`, 0) * parseEther(selected?.max) && Number(amount) <= maxAmount
+  const canBuy =
+    collateralBalance >= (parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n && Number(amount) <= maxAmount
 
   const fillSellOrder = async () => {
     try {
+      if (Number(amount) <= 0) {
+        toast.error("Amount can't be less than or equal to 0")
+        return
+      }
       if (!signer) return
       const seaport = new Seaport(signer, {
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
@@ -174,11 +179,12 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>{displayBalance(parseUnits(amount as `${number}`, 0) * parseEther(selected?.max))} USDC</div>
+              <div>{displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)} USDC</div>
             </div>
             <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
               <div className={'text-white'}>
-                Authorization required for {displayBalance(parseUnits(amount as `${number}`, 0) * parseEther(selected?.max))} USDC
+                Authorization required for {displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)}{' '}
+                USDC
               </div>
               USDC Balance: {displayBalance(collateralBalance)}
             </div>

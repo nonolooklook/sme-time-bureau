@@ -39,6 +39,10 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   useEffect(() => setAmount(maxAmount?.toFixed() ?? '1'), [selected])
   const fillBidOrder = async () => {
     try {
+      if (Number(amount) <= 0) {
+        toast.error("Amount can't be less than or equal to 0")
+        return
+      }
       if (!signer) return
       setO(true)
       const seaport = new Seaport(signer, {
