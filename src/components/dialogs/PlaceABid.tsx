@@ -20,6 +20,7 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useAccount } from 'wagmi'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { handleError } from '@/utils/error'
 
 export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
@@ -91,7 +92,7 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
       onChange?.(false)
     } catch (e) {
       console.error(e)
-      toast.error(e?.toString())
+      handleError(e)
     }
     setLoading(false)
   }, [signer, min, max, amount])

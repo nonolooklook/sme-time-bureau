@@ -22,6 +22,7 @@ import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { handleError } from '@/utils/error'
 
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { availableAmount } = useAvailableAmount()
@@ -140,9 +141,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
         }
       }, 5000)
     } catch (e: any) {
-      console.error(e)
-      toast.error(e.toString())
       setO(false)
+      handleError(e)
     }
 
     setLoading(false)

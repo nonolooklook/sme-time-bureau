@@ -21,6 +21,7 @@ import { displayBalance } from '@/utils/display'
 import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { handleError } from '@/utils/error'
 
 export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const { availableAmount } = useAvailableAmount()
@@ -94,7 +95,7 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
       onChange?.(false)
     } catch (e: any) {
       console.error(e)
-      toast.error(e?.toString())
+      handleError(e)
     }
     setLoading(false)
   }, [signer, min, max, amount])

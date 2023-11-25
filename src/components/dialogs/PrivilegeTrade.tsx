@@ -19,6 +19,7 @@ import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { handleError } from '@/utils/error'
 
 export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
@@ -109,6 +110,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
       }, 5000)
     } catch (e) {
       console.error(e)
+      handleError(e)
     }
 
     // setLoading(false)

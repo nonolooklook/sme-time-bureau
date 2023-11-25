@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits } from 'viem'
+import { parseEther, parseUnits, UserRejectedRequestError } from 'viem'
 import { InputWithButton } from '@/components/InputWithButton'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
@@ -21,6 +21,8 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { useAccount } from 'wagmi'
+import { ERROR_SIGN_REJECTED, ERROR_SYSTEM } from '@/config/error'
+import { handleError } from '@/utils/error'
 
 export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
@@ -139,9 +141,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         }
       }, 5000)
     } catch (e: any) {
-      console.error(e)
       setO(false)
-      toast.error(e.toString())
+      handleError(e)
     }
 
     setLoading(false)
