@@ -53,8 +53,11 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       })
       setO(true)
       const order = selected?.order
-      const startOfferAmount = order?.entry?.parameters?.consideration?.[0].startAmount * (Number(amount) / selected?.count)
-      const offerAmount = order?.entry?.parameters?.consideration?.[0].endAmount * (Number(amount) / selected?.count)
+      const csd = order?.entry?.parameters?.consideration
+      const startAmount = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.startAmount) + BigInt(amount)).toString(), '0')
+      const endAmount = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.endAmount) + BigInt(amount)).toString(), '0')
+      const startOfferAmount = startAmount * (Number(amount) / selected?.count)
+      const offerAmount = endAmount * (Number(amount) / selected?.count)
       const itemAmount = order?.entry?.parameters?.offer?.[0].startAmount * (Number(amount) / selected?.count)
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',

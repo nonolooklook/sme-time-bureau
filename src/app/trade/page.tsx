@@ -184,8 +184,9 @@ export default function Page() {
               <div className={'h-[1px] w-full bg-gray-500 my-6'} />
               <div className='flex flex-col gap-4 h-[424px] overflow-y-auto'>
                 {finalListOrders?.map((order) => {
-                  const minp = order?.entry?.parameters?.consideration?.[0]?.startAmount
-                  const maxp = order?.entry?.parameters?.consideration?.[0]?.endAmount
+                  const csd = order?.entry?.parameters?.consideration
+                  const minp = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.startAmount) + BigInt(amount)).toString(), '0')
+                  const maxp = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.endAmount) + BigInt(amount)).toString(), '0')
                   const mid = calculateMidPrice(minp, maxp)
                   let count = BigInt(order?.entry?.parameters?.offer?.[0]?.startAmount)
                   count = count === 0n ? 1n : count
