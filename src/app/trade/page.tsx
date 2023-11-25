@@ -9,7 +9,7 @@ import { ListForSale } from '@/components/dialogs/ListForSale'
 import { BuyDialog } from '@/components/dialogs/Buy'
 import { SaleDialog } from '@/components/dialogs/Sale'
 import { useOrders } from '@/hooks/useOrders'
-import { calculateMidPrice } from '@/utils/price'
+import { calculateMidPrice, displayTradePrice } from '@/utils/price'
 import { displayBalance } from '@/utils/display'
 import * as HoverCard from '@radix-ui/react-hover-card'
 import Cookies from 'ts-cookies'
@@ -133,9 +133,9 @@ export default function Page() {
                         >
                           <div className='grid grid-cols-4 text-gray-200'>
                             <div>{order?.remainingQuantity}</div>
-                            <div className={'text-center'}>${displayBalance(BigInt(maxP) / count)}</div>
-                            <div className={'text-center'}>${displayBalance(BigInt(minP) / count)}</div>
-                            <div className={'text-right pr-2'}>${order?.type === '3' ? '8.19' : displayBalance(realMid)}</div>
+                            <div className={'text-center'}>{displayTradePrice(BigInt(maxP) / count)}</div>
+                            <div className={'text-center'}>{displayTradePrice(BigInt(minP) / count)}</div>
+                            <div className={'text-right pr-2'}>{order?.type === '3' ? '$8.19' : displayTradePrice(realMid)}</div>
                           </div>
                           <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
                         </div>
@@ -214,9 +214,9 @@ export default function Page() {
                           key={order?.hash}
                         >
                           <div className='grid grid-cols-4 text-gray-200'>
-                            <div className={'pl-2'}>${displayBalance(realMid)}</div>
-                            <div className={'text-center'}>${displayBalance(BigInt(minp) / count)}</div>
-                            <div className={'text-center'}>${displayBalance(BigInt(maxp) / count)}</div>
+                            <div className={'pl-2'}>{displayTradePrice(realMid)}</div>
+                            <div className={'text-center'}>{displayTradePrice(BigInt(minp) / count)}</div>
+                            <div className={'text-center'}>{displayTradePrice(BigInt(maxp) / count)}</div>
                             <div className={'text-right'}>{order?.remainingQuantity}</div>
                           </div>
                           <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
