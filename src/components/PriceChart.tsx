@@ -39,8 +39,8 @@ export const PriceChart = ({
       const lp = lists?.find((l: any) => l.price === i)?.expectation ?? 0
       data.push({
         price: i,
-        bidAmount: Math.floor((bp * 30) / bidMaxY),
-        listAmount: Math.floor((lp * 30) / listMaxY),
+        bidAmount: Math.floor((bp * 30) / maxValue),
+        listAmount: Math.floor((lp * 30) / maxValue),
       })
     }
   }
