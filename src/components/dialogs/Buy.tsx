@@ -110,6 +110,11 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         })
       }
 
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: 0, itemIndex: 1 }],
+      })
+
       await sleep(2000)
       ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {

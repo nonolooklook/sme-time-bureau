@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -52,6 +52,9 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
 
+      const startAmount = parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)
+      const endAmount = parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)
+
       const makerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
         conduitKey: CONDUIT_KEY[getCurrentChainId()],
@@ -67,10 +70,16 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
         ],
         consideration: [
           {
-            amount: (parseEther(min as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
-            endAmount: (parseEther(max as `${number}`) * parseUnits(amount as `${number}`, 0)).toString(),
+            amount: ((BigInt(startAmount) * 995n) / 1000n).toString(),
+            endAmount: ((BigInt(endAmount) * 995n) / 1000n).toString(),
             token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
+          },
+          {
+            amount: ((BigInt(startAmount) * 5n) / 1000n).toString(),
+            endAmount: ((BigInt(endAmount) * 5n) / 1000n).toString(),
+            token: ERC20_ADDRESS[getCurrentChainId()],
+            recipient: FEE_ADDRESS,
           },
         ],
         allowPartialFills: Number(amount) > 1,

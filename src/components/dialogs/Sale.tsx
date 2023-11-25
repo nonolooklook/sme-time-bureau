@@ -9,7 +9,7 @@ import { displayBalance } from '@/utils/display'
 import { Seaport } from '@opensea/seaport-js'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -71,10 +71,16 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
         ],
         consideration: [
           {
-            amount: startItemAmount.toString(),
-            endAmount: endItemAmount.toString(),
+            amount: ((BigInt(startItemAmount) * 995n) / 1000n).toString(),
+            endAmount: ((BigInt(endItemAmount) * 995n) / 1000n).toString(),
             token: ERC20_ADDRESS[getCurrentChainId()],
             recipient: address,
+          },
+          {
+            amount: ((BigInt(startItemAmount) * 5n) / 1000n).toString(),
+            endAmount: ((BigInt(endItemAmount) * 5n) / 1000n).toString(),
+            token: ERC20_ADDRESS[getCurrentChainId()],
+            recipient: FEE_ADDRESS,
           },
         ],
       }
@@ -109,6 +115,11 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
           considerationComponents: [{ orderIndex: i, itemIndex: 0 }],
         })
       }
+
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: 1, itemIndex: 1 }],
+      })
 
       await sleep(2000)
       ref?.current?.click()
