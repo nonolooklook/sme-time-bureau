@@ -20,6 +20,7 @@ import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
+import { parseEther } from 'viem'
 
 export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
@@ -47,8 +48,8 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
       endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
       consideration: [
         {
-          amount: '1000000000000000000',
-          endAmount: '100000000000000000000',
+          amount: '0',
+          endAmount: (parseEther('1010') * BigInt(amount)).toString(),
           token: ERC20_ADDRESS[getCurrentChainId()],
           recipient: address,
         },
@@ -58,7 +59,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
           itemType: ItemType.ERC1155,
           token: NFTContractAddress[getCurrentChainId()],
           identifier: TokenId.toString(),
-          amount: '1',
+          amount: amount,
         },
       ],
     }
@@ -78,7 +79,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
     })
 
     await sleep(2000)
-    // ref?.current?.click()
+    ref?.current?.click()
 
     try {
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
@@ -96,8 +97,8 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
       }).then((r) => r.json())
       console.log(res)
       if (!res?.data?.status) {
-        // ref?.current?.click()
-        // setWrongMsg(res?.data?.data)
+        ref?.current?.click()
+        setWrongMsg(res?.data?.data)
         return
       }
 
@@ -105,7 +106,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          // ref?.current?.click()
+          ref?.current?.click()
         }
       }, 5000)
     } catch (e) {
@@ -233,7 +234,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
                     <Spinner />
                     <h1>Waiting for Chainlink to return a random number</h1>
                   </div>
-                  <div className={'mt-10 flex items-center gap-2 justify-center'}>
+                  <div className={'mt-10 flex items-center gap-2 justify-center w-[360px]'}>
                     <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
                   </div>
                 </Stepper>
