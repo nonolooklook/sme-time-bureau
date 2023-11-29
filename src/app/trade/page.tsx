@@ -107,7 +107,7 @@ export default function Page() {
                   let count = BigInt(order?.entry?.parameters?.consideration?.[0]?.startAmount)
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
-                  const wc = `${50n * count}px`
+                  const wc = `${50 * order?.remainingQuantity}px`
 
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
@@ -191,7 +191,7 @@ export default function Page() {
                   let count = BigInt(order?.entry?.parameters?.offer?.[0]?.startAmount)
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
-                  const wc = `${50n * count}px`
+                  const wc = `${50 * order?.remainingQuantity}px`
 
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
