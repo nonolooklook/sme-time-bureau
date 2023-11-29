@@ -21,6 +21,7 @@ import { useAccount } from 'wagmi'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { handleError } from '@/utils/error'
+import { ERROR_MIN_MAX_WRONG_PRICE } from '@/config/error'
 
 export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
@@ -38,8 +39,8 @@ export const PlaceABid = ({ open, onChange, mutate }: { open: boolean; onChange:
         return
       }
       if (!signer) return
-      if (parseEther(min) >= parseEther(max)) {
-        toast.error('Min price can`t be greater than max price')
+      if (parseEther(min) > parseEther(max)) {
+        toast.error(ERROR_MIN_MAX_WRONG_PRICE)
         return
       }
       setLoading(true)

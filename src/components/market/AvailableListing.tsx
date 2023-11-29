@@ -17,6 +17,7 @@ import { Spinner } from '../Spinner'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { toast } from 'sonner'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
+import { ERROR_MIN_MAX_WRONG_PRICE } from '@/config/error'
 
 export const AvailableListing = () => {
   const router = useRouter()
@@ -48,8 +49,8 @@ export const AvailableListing = () => {
   useEffect(() => setWrong(min >= max), [min, max])
 
   const createOrder = useCallback(async () => {
-    if (min >= max) {
-      toast.error('Min price can`t be greater than max price')
+    if (min > max) {
+      toast.error(ERROR_MIN_MAX_WRONG_PRICE)
       return
     }
     if (!signer) return

@@ -22,6 +22,7 @@ import { calculateMidPriceFromBigInt } from '@/utils/price'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
+import { ERROR_MIN_MAX_WRONG_PRICE } from '@/config/error'
 
 export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const { availableAmount } = useAvailableAmount()
@@ -40,8 +41,8 @@ export const ListForSale = ({ open, onChange, mutate }: { open: boolean; onChang
         toast.error("Amount can't be less than or equal to 0")
         return
       }
-      if (parseEther(min) >= parseEther(max)) {
-        toast.error('Min price can`t be greater than max price')
+      if (parseEther(min) > parseEther(max)) {
+        toast.error(ERROR_MIN_MAX_WRONG_PRICE)
         return
       }
       if (!signer) return
