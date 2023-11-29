@@ -35,53 +35,52 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
   const enabled = Number(amount) <= Math.min(availableAmount, maxCount)
 
   const fillBidOrder = async () => {
-    if (!signer) return
-    setO(true)
-    const seaport = new Seaport(signer, {
-      overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
-      conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-    })
-    const takerOrder = {
-      zone: '0x0000000000000000000000000000000000000000',
-      conduitKey: CONDUIT_KEY[getCurrentChainId()],
-      startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
-      endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
-      consideration: [
-        {
-          amount: '0',
-          endAmount: (parseEther('1010') * BigInt(amount)).toString(),
-          token: ERC20_ADDRESS[getCurrentChainId()],
-          recipient: address,
-        },
-      ],
-      offer: [
-        {
-          itemType: ItemType.ERC1155,
-          token: NFTContractAddress[getCurrentChainId()],
-          identifier: TokenId.toString(),
-          amount: amount,
-        },
-      ],
-    }
-
-    const { executeAllActions } = await seaport.createOrder(takerOrder, address)
-
-    const order = await executeAllActions()
-    const modeOrderFulfillments: MatchOrdersFulfillment[] = []
-    modeOrderFulfillments.push({
-      offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
-      considerationComponents: [{ orderIndex: 1, itemIndex: 0 }],
-    })
-
-    modeOrderFulfillments.push({
-      offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
-      considerationComponents: [{ orderIndex: 0, itemIndex: 0 }],
-    })
-
-    await sleep(2000)
-    ref?.current?.click()
-
     try {
+      if (!signer) return
+      setO(true)
+      const seaport = new Seaport(signer, {
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
+        conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
+      })
+      const takerOrder = {
+        zone: '0x0000000000000000000000000000000000000000',
+        conduitKey: CONDUIT_KEY[getCurrentChainId()],
+        startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
+        endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+        consideration: [
+          {
+            amount: '0',
+            endAmount: (parseEther('1010') * BigInt(amount)).toString(),
+            token: ERC20_ADDRESS[getCurrentChainId()],
+            recipient: address,
+          },
+        ],
+        offer: [
+          {
+            itemType: ItemType.ERC1155,
+            token: NFTContractAddress[getCurrentChainId()],
+            identifier: TokenId.toString(),
+            amount: amount,
+          },
+        ],
+      }
+
+      const { executeAllActions } = await seaport.createOrder(takerOrder, address)
+
+      const order = await executeAllActions()
+      const modeOrderFulfillments: MatchOrdersFulfillment[] = []
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: 1, itemIndex: 0 }],
+      })
+
+      modeOrderFulfillments.push({
+        offerComponents: [{ orderIndex: 1, itemIndex: 0 }],
+        considerationComponents: [{ orderIndex: 0, itemIndex: 0 }],
+      })
+
+      await sleep(2000)
+      ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -112,9 +111,8 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
     } catch (e) {
       console.error(e)
       handleError(e)
+      setO(false)
     }
-
-    // setLoading(false)
   }
 
   return (
