@@ -15,14 +15,14 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
-      <Script async src='https://www.googletagmanager.com/gtag/js?id=GTM-PWV6NH6J'></Script>
+      <Script async src='https://www.googletagmanager.com/gtag/js?id=G-46NJNM8TCB'></Script>
       <Script id={'google'}>
         {`
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'GTM-PWV6NH6');
+      gtag('config', 'G-46NJNM8TCB');
         `}
       </Script>
       <body className={montserrat.className}>
