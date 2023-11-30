@@ -21,7 +21,7 @@ export const Header = () => {
       </Script>
       <div className='container mx-auto flex items-center justify-between'>
         <Link className='flex items-center gap-2' href={'/'}>
-          <div className={'text-[24px] font-semibold'}>SME</div>
+          <div className={'text-[24px] font-semibold'}>SSE</div>
         </Link>
         <div className={'flex gap-10 items-center text-[14px]'}>
           <Link className={`${pathname === '/' ? 'active' : ''} item`} href={'/'}>
