@@ -48,7 +48,7 @@ export default function Page() {
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
-  const canMint = !!mint && !isMintLoading && mintedCount < 5
+  const canMint = !!mint && !isMintLoading && mintedCount < 5 && shouldCountdown
 
   console.log('You had minted: ', mintedCount, collateralBalance)
 
@@ -150,7 +150,7 @@ export default function Page() {
               <div className='flex gap-10 items-center'>
                 <InputWithButton amount={amount} setAmount={setAmount} />
                 {shouldApprove && (
-                  <button className={'btn-primary w-[140px]'} onClick={approve} disabled={!approve || isApproveLoading}>
+                  <button className={'btn-primary w-[140px]'} onClick={approve} disabled={!approve || isApproveLoading || !shouldCountdown}>
                     {isApproveLoading && <Spinner />}
                     Approve
                   </button>
