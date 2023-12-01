@@ -25,7 +25,7 @@ import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
 
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
-  const { availableAmount } = useAvailableAmount()
+  const { availableAmount, mutate } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
   const signer = useEthersSigner()
@@ -156,6 +156,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       handleError(e)
     }
 
+    mutate?.()
     setLoading(false)
   }
 

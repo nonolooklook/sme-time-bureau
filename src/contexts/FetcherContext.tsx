@@ -7,6 +7,7 @@ import { ERC1155ABI } from '@/config/abi/ERC1155'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 import { TimeNFT } from '@/config/abi/TimeNFT'
+import { useInterval } from 'usehooks-ts'
 
 interface FetcherContextArgs {
   collateralBalance: bigint
@@ -42,7 +43,11 @@ const FetcherContextProvider = ({ children }: any) => {
   const listedCount = listOrders?.reduce((count: number, cv: any) => Number(cv?.entry.parameters?.offer?.[0]?.startAmount) + count, 0)
   const bidCount = bidOrders?.reduce((count: number, cv: any) => Number(cv?.entry.parameters?.consideration?.[0]?.startAmount) + count, 0)
 
-  const { orders } = useOrderDistribution()
+  const { orders, mutate: mutateOrders } = useOrderDistribution()
+
+  useInterval(() => {
+    mutateOrders?.()
+  }, 1500)
 
   const minPrice = orders?.minPrice ?? 0
   const maxPrice = orders?.maxPrice ?? 0
