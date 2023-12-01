@@ -265,14 +265,26 @@ export default function Page() {
                 <div className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`} style={{ left: `${(used / total) * 100}%` }} />
               </div>
               <div className='flex gap-10 items-center'>
-                <Link
-                  href={'/trade?type=privilege'}
-                  className={
-                    'bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
-                  }
-                >
-                  TRADE
-                </Link>
+                {shouldCountdown2 && (
+                  <Link
+                    href={'/trade?type=privilege'}
+                    className={
+                      'bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
+                    }
+                  >
+                    TRADE
+                  </Link>
+                )}
+                {!shouldCountdown2 && (
+                  <button
+                    className={
+                      'opacity-50 bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
+                    }
+                  >
+                    TRADE
+                  </button>
+                )}
+
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
                   You have {availableAmount} capsules
                 </div>
