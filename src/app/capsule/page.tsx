@@ -40,8 +40,11 @@ export default function Page() {
 
   const { tops } = useTops()
   const endTime = 1701130328000
+  const endTime2 = endTime + 7 * 24 * 3600 * 1000
   const shouldCountdown = endTime > new Date().getTime()
+  const shouldCountdown2 = endTime2 > new Date().getTime()
   const [days, hours, minutes, seconds] = useCountdown(endTime)
+  const [days2, hours2, minutes2, seconds2] = useCountdown(endTime2)
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
@@ -216,35 +219,41 @@ export default function Page() {
                 After the event, Stochastic Universe will retrieve all Schrödinger`s Time Capsules at a fixed price, i.e. Time Reset Trade.
               </div>
               <div className={'text-gray-200 text-sm mb-3'}>• End countdown</div>
-              <div className={'flex gap-2'}>
-                <CircleProgress ratio={0.3}>
-                  <div className={'flex flex-col items-center justify-center h-full'}>
-                    <div className={'text-lg -mb-1'}>03</div>
-                    <div className={'text-xs text-gray-400'}>DAYS</div>
-                  </div>
-                </CircleProgress>
-                <div className={'text-2xl mx-1 mt-3'}>:</div>
-                <CircleProgress ratio={10 / 24}>
-                  <div className={'flex flex-col items-center justify-center h-full'}>
-                    <div className={'text-lg -mb-1'}>10</div>
-                    <div className={'text-xs text-gray-400'}>HRS</div>
-                  </div>
-                </CircleProgress>
-                <div className={'text-2xl mx-1 mt-3'}>:</div>
-                <CircleProgress ratio={42 / 60}>
-                  <div className={'flex flex-col items-center justify-center h-full'}>
-                    <div className={'text-lg -mb-1'}>42</div>
-                    <div className={'text-xs text-gray-400'}>MINS</div>
-                  </div>
-                </CircleProgress>
-                <div className={'text-2xl mx-1 mt-3'}>:</div>
-                <CircleProgress ratio={18 / 60}>
-                  <div className={'flex flex-col items-center justify-center h-full'}>
-                    <div className={'text-lg -mb-1'}>18</div>
-                    <div className={'text-xs text-gray-400'}>SECS</div>
-                  </div>
-                </CircleProgress>
-              </div>
+              {shouldCountdown2 && !shouldCountdown ? (
+                <div className={'flex gap-2'}>
+                  <CircleProgress ratio={days2 / 30}>
+                    <div className={'flex flex-col items-center justify-center h-full'}>
+                      <div className={'text-lg -mb-1'}>{days2}</div>
+                      <div className={'text-xs text-gray-400'}>DAYS</div>
+                    </div>
+                  </CircleProgress>
+                  <div className={'text-2xl mx-1 mt-3'}>:</div>
+                  <CircleProgress ratio={hours2 / 24}>
+                    <div className={'flex flex-col items-center justify-center h-full'}>
+                      <div className={'text-lg -mb-1'}>{hours2}</div>
+                      <div className={'text-xs text-gray-400'}>HRS</div>
+                    </div>
+                  </CircleProgress>
+                  <div className={'text-2xl mx-1 mt-3'}>:</div>
+                  <CircleProgress ratio={minutes2 / 60}>
+                    <div className={'flex flex-col items-center justify-center h-full'}>
+                      <div className={'text-lg -mb-1'}>{minutes2}</div>
+                      <div className={'text-xs text-gray-400'}>MINS</div>
+                    </div>
+                  </CircleProgress>
+                  <div className={'text-2xl mx-1 mt-3'}>:</div>
+                  <CircleProgress ratio={seconds2 / 60}>
+                    <div className={'flex flex-col items-center justify-center h-full'}>
+                      <div className={'text-lg -mb-1'}>{seconds2}</div>
+                      <div className={'text-xs text-gray-400'}>SECS</div>
+                    </div>
+                  </CircleProgress>
+                </div>
+              ) : (
+                <>
+                  <div className={'text-[30px] mt-6'}>--</div>
+                </>
+              )}
               <div className={'text-gray-200 mb-3 mt-10'}>
                 • Used: {used} / {total}
               </div>
