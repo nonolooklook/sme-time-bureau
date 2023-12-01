@@ -47,7 +47,7 @@ const FetcherContextProvider = ({ children }: any) => {
 
   useInterval(() => {
     mutateOrders?.()
-  }, 1500)
+  }, 3000)
 
   const minPrice = orders?.minPrice ?? 0
   const maxPrice = orders?.maxPrice ?? 0
