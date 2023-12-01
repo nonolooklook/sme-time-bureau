@@ -43,6 +43,7 @@ export default function Page() {
   const endTime2 = endTime + 7 * 24 * 3600 * 1000
   const shouldCountdown = endTime > new Date().getTime()
   const shouldCountdown2 = endTime2 > new Date().getTime()
+  const ended = !shouldCountdown && !shouldCountdown2
   const [days, hours, minutes, seconds] = useCountdown(endTime)
   const [days2, hours2, minutes2, seconds2] = useCountdown(endTime2)
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
@@ -337,9 +338,10 @@ export default function Page() {
               </div>
               <div className='flex gap-10 mt-12 items-center'>
                 <button
-                  className={
-                    'bg-primary rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
-                  }
+                  disabled={!ended}
+                  className={`${
+                    ended ? '' : 'opacity-50'
+                  } bg-primary rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold`}
                 >
                   SELL
                 </button>
