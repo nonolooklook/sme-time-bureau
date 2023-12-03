@@ -14,7 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // const mid = 'GTM-PWV6NH6J'
-  const mid = 'IDG-714WJX6HK5'
+  const mid = 'G-714WJX6HK5'
   // const mid = 'G-46NJNM8TCB'
   return (
     <html lang='en'>
