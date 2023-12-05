@@ -18,15 +18,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   // const mid = 'G-46NJNM8TCB'
   return (
     <html lang='en'>
-      <Script async src={`https://www.googletagmanager.com/gtag/js?id=${mid}`}></Script>
-      <Script id={'google'}>
+      <Script async src='https://www.googletagmanager.com/gtag/js?id=G-714WJX6HK5'></Script>
+      <Script>
         {`
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', ${mid});
-        `}
+      gtag('config', 'G-714WJX6HK5');
+      `}
       </Script>
       <body className={montserrat.className}>
         <Toaster position={'top-right'} />
