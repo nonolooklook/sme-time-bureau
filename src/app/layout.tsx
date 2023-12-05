@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
       <Script async src='https://www.googletagmanager.com/gtag/js?id=G-714WJX6HK5'></Script>
-      <Script>
+      <Script id={'google2'}>
         {`
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
