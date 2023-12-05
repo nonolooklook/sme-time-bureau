@@ -8,10 +8,10 @@ const fetcher = async ({ url, address }: any) => {
 
 export const useAvailableAmount = (): { availableAmount: number; mutate: any; isLoading: boolean } => {
   const { address } = useAccount()
-  const { data, mutate, error, isLoading } = useSWR({ url: '/available_amount', address: address }, fetcher)
+  const { data, mutate, error, isLoading } = useSWR(address ? { url: '/available_amount', address: address } : null, fetcher)
 
   return {
-    availableAmount: data?.data,
+    availableAmount: data?.data ?? 0,
     mutate,
     isLoading,
   }
