@@ -160,7 +160,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
       }
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch('https://sme-demo.mcglobal.ai/mock-task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
           ref?.current?.click()
