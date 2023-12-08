@@ -89,6 +89,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
             token: NFTContractAddress[getCurrentChainId()],
             identifier: TokenId?.toString(),
             identifierOrCriteria: TokenId?.toString(),
+            recipient: address as `0x${string}`,
             amount: itemAmount.toString(),
             startAmount: itemAmount.toString(),
             endAmount: itemAmount.toString(),
