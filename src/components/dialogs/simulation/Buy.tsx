@@ -137,7 +137,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
 
       await sleep(2000)
       ref?.current?.click()
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch('https://sme-demo.mcglobal.ai/mock-task/fillOrder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
