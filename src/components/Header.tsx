@@ -33,6 +33,9 @@ export const Header = () => {
           <Link className={`${pathname === '/trade' ? 'active' : ''} item`} href={'/trade'}>
             Trade
           </Link>
+          <Link className={`${pathname === '/trade-simulation' ? 'active' : ''} item`} href={'/trade-simulation'}>
+            Trade Simulation
+          </Link>
           {address && (
             <Link className={`${pathname === '/portfolio' ? 'active' : ''} item`} href={'/portfolio'}>
               Portfolio
