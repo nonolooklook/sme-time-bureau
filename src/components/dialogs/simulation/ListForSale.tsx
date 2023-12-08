@@ -28,7 +28,7 @@ import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
 export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
   const { address } = useAccount()
-  const { balance: availableAmount } = useSimulationUserBalance(address)
+  const { quantity: availableAmount } = useSimulationUserBalance(address)
   const [min, setMin] = useState<`${number}`>('8')
   const [max, setMax] = useState<`${number}`>('10')
   const [loading, setLoading] = useState(false)

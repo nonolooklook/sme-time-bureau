@@ -29,7 +29,7 @@ import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
 export const SimulationSaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
-  const { balance: availableAmount, mutate } = useSimulationUserBalance(address)
+  const { quantity: availableAmount, mutate } = useSimulationUserBalance(address)
   const signer = useEthersSigner()
 
   const [loading, setLoading] = useState(false)
