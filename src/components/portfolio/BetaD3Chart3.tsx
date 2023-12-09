@@ -238,7 +238,7 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
   }, [svgRef, chartW, chartH, minPrice, maxPrice])
 
   return (
-    <div className={'relative px-4'}>
+    <div className={'relative px-4 w-full'}>
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <div className={'hidden'}>
