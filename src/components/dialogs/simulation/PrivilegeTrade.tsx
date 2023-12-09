@@ -22,6 +22,7 @@ import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
 import { parseEther } from 'viem'
 import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { BetaD3Chart3 } from '@/components/portfolio/BetaD3Chart3'
 
 export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
@@ -49,6 +50,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
         conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
+        counter: '0',
         consideration: [
           {
             amount: '0',
@@ -138,8 +140,19 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
             </Dialog.Close>
           </div>
           <CapsuleCard />
+          <div className='grid-cols-3 grid'>
+            <div className='col-span-1'>
+              <BetaD3Chart3 ratio={1} />
+            </div>
+            <div className='col-span-1 flex items-end'>
+              <BetaD3Chart3 ratio={1.6} />
+            </div>
+            <div className='col-span-1 flex items-end'>
+              <BetaD3Chart3 ratio={2} />
+            </div>
+          </div>
           <div className={'mt-6 mb-4'}>Get rewards from Time-Weaving</div>
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-4 hidden'>
             <div className='border border-gray-600 rounded-2xl p-4'>
               <div className='flex justify-between items-center'>
                 <div>

@@ -3,26 +3,15 @@ import { calculateBetaFunction } from '@/utils/beta'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import Image from 'next/image'
+import { parseEther } from 'viem'
 
 const d = calculateBetaFunction(3, 3)
 const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
 
-const marginX = 80
+const marginX = 10
 const margin = { top: 60, bottom: 20, left: marginX, right: marginX }
 let rendered = false
-export const BetaD3Chart = ({
-  minPrice,
-  expectedPrice,
-  maxPrice,
-  buy,
-  withBrush,
-}: {
-  minPrice: bigint
-  expectedPrice: bigint
-  maxPrice: bigint
-  buy?: boolean
-  withBrush?: boolean
-}) => {
+export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
   const chartRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const [x, setX] = useState(0)
@@ -32,6 +21,9 @@ export const BetaD3Chart = ({
   const [showEnd, setShowEnd] = useState(false)
   const [endValue, setEndValue] = useState('')
   const xPadding = 0
+  const minPrice = parseEther('8')
+  const expectedPrice = parseEther('9')
+  const maxPrice = parseEther('10')
 
   useLayoutEffect(() => {
     if (!chartRef.current || !svgRef.current) return
@@ -39,7 +31,8 @@ export const BetaD3Chart = ({
     if (minPrice >= 0 && expectedPrice >= 0 && maxPrice >= 0) {
       rendered = true
       const chartW = chartRef.current.offsetWidth
-      const chartH = 220
+      console.log(chartW)
+      const chartH = 220 / ratio
       setChartW(chartW)
       setChartH(chartH)
       const width = chartW - margin.left - margin.right
@@ -214,11 +207,7 @@ export const BetaD3Chart = ({
         .call(brush.move, [xPadding, width - xPadding])
 
       brushG.selectAll('.overlay').style('pointer-events', 'none')
-      brushG
-        .selectAll('.selection')
-        .style('pointer-events', 'none')
-        .style('stroke', 'none')
-        .style('fill', withBrush ? '#999' : 'none')
+      brushG.selectAll('.selection').style('pointer-events', 'none').style('stroke', 'none').style('fill', 'none')
       var smallRectWidth = 6
       var smallRectHeight = 20
       const dropTooltip = svg.select('#drop-tooltip')
@@ -235,7 +224,7 @@ export const BetaD3Chart = ({
         .on('mouseleave', () => {
           dropTooltip.style('opacity', 0)
         })
-      brushG.selectAll('.handle').style('fill', '#fff').style('stroke', 'none').style('width', '2px')
+      // brushG.selectAll('.handle').style('fill', '#fff').style('stroke', 'none').style('width', '2px')
       brushG.selectAll('.handle').each(function () {
         d3.select(this)
           .append('rect')
@@ -246,47 +235,13 @@ export const BetaD3Chart = ({
           .attr('fill', 'red')
       })
     }
-  }, [svgRef, chartW, chartH, minPrice, maxPrice, withBrush])
-
-  useEffect(() => {
-    if (!svgRef.current) return
-    const svgM = d3.select(svgRef.current)
-    const svg = svgM.select('#g')
-    const width = chartW - margin.left - margin.right
-    const height = chartH - margin.top - margin.bottom
-    if (chartW > 0 && chartH > 0) {
-      const xAxisScale = d3
-        .scaleLinear()
-        .domain([Number(displayBalance(minPrice)), Number(displayBalance(maxPrice))])
-        .range([0, width])
-      svg.select('#price-scale').remove()
-      const axisX = svg
-        .append('g')
-        .attr('id', 'price-scale')
-        .attr('transform', `translate(0,${height})`)
-        .call(
-          d3
-            .axisBottom(xAxisScale)
-            .tickValues([Number(displayBalance(minPrice)), Number(displayBalance(expectedPrice)), Number(displayBalance(maxPrice))])
-            .tickSize(0)
-            .tickPadding(30),
-        )
-      axisX.selectAll('text').style('font-size', '18px')
-    }
-  }, [minPrice, expectedPrice, maxPrice, svgRef, chartW, chartH])
+  }, [svgRef, chartW, chartH, minPrice, maxPrice])
 
   return (
-    <div className={'relative px-16'}>
-      {/*{x > 0 && x <= 1 && (*/}
-      {/*  <div className={'flex justify-end mb-8 absolute top-4 left-0'}>*/}
-      {/*    <div className={'border border-black rounded-lg p-2 w-[380px] text-sm'}>*/}
-      {/*      The probability of a deal occurring above {displayBalance(cx)} is {((1 - x) * 100).toFixed(0)}%.*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*)}*/}
+    <div className={'relative px-4'}>
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
-          <>
+          <div className={'hidden'}>
             <div className='absolute text-xs bottom-20 -ml-16 flex flex-col items-center'>
               Random Price &lt; {displayBalance(cx, 2)}
               <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(0)}%</div>
@@ -296,7 +251,7 @@ export const BetaD3Chart = ({
               Random Price &gt; {displayBalance(cx, 2)}
               <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(0)}%</div>
             </div>
-          </>
+          </div>
         )}
         {/*<div className="text-center mb-4 text-xs pr-8">Expected Price</div>*/}
         {/*<div id={'chart'} ref={chartRef} className={'bg-grayx'}></div>*/}
@@ -326,14 +281,6 @@ export const BetaD3Chart = ({
               <text id={'end-tooltip-text'} fontSize={13} fontWeight={800} />
             </g>
           </svg>
-          <div className={'-mt-4 py-2 text-sm flex items-center justify-between mb-4 px-16'}>
-            <div className={'border border-white rounded-full w-[60px] text-center -ml-4'}>{displayBalance(minPrice)}</div>
-            <div className={'flex flex-col items-center text-xs'}>
-              <div className='triangle-up mb-1' />
-              <div>Expected Price</div>
-            </div>
-            <div className={'border border-white rounded-full w-[60px] text-center -mr-4'}>{displayBalance(maxPrice)}</div>
-          </div>
         </div>
       </div>
     </div>
