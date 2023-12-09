@@ -21,12 +21,13 @@ import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
 import { parseEther } from 'viem'
+import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
 
-export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
+export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
-  const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
   const { address } = useAccount()
+  const { quantity: availableAmount } = useSimulationUserBalance(address)
   const signer = useEthersSigner()
   const [amount, setAmount] = useState('1')
   const [wrongMsg, setWrongMsg] = useState('')
@@ -38,21 +39,25 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
     try {
       if (!signer) return
       setO(true)
-      const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
-        conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
-      })
       const takerOrder = {
         zone: '0x0000000000000000000000000000000000000000',
+        zoneHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        salt: '0x000000000000000000000000000000000000000000000000f14af04e1d2fc643',
+        totalOriginalConsiderationItems: 1,
+        orderType: 0,
+        offerer: address as `0x${string}`,
         conduitKey: CONDUIT_KEY[getCurrentChainId()],
         startTime: Math.floor(new Date().getTime() / 1000 - 60 * 60).toString(),
         endTime: Math.floor(new Date().getTime() / 1000 + 60 * 60).toString(),
         consideration: [
           {
             amount: '0',
+            startAmount: '0',
             endAmount: (parseEther('1010') * BigInt(amount)).toString(),
             token: ERC20_ADDRESS[getCurrentChainId()],
-            recipient: address,
+            recipient: address as `0x${string}`,
+            itemType: ItemType.ERC20,
+            identifierOrCriteria: '0',
           },
         ],
         offer: [
@@ -60,15 +65,18 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
             itemType: ItemType.ERC1155,
             token: NFTContractAddress[getCurrentChainId()],
             identifier: TokenId.toString(),
+            identifierOrCriteria: TokenId.toString(),
             amount: amount,
+            startAmount: amount,
+            endAmount: amount,
           },
         ],
       }
 
-      const { executeAllActions } = await seaport.createOrder(takerOrder, address)
-
-      const order = await executeAllActions()
-      console.log(order)
+      const order = {
+        parameters: takerOrder,
+        signature: '',
+      }
       const modeOrderFulfillments: MatchOrdersFulfillment[] = []
       modeOrderFulfillments.push({
         offerComponents: [{ orderIndex: 0, itemIndex: 0 }],
@@ -82,7 +90,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
 
       await sleep(2000)
       ref?.current?.click()
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch('https://sme-demo.mcglobal.ai/mock-task/fillOrder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +111,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
       }
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch('https://sme-demo.mcglobal.ai/mock-task/findByRequestId/' + res.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
           ref?.current?.click()

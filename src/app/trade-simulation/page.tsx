@@ -23,6 +23,7 @@ import { SimulationSaleDialog } from '@/components/dialogs/simulation/Sale'
 import { SimulationPriceChart } from '@/components/SimulationPriceChart'
 import { SimulationListForSale } from '@/components/dialogs/simulation/ListForSale'
 import { SimulationBuyDialog } from '@/components/dialogs/simulation/Buy'
+import { SimulationPrivilegeTrade } from '@/components/dialogs/simulation/PrivilegeTrade'
 
 export default function Page() {
   const { address } = useAccount()
@@ -299,7 +300,7 @@ export default function Page() {
             />
           </div>
         </div>
-        <PrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} maxCount={privilegeCount} />
+        <SimulationPrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} maxCount={privilegeCount} />
       </div>
     </div>
   )
