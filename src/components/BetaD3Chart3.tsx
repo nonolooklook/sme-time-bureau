@@ -5,13 +5,32 @@ import * as d3 from 'd3'
 import Image from 'next/image'
 import { parseEther } from 'viem'
 
-const d = calculateBetaFunction(3, 3)
-const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
-
-const marginX = 10
-const margin = { top: 60, bottom: 20, left: marginX, right: marginX }
 let rendered = false
-export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
+export const BetaD3Chart3 = ({
+  ratio,
+  data,
+  minPrice,
+  maxPrice,
+  expectedPrice,
+  margin,
+  setOutX,
+  setOutCX,
+  setOutRealX,
+  index,
+  setIndex,
+}: {
+  ratio: number
+  data: any
+  minPrice: bigint
+  maxPrice: bigint
+  expectedPrice: bigint
+  margin: any
+  setOutX: any
+  setOutCX: any
+  setOutRealX: any
+  index: number
+  setIndex: any
+}) => {
   const chartRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const [x, setX] = useState(0)
@@ -21,9 +40,6 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
   const [showEnd, setShowEnd] = useState(false)
   const [endValue, setEndValue] = useState('')
   const xPadding = 0
-  const minPrice = parseEther('8')
-  const expectedPrice = parseEther('9')
-  const maxPrice = parseEther('10')
 
   useLayoutEffect(() => {
     if (!chartRef.current || !svgRef.current) return
@@ -59,7 +75,7 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
       svg.append('defs')
       svg.call(createGradient)
 
-      const xScale = d3.scaleLinear().domain([0, 1]).range([0, width])
+      const xScale = d3.scaleLinear().domain([0, 1.4]).range([0, width])
       const yScale = d3.scaleLinear().domain([0, 1.875]).range([height, 0])
 
       const line = d3
@@ -129,23 +145,27 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
             .raise()
           // .attr('cx', xScale(xAccessor(hoveredIndexData)))
           // .attr('cy', yScale(yAccessor(hoveredIndexData)))
-          tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh + 6} ${realX + 6},${dh + 14} ${realX - 6},${dh + 14}`)
+          // tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh + 6} ${realX + 6},${dh + 14} ${realX - 6},${dh + 14}`)
+          setOutRealX(realX)
 
           // tooltipEllipse
           //   .attr('cx', realX)
           //   .attr('cy', dh - dy / 2)
           //   .attr('opacity', 1)
           //   .raise()
-
-          tooltipText
-            .attr('x', realX - 15)
-            .attr('y', dh + 30)
-            .text(displayBalance(dx + minPrice, 2))
-            .raise()
+          //
+          // tooltipText
+          //   .attr('x', realX - 15)
+          //   .attr('y', dh + 30)
+          //   .text(displayBalance(dx + minPrice, 2))
+          //   .raise()
           // .attr('y', dh - dy / 2 + 6)
 
           setCx(dx + minPrice)
+          setOutCX(dx + minPrice)
           setX(x)
+          setOutX(x)
+          setIndex(index)
         })
         .on('mouseleave', function (event) {
           tooltipEllipse.attr('opacity', 0)
@@ -153,6 +173,7 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
           tooltipLine.style('opacity', 0).raise()
           tooltipArrow.attr('opacity', 0)
           setX(0)
+          setOutX(0)
         })
     }
   }, [chartRef, minPrice, expectedPrice, maxPrice])
@@ -238,7 +259,7 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
   }, [svgRef, chartW, chartH, minPrice, maxPrice])
 
   return (
-    <div className={'relative px-4 w-full'}>
+    <div className={'relative w-full'}>
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <div className={'hidden'}>
@@ -257,20 +278,6 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
         {/*<div id={'chart'} ref={chartRef} className={'bg-grayx'}></div>*/}
         <div id={'chart'} ref={chartRef} className={'bg-grayx'}>
           <svg ref={svgRef} width={chartW} height={chartH + 10}>
-            <rect
-              id={'33222'}
-              width={1}
-              height={chartH - margin.top - margin.bottom}
-              x={chartW / 2}
-              y={margin.top}
-              className={'z-50'}
-              stroke={'#fff'}
-              strokeWidth={1}
-              strokeDasharray={'4,4'}
-            />
-            {/*<text fill={'#fff'} fontSize={12} x={chartW / 2 - 40} y={20}>*/}
-            {/*  Expected price*/}
-            {/*</text>*/}
             <rect width={chartW + 80} height={1} x={0} y={chartH - 20} fill={'#fff'} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />
@@ -281,6 +288,13 @@ export const BetaD3Chart3 = ({ ratio }: { ratio: number }) => {
               <text id={'end-tooltip-text'} fontSize={13} fontWeight={800} />
             </g>
           </svg>
+          <div
+            className={'-mt-4 py-2 text-sm flex items-center justify-between mb-4'}
+            style={{ marginLeft: margin.left / 2 + 'px', marginRight: 30 + margin.right + 'px' }}
+          >
+            <div className={'rounded-full w-[60px] text-center -ml-4'}>{!minPrice ? '0' : displayBalance(minPrice, 0)}</div>
+            <div className={'rounded-full w-[60px] text-center'}>{displayBalance(maxPrice, 0)}</div>
+          </div>
         </div>
       </div>
     </div>

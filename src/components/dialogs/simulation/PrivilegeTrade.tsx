@@ -1,12 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
-import React, { useContext, useRef, useState } from 'react'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import React, { useContext, useMemo, useRef, useState } from 'react'
+import { CONDUIT_KEY } from '@/config/key'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
@@ -18,11 +14,20 @@ import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { FetcherContext } from '@/contexts/FetcherContext'
-import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { handleError } from '@/utils/error'
 import { parseEther } from 'viem'
 import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
-import { BetaD3Chart3 } from '@/components/portfolio/BetaD3Chart3'
+import { BetaD3Chart3 } from '@/components/BetaD3Chart3'
+import { calculateFirstBetaFunction, calculateSecondBetaFunction } from '@/utils/beta'
+import { displayBalance } from '@/utils/display'
+
+const d1 = calculateFirstBetaFunction(2, 3)
+const d2 = calculateSecondBetaFunction(3, 3)
+const d3 = calculateSecondBetaFunction(3, 3)
+const data1 = d1.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
+const data2 = d2.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
+const data3 = d3.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
+console.log(data1)
 
 export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
@@ -126,6 +131,36 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
     }
   }
 
+  const [outCx, setOutCX] = useState(0n)
+  const [outX, setOutX] = useState(0)
+  const [outRealX, setOutRealX] = useState(0)
+  const [index, setIndex] = useState(0)
+  console.log(outCx, outX, index)
+
+  const r = useMemo(() => {
+    if (index === 0 && outX < 1) {
+      return (outX * 98) / 100
+    }
+    if (index === 0 && outX > 1 && outX < 1.5) {
+      return 0.9989
+    }
+
+    if (index === 1 && outX < 1) {
+      return 0.9989 + outX * 0.0001
+    }
+    if (index === 1 && outX > 1) {
+      return 0.9999
+    }
+    if (index === 2 && outX < 1) {
+      return 0.9999 + outX * 0.0001
+    }
+    if (index === 2 && outX > 1) {
+      return 1
+    }
+
+    return 0.9999
+  }, [outX, index])
+
   return (
     <Dialog.Root open={open} onOpenChange={onChange}>
       <Dialog.Portal>
@@ -140,15 +175,80 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
             </Dialog.Close>
           </div>
           <CapsuleCard />
-          <div className='grid-cols-3 grid'>
-            <div className='col-span-1'>
-              <BetaD3Chart3 ratio={1} />
-            </div>
-            <div className='col-span-1 flex items-end'>
-              <BetaD3Chart3 ratio={1.6} />
-            </div>
-            <div className='col-span-1 flex items-end'>
-              <BetaD3Chart3 ratio={2} />
+          <div className={'h-[80px] -mb-16 pt-4'}>
+            {outX > 0 && outX <= 1.6 && (
+              <div className={'flex justify-between'}>
+                <div className=' text-xs flex flex-col items-center'>
+                  Random Price &lt; {displayBalance(outCx, 2)}
+                  <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(r * 100).toFixed(5)}%</div>
+                </div>
+
+                <div className='text-xs flex flex-col items-center'>
+                  Random Price &gt; {displayBalance(outCx, 2)}
+                  <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - r) * 100).toFixed(5)}%</div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className='relative'>
+            {outX > 0 && outX < 1.6 && (
+              <div
+                className={'absolute bottom-0 text-xs'}
+                style={{
+                  left: index > 1 ? outRealX + 370 : index > 0 ? outRealX + 170 : outRealX,
+                  bottom: '40px',
+                  marginLeft: '10px',
+                }}
+              >
+                {displayBalance(outCx)}
+              </div>
+            )}
+            <div className='grid-cols-3 grid'>
+              <div className='col-span-1'>
+                <BetaD3Chart3
+                  setOutX={setOutX}
+                  setOutCX={setOutCX}
+                  setOutRealX={setOutRealX}
+                  ratio={1}
+                  index={0}
+                  setIndex={setIndex}
+                  data={data1}
+                  maxPrice={parseEther('20')}
+                  minPrice={0n}
+                  expectedPrice={parseEther('10')}
+                  margin={{ top: 60, bottom: 20, left: 30, right: 0 }}
+                />
+              </div>
+              <div className='col-span-1 flex items-end'>
+                <BetaD3Chart3
+                  setOutX={setOutX}
+                  setOutCX={setOutCX}
+                  setOutRealX={setOutRealX}
+                  ratio={1.8}
+                  index={1}
+                  setIndex={setIndex}
+                  data={data2}
+                  minPrice={parseEther('190')}
+                  expectedPrice={parseEther('200')}
+                  maxPrice={parseEther('210')}
+                  margin={{ top: 60, bottom: 20, left: 0, right: 0 }}
+                />
+              </div>
+              <div className='col-span-1 flex items-end'>
+                <BetaD3Chart3
+                  setOutX={setOutX}
+                  setOutCX={setOutCX}
+                  setOutRealX={setOutRealX}
+                  ratio={2.2}
+                  index={2}
+                  setIndex={setIndex}
+                  data={data3}
+                  minPrice={parseEther('990')}
+                  expectedPrice={parseEther('1000')}
+                  maxPrice={parseEther('1100')}
+                  margin={{ top: 60, bottom: 20, left: 0, right: 30 }}
+                />
+              </div>
             </div>
           </div>
           <div className={'mt-6 mb-4'}>Get rewards from Time-Weaving</div>
