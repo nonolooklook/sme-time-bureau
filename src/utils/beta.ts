@@ -19,9 +19,9 @@ export const calculateFirstBetaFunction = (alpha: number, beta: number) => {
     data.push({ x, y, name: '2.35' })
   }
 
-  for (let i = 1; i <= 20; ++i) {
-    data.push({ x: strip(0.02 * (i + 50)), y: 0, name: '2.35' })
-  }
+  // for (let i = 1; i <= 20; ++i) {
+  //   data.push({ x: strip(0.02 * (i + 50)), y: 0, name: '2.35' })
+  // }
 
   return data
 }
@@ -34,9 +34,9 @@ export const calculateSecondBetaFunction = (alpha: number, beta: number) => {
     data.push({ x, y, name: '2.35' })
   }
 
-  for (let i = 1; i <= 20; ++i) {
-    data.push({ x: strip(0.03 * (i + 50)), y: 0, name: '2.35' })
-  }
+  // for (let i = 1; i <= 20; ++i) {
+  //   data.push({ x: strip(0.03 * (i + 50)), y: 0, name: '2.35' })
+  // }
 
   return data
 }

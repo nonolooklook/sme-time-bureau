@@ -138,9 +138,14 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
   console.log(outCx, outX, index)
 
   const r = useMemo(() => {
+    if (index === 0 && outX < 0.5) {
+      return outX
+    }
+
     if (index === 0 && outX < 1) {
       return (outX * 98) / 100
     }
+
     if (index === 0 && outX > 1 && outX < 1.5) {
       return 0.9989
     }
@@ -176,12 +181,13 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
           </div>
           <CapsuleCard />
           <div className={'h-[80px] -mb-16 pt-4'}>
-            {outX > 0 && outX <= 1.6 && (
+            {outX > 0 && outX <= 1 && (
               <div className={'flex justify-between'}>
-                <div className=' text-xs flex flex-col items-center'>
-                  Random Price &lt; {displayBalance(outCx, 2)}
-                  <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(r * 100).toFixed(5)}%</div>
-                </div>
+                {/*<div className=' text-xs flex flex-col items-center'>*/}
+                {/*  Random Price &lt; {displayBalance(outCx, 2)}*/}
+                {/*  <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(r * 100).toFixed(5)}%</div>*/}
+                {/*</div>*/}
+                <div />
 
                 <div className='text-xs flex flex-col items-center'>
                   Random Price &gt; {displayBalance(outCx, 2)}
@@ -191,7 +197,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
             )}
           </div>
           <div className='relative'>
-            {outX > 0 && outX < 1.6 && (
+            {outX > 0 && outX < 1 && (
               <div
                 className={'absolute bottom-0 text-xs'}
                 style={{
@@ -234,7 +240,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
                   margin={{ top: 60, bottom: 20, left: 0, right: 0 }}
                 />
               </div>
-              <div className='col-span-1 flex items-end'>
+              <div className='col-span-1 flex items-end pr-10'>
                 <BetaD3Chart3
                   setOutX={setOutX}
                   setOutCX={setOutCX}
@@ -246,7 +252,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
                   minPrice={parseEther('990')}
                   expectedPrice={parseEther('1000')}
                   maxPrice={parseEther('1100')}
-                  margin={{ top: 60, bottom: 20, left: 0, right: 30 }}
+                  margin={{ top: 60, bottom: 20, left: 0, right: 0 }}
                 />
               </div>
             </div>
