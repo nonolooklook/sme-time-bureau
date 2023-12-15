@@ -1,29 +1,27 @@
-import * as Dialog from '@radix-ui/react-dialog'
-import { Cross2Icon } from '@radix-ui/react-icons'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits, UserRejectedRequestError } from 'viem'
-import { InputWithButton } from '@/components/InputWithButton'
-import React, { useContext, useEffect, useRef, useState } from 'react'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
-import { FetcherContext } from '@/contexts/FetcherContext'
-import { displayBalance } from '@/utils/display'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
-import { sleep } from '@/utils/sleep'
-import { toast } from 'sonner'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
-import Stepper from 'awesome-react-stepper'
-import { Spinner } from '@/components/Spinner'
-import { useAccount } from 'wagmi'
-import { ERROR_SIGN_REJECTED, ERROR_SYSTEM } from '@/config/error'
-import { handleError } from '@/utils/error'
 import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { displayBalance } from '@/utils/display'
+import { handleError } from '@/utils/error'
+import { sleep } from '@/utils/sleep'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import Stepper from 'awesome-react-stepper'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { parseEther } from 'viem'
+import { useAccount } from 'wagmi'
+import { MinMax } from '../MinMax'
 
 export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
@@ -188,21 +186,17 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
                 </button>
               </Dialog.Close>
             </div>
-
             <CapsuleCard />
-
             <div className={'-mt-6'}>
               <BetaD3Chart
                 minPrice={parseEther(selected?.min)}
                 expectedPrice={parseEther(selected?.mid)}
                 maxPrice={parseEther(selected?.max)}
+                showType='left'
+                defaultValue={30}
               />
             </div>
-            <div className='flex justify-center mb-6'>
-              <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
-                {selected?.mid}
-              </div>
-            </div>
+            <MinMax min={selected?.min} max={selected?.max} disableInput />
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />

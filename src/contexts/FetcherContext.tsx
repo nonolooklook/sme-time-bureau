@@ -1,13 +1,14 @@
-import React from 'react'
-import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { arbitrumGoerli } from 'viem/chains'
-import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { useUserOrders } from '@/hooks/useUserOrders'
-import { useOrderDistribution } from '@/hooks/useOrderDistribution'
+import SmeGasManager from '@/config/abi/SmeGasManager'
 import { TimeNFT } from '@/config/abi/TimeNFT'
+import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { SME_GAS_MANAGER } from '@/config/key'
+import { useOrderDistribution } from '@/hooks/useOrderDistribution'
+import { useUserOrders } from '@/hooks/useUserOrders'
+import React from 'react'
 import { useInterval } from 'usehooks-ts'
+import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 
 interface FetcherContextArgs {
   collateralBalance: bigint
@@ -19,6 +20,7 @@ interface FetcherContextArgs {
   allowance4nft: bigint
   currentPrice: number
   currentMaxPrice: number
+  gasFee: bigint
 }
 
 const FetcherContext = React.createContext<FetcherContextArgs>({
@@ -31,6 +33,7 @@ const FetcherContext = React.createContext<FetcherContextArgs>({
   allowance4nft: 0n,
   currentPrice: 0,
   currentMaxPrice: 0,
+  gasFee: 0n,
 })
 
 // This context maintain 2 counters that can be used as a dependencies on other hooks to force a periodic refresh
@@ -84,6 +87,11 @@ const FetcherContextProvider = ({ children }: any) => {
         functionName: 'minted',
         args: [address as Address],
       },
+      {
+        address: SME_GAS_MANAGER[getCurrentChainId()] as Address,
+        abi: SmeGasManager,
+        functionName: 'gasFee',
+      },
     ],
     watch: true,
   })
@@ -100,6 +108,7 @@ const FetcherContextProvider = ({ children }: any) => {
         allowance4nft: data?.[3]?.result ?? 0n,
         currentPrice: mid,
         currentMaxPrice: maxPrice,
+        gasFee: data?.[5]?.result ?? 0n,
       }}
     >
       {children}

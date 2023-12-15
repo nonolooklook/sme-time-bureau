@@ -12,3 +12,7 @@ export const CONDUIT_KEYS_TO_CONDUIT = {
 }
 
 export const FEE_ADDRESS = '0xB888488186c59A5bB905cb883f15FC802eF3D588'
+
+export const SME_GAS_MANAGER = {
+  [arbitrumGoerli.id]: '0x4792d7F0F8576AA5b3Df5a1D894e55A51002FC82',
+}

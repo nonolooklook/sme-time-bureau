@@ -3,8 +3,8 @@ function strip(num: number, precision = 12) {
 }
 export const calculateBetaFunction = (alpha: number, beta: number) => {
   const data = []
-  for (let i = 0; i <= 50; ++i) {
-    const x = strip(0.02 * i)
+  for (let i = 0; i <= 100; ++i) {
+    const x = strip(0.01 * i)
     const y = betaFunction(alpha, beta, x)
     data.push({ x, y, name: '2.35' })
   }

@@ -1,34 +1,33 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import React, { useContext, useState } from 'react'
-import Image from 'next/image'
 import { PriceChart } from '@/components/PriceChart'
-import { PlaceABid } from '@/components/dialogs/PlaceABid'
-import { ListForSale } from '@/components/dialogs/ListForSale'
 import { BuyDialog } from '@/components/dialogs/Buy'
-import { SaleDialog } from '@/components/dialogs/Sale'
-import { useOrders } from '@/hooks/useOrders'
-import { calculateMidPrice, displayTradePrice } from '@/utils/price'
-import { displayBalance } from '@/utils/display'
-import * as HoverCard from '@radix-ui/react-hover-card'
-import Cookies from 'ts-cookies'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useInterval } from 'usehooks-ts'
-import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
-import { Cross2Icon } from '@radix-ui/react-icons'
+import { ListForSale } from '@/components/dialogs/ListForSale'
+import { PlaceABid } from '@/components/dialogs/PlaceABid'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
+import { SaleDialog } from '@/components/dialogs/Sale'
 import { FetcherContext } from '@/contexts/FetcherContext'
-import { useQuantity } from '@/hooks/useQuantity'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { useOrders } from '@/hooks/useOrders'
+import { useQuantity } from '@/hooks/useQuantity'
+import { displayBalance } from '@/utils/display'
+import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
+import { calculateMidPrice, displayTradePrice } from '@/utils/price'
+import * as HoverCard from '@radix-ui/react-hover-card'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useContext, useState } from 'react'
+import Cookies from 'ts-cookies'
+import { useInterval } from 'usehooks-ts'
 
 export default function Page() {
   const { currentPrice } = useContext(FetcherContext)
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
-
-  const [openPrivilege, setOpenPrivilege] = useState(false)
+  const [privilege, setPrivilege] = useState<{ order: any; count: number } | undefined>()
   const [openBid, setOpenBid] = useState(false)
   const [openList, setOpenList] = useState(false)
   const [selectedPrice, setSelectedPrice] = useState(0)
@@ -37,7 +36,6 @@ export default function Page() {
   const [openBuy, setOpenBuy] = useState(false)
   const [openSale, setOpenSale] = useState(false)
   const [selected, setSelected] = useState<any>({ min: '8', max: '10', mid: '9', count: 1 })
-  const [privilegeCount, setPrivilegeCount] = useState(0)
 
   const { orders: listOrders, mutate: mutateList } = useOrders(false)
   const { orders: bidOrders, mutate: mutateBid } = useOrders(true)
@@ -52,18 +50,17 @@ export default function Page() {
       ? listOrders.filter((o: any) => getListOrderMinPrice(o) < selectedPrice && getListOrderMaxPrice(o) > selectedPrice)
       : listOrders
 
-  const { remaining } = useQuantity()
-  const { availableAmount } = useAvailableAmount()
-
   useInterval(() => {
     if (type === 'list') {
       setOpenList(true)
       router.push('/trade')
     }
     if (type === 'privilege') {
-      setOpenPrivilege(true)
-      setPrivilegeCount(Math.min(remaining, availableAmount))
-      router.push('/trade')
+      const privilegeOrder = bidOrders?.find((item) => item.type === '3')
+      if (privilegeOrder && !privilege) {
+        setPrivilege({ order: privilegeOrder, count: privilegeOrder.remainingQuantity })
+        router.push('/trade')
+      }
     }
   }, 500)
 
@@ -81,8 +78,8 @@ export default function Page() {
           <Image src={'/capsule-1.png'} alt={'capsule'} width={88} height={120} />
           <div className={'text-[38px] font-semibold ml-8 text-gray-200 uppercase'}>Schrödinger`s Time Capsules / USDC</div>
           <div className='flex items-center text-2xl gap-2 ml-auto'>
-            <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} />
-            {currentPrice}
+            {/* <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} /> */}
+            {'$ ' + currentPrice}
           </div>
         </div>
         <div className='grid grid-cols-2 gap-8 mt-10'>
@@ -117,8 +114,7 @@ export default function Page() {
                           key={order?.hash}
                           onClick={() => {
                             if (order?.type === '3') {
-                              setPrivilegeCount(order?.remainingQuantity)
-                              setOpenPrivilege(true)
+                              setPrivilege({ order, count: order?.remainingQuantity })
                               return
                             }
                             setOpenSale(true)
@@ -200,7 +196,6 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           onClick={() => {
                             if (order?.type === '3') {
-                              setOpenPrivilege(true)
                               return
                             }
                             setOpenBuy(true)
@@ -292,7 +287,14 @@ export default function Page() {
             />
           </div>
         </div>
-        <PrivilegeTrade open={openPrivilege} onChange={setOpenPrivilege} maxCount={privilegeCount} />
+        {privilege && (
+          <PrivilegeTrade
+            order={privilege.order}
+            open={true}
+            onChange={(open: boolean) => !open && setPrivilege(undefined)}
+            maxCount={privilege.count}
+          />
+        )}
       </div>
     </div>
   )

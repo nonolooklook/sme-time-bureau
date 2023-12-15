@@ -1,30 +1,27 @@
+import { BetaD3Chart } from '@/components/BetaD3Chart'
+import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
+import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { displayBalance } from '@/utils/display'
+import { handleError } from '@/utils/error'
+import { sleep } from '@/utils/sleep'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits } from 'viem'
-import { InputWithButton } from '@/components/InputWithButton'
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
-import { displayBalance } from '@/utils/display'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
-import { sleep } from '@/utils/sleep'
-import { toast } from 'sonner'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
-import { useAccount } from 'wagmi'
 import Stepper from 'awesome-react-stepper'
-import { Spinner } from '@/components/Spinner'
-import { FetcherContext } from '@/contexts/FetcherContext'
-import { useAvailableAmount } from '@/hooks/useAvailableAmount'
-import { handleError } from '@/utils/error'
-import { SimulationFetcherContext } from '@/contexts/SimulationFetcherContext'
-import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { parseEther } from 'viem'
+import { useAccount } from 'wagmi'
+import { MinMax } from '../MinMax'
 
 export const SimulationSaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -206,13 +203,11 @@ export const SimulationSaleDialog = ({ open, onChange, selected }: { open: boole
                 minPrice={parseEther(selected?.min)}
                 expectedPrice={parseEther(selected?.mid)}
                 maxPrice={parseEther(selected?.max)}
+                defaultValue={70}
+                showType='right'
               />
             </div>
-            <div className='flex justify-center mb-6'>
-              <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
-                {selected?.mid}
-              </div>
-            </div>
+            <MinMax min={selected?.min} max={selected?.max} disableInput />
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />

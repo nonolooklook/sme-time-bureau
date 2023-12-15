@@ -1,36 +1,30 @@
+import { BetaD3Chart } from '@/components/BetaD3Chart'
+import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
+import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { ERROR_MIN_MAX_WRONG_PRICE } from '@/config/error'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { handleError } from '@/utils/error'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import Image from 'next/image'
-import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits } from 'viem'
-import { InputWithButton } from '@/components/InputWithButton'
-import React, { useCallback, useContext, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT, FEE_ADDRESS } from '@/config/key'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { parseEther, parseUnits } from 'viem'
 import { useAccount } from 'wagmi'
-import { Spinner } from '@/components/Spinner'
-import { FetcherContext } from '@/contexts/FetcherContext'
-import { displayBalance } from '@/utils/display'
-import { calculateMidPriceFromBigInt } from '@/utils/price'
-import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
-import { useAvailableAmount } from '@/hooks/useAvailableAmount'
-import { handleError } from '@/utils/error'
-import { ERROR_MIN_MAX_WRONG_PRICE } from '@/config/error'
-import { useSimulationUserBalance } from '@/hooks/useSimulationUserBalance'
+import { MinMax } from '../MinMax'
 
 export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
   const { address } = useAccount()
   const { quantity: availableAmount } = useSimulationUserBalance(address)
-  const [min, setMin] = useState<`${number}`>('8')
-  const [max, setMax] = useState<`${number}`>('10')
+  const [[min, max], setMinMax] = useState<[`${number}`, `${number}`]>(['8', '10'])
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState('1')
 
@@ -145,33 +139,15 @@ export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolea
           <CapsuleCard />
 
           <div className={'-mt-6'}>
-            <BetaD3Chart minPrice={parseEther(min)} expectedPrice={parseEther('9')} maxPrice={parseEther(max)} />
+            <BetaD3Chart
+              minPrice={parseEther(min)}
+              expectedPrice={parseEther('9')}
+              maxPrice={parseEther(max)}
+              defaultValue={70}
+              showType='right'
+            />
           </div>
-          <div className='flex justify-center mb-6 justify-between'>
-            <div className='px-6 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-sm'>
-              <div>Min</div>
-              <input
-                type='text'
-                value={min}
-                className={'w-[90px] bg-transparent outline-0 text-center text-3xl font-semibold'}
-                onChange={(e) => setMin(e.target.value as `${number}`)}
-              />
-              <Image src={'/usdc.svg'} alt={'usdc'} width={20} height={20} />
-            </div>
-            <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
-              {displayBalance(calculateMidPriceFromBigInt(parseEther(min as `${number}`), parseEther(max as `${number}`)))}
-            </div>
-            <div className='px-6 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-sm'>
-              <div>Max</div>
-              <input
-                type='text'
-                value={max}
-                className={'w-[90px] bg-transparent outline-0 text-center text-3xl font-semibold'}
-                onChange={(e) => setMax(e.target.value as `${number}`)}
-              />
-              <Image src={'/usdc.svg'} alt={'usdc'} width={20} height={20} />
-            </div>
-          </div>
+          <MinMax min={min} max={max} onChange={(min, max) => setMinMax([min, max])} />
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>
             <InputWithButton amount={amount} setAmount={setAmount} />

@@ -3,182 +3,221 @@
 @tailwind utilities;
 
 body {
-    @apply bg-black;
-    font-family: montserrat, serif;
+  @apply bg-black;
+  font-family: montserrat, serif;
 }
 
 .nav-item {
-    @apply font-semibold text-lg text-[#040914] relative;
+  @apply font-semibold text-lg text-[#040914] relative;
 }
 
 .nav-item.active:after {
-    display: block;
-    content: '';
-    width: 32px;
-    height: 1px;
-    @apply bg-gray-600 absolute left-1/2 -translate-x-1/2 mt-2;
+  display: block;
+  content: '';
+  width: 32px;
+  height: 1px;
+  @apply bg-gray-600 absolute left-1/2 -translate-x-1/2 mt-2;
 }
 
 .divider {
-    @apply h-[1px] w-full bg-gray-600 my-4;
+  @apply h-[1px] w-full bg-gray-600 my-4;
 }
 
 .btn {
-    @apply flex items-center gap-2 justify-center cursor-pointer;
+  @apply flex items-center gap-2 justify-center cursor-pointer;
 }
 
 .btn:disabled {
-    @apply opacity-50;
+  @apply opacity-50;
 }
 
 .btn-primary {
-    @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center;
-    box-shadow: 0px 8px 30px 0px rgba(255, 172, 3, 0.4);
+  @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center;
+  box-shadow: 0px 8px 30px 0px rgba(255, 172, 3, 0.4);
 }
 
 .btn-primary:disabled {
-    @apply bg-red-400 opacity-50;
+  @apply bg-red-400 opacity-50;
 }
 
 .btn-large {
-    @apply text-lg;
+  @apply text-lg;
 }
 
 .btn-outline {
-    @apply border border-solid border-gray-800 rounded-xl py-3 px-4 text-sm;
+  @apply border border-solid border-gray-800 rounded-xl py-3 px-4 text-sm;
 }
 
 .dialog-title {
-    @apply text-xl font-semibold;
+  @apply text-xl font-semibold;
 }
 
 .dialog-overlay {
-    background-color: rgba(0, 0, 0, .3);
-    position: fixed;
-    inset: 0;
-    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: rgba(0, 0, 0, 0.3);
+  position: fixed;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dialog-content {
-    @apply max-w-[700px] max-h-[700px];
-    @apply bg-[#242424] border border-[#484848] rounded-xl fixed text-white p-5 overflow-auto z-50;
-    @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-[46%];
-    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  @apply max-w-[700px] max-h-[700px];
+  @apply bg-[#242424] border border-[#484848] rounded-xl fixed text-white p-5 overflow-auto z-50;
+  @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-[46%];
+  box-shadow:
+    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .DialogContent:focus {
-    outline: none;
+  outline: none;
 }
 .dialog-content:focus {
-    outline: none;
+  outline: none;
 }
 
 .checkbox-root {
-    @apply w-[20px] h-[20px] rounded-md flex items-center justify-center cursor-pointer;
-    border: 1px solid #999;
+  @apply w-[20px] h-[20px] rounded-md flex items-center justify-center cursor-pointer;
+  border: 1px solid #999;
 }
 
 .checkbox-indicator {
-    @apply text-gray-400;
+  @apply text-gray-400;
 }
 
 button {
-    all: unset;
+  all: unset;
 }
 
 .card-shadow {
-    box-shadow: 0 0 70px #f0f0f0;
+  box-shadow: 0 0 70px #f0f0f0;
 }
 
 .item {
-    @apply relative py-6 text-center;
+  @apply relative py-6 text-center;
 }
 
 .item.active {
-    @apply text-primary;
+  @apply text-primary;
 }
 
 .item.active:after {
-    content: '';
-    background: linear-gradient(270.01deg, #FFAC03 23.25%, rgba(255, 255, 255, 0) 100%, rgba(255, 172, 3, 0) 100%);
-    @apply block h-[1px] w-full  absolute bottom-0;
+  content: '';
+  background: linear-gradient(270.01deg, #ffac03 23.25%, rgba(255, 255, 255, 0) 100%, rgba(255, 172, 3, 0) 100%);
+  @apply block h-[1px] w-full  absolute bottom-0;
 }
 
 .capsule-title {
-    @apply text-[40px] font-semibold;
+  @apply text-[40px] font-semibold;
 }
 .capsule-desc {
-    @apply text-white text-opacity-50 text-sm;
+  @apply text-white text-opacity-50 text-sm;
 }
 
 .sidebar-item {
-    @apply flex -ml-[10px] items-start cursor-pointer;
+  @apply flex -ml-[10px] items-start cursor-pointer;
 }
 
 .sidebar-item .bar {
-    @apply w-[60px] h-[1px] -ml-6 bg-gradient-to-r from-[#ffffff22] to-[#fff];
+  @apply w-[60px] h-[1px] -ml-6 bg-gradient-to-r from-[#ffffff22] to-[#fff];
 }
 
 .sidebar-item.active {
-    @apply text-primary;
+  @apply text-primary;
 }
 
 .sidebar-item.active .bar {
-    @apply  bg-gradient-to-r from-[#FFAC0333] to-[#FFAC03];
+  @apply bg-gradient-to-r from-[#FFAC0333] to-[#FFAC03];
 }
 
 .trade-card {
-    @apply p-6 border border-gray-600 rounded-xl bg-gray-700 bg-opacity-30 text-sm backdrop-blur-sm;
+  @apply p-6 border border-gray-600 rounded-xl bg-gray-700 bg-opacity-30 text-sm backdrop-blur-sm;
 }
 
 .dialog-overlay {
-    @apply bg-black bg-opacity-20 backdrop-blur-sm fixed;
-    inset: 0;
-    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  @apply bg-black bg-opacity-20 backdrop-blur-sm fixed;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .triangle-up {
-    @apply w-0 h-0 border-l-[6px] border-l-transparent border-b-[8px]  border-r-[6px] border-r-transparent;
-    @apply border-b-white;
+  @apply w-0 h-0 border-l-[6px] border-l-transparent border-b-[8px]  border-r-[6px] border-r-transparent;
+  @apply border-b-white;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-input[type="number"] {
-    -moz-appearance: textfield; /* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
 ::-webkit-scrollbar {
-    background-color: transparent;
+  background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #a0a0a0;
+  background-color: #a0a0a0;
 }
 
 ::-webkit-scrollbar {
-    width: 4px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar {
-    border-radius: 20px;
+  border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb {
-    height: 50px;
+  height: 50px;
 }
 
 .index-scroll div {
-    @apply transition-all duration-300;
+  @apply transition-all duration-300;
 }
 .index-scroll .active {
-    @apply text-[20px] text-white;
+  @apply text-[20px] text-white;
 }
 
 .IconButton {
-    @apply cursor-pointer;
+  @apply cursor-pointer;
+}
+
+
+div[data-radix-popper-content-wrapper] {
+    z-index: 1000 !important;
+}
+.TooltipContent {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.TooltipContent[data-side='top'] {
+  animation-name: slideUp;
+}
+.TooltipContent[data-side='bottom'] {
+  animation-name: slideDown;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

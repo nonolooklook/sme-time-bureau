@@ -1,27 +1,28 @@
-import { displayBalance } from '@/utils/display'
 import { calculateBetaFunction } from '@/utils/beta'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { displayBalance } from '@/utils/display'
 import * as d3 from 'd3'
-import Image from 'next/image'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 const d = calculateBetaFunction(3, 3)
 const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
 
 const marginX = 80
 const margin = { top: 60, bottom: 20, left: marginX, right: marginX }
-let rendered = false
+
 export const BetaD3Chart = ({
   minPrice,
   expectedPrice,
   maxPrice,
-  buy,
   withBrush,
+  defaultValue,
+  showType,
 }: {
   minPrice: bigint
   expectedPrice: bigint
   maxPrice: bigint
-  buy?: boolean
   withBrush?: boolean
+  defaultValue?: number
+  showType?: 'left' | 'right'
 }) => {
   const chartRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -29,15 +30,11 @@ export const BetaD3Chart = ({
   const [cx, setCx] = useState(0n)
   const [chartW, setChartW] = useState(0)
   const [chartH, setChartH] = useState(0)
-  const [showEnd, setShowEnd] = useState(false)
-  const [endValue, setEndValue] = useState('')
   const xPadding = 0
 
   useLayoutEffect(() => {
     if (!chartRef.current || !svgRef.current) return
-    // if (rendered) return
     if (minPrice >= 0 && expectedPrice >= 0 && maxPrice >= 0) {
-      rendered = true
       const chartW = chartRef.current.offsetWidth
       const chartH = 220
       setChartW(chartW)
@@ -58,13 +55,16 @@ export const BetaD3Chart = ({
         gradient.append('stop').attr('offset', '0%').attr('style', 'stop-color:rgba(255,172,3,.85);stop-opacity:0.2')
         // gradient.append('stop').attr('class', 'end').attr('offset', '100%').attr('style', 'stop-color:#FFAC034D;stop-opacity:1')
         gradient.append('stop').attr('offset', '100%').attr('style', 'stop-color:rgba(255,172,3);stop-opacity:0')
+        gradient.raise()
       }
 
       const svgM = d3.select(svgRef.current)
       const svg = svgM.select('#g')
-
-      svg.append('defs')
-      svg.call(createGradient)
+      const olddefs = svg.select('defs')
+      if (!olddefs || !olddefs.node()) {
+        svg.append('defs')
+        svg.call(createGradient)
+      }
 
       const xScale = d3.scaleLinear().domain([0, 1]).range([0, width])
       const yScale = d3.scaleLinear().domain([0, 1.875]).range([height, 0])
@@ -75,15 +75,18 @@ export const BetaD3Chart = ({
         .y((d: any) => yScale(d.y))
         .curve(d3.curveCatmullRom.alpha(0.5))
 
+      svg.select('#bg-path').remove()
       svg
         .append('path')
         .datum(data)
+        .attr('id', 'bg-path')
         .attr('d', (d) => line(data as any))
         .style('fill', 'url(#gradient)')
-
+      svg.select('#curue-line').remove()
       svg
         .append('path')
         .datum(data)
+        .attr('id', 'curue-line')
         .attr('d', (d) => line(data as any))
         .attr('stroke-width', '1')
         .style('fill', 'none')
@@ -105,64 +108,86 @@ export const BetaD3Chart = ({
         .attr('stroke-dasharray', '4,4')
         .style('opacity', 0)
         .style('pointer-events', 'none')
-
+      const createInitEvent = (value: number, target: any): any => {
+        if (!target) return null
+        const realX = xScale(value / 100)
+        const rect = target.getBoundingClientRect()
+        let point = (target.ownerSVGElement || target).createSVGPoint()
+        point.x = realX
+        point.y = 0
+        point = point.matrixTransform(target.getScreenCTM())
+        const event = new MouseEvent('mousemove', {
+          view: window,
+          clientX: point.x,
+          clientY: rect.y + rect.height / 2,
+        })
+        return event
+      }
       const tooltipArrow = svg.select('#tooltip-arrow').attr('points', '0,0 0,0 0,0').attr('fill', '#fff')
       const tooltipEllipse = svg.select('#tooltip-ellipse')
       const tooltipText = svg.select('#tooltip-text')
+      const onMouseEvent = function (event: any) {
+        const mousePos = d3.pointer(event, svg.node())
+        console.info('ent:', event)
+        console.info('pos:', mousePos)
+        const xAccessor = (d: any) => d.x
+        const yAccessor = (d: any) => d.y
+        const realX = mousePos[0]
+        const x = xScale.invert(realX)
+        const xBisector = d3.bisector(xAccessor).left
+        const bisectionIndex = xBisector(data, x)
+        const hoveredIndexData = data[Math.max(0, bisectionIndex - 1)]
+        const dx = (BigInt(bisectionIndex) * (maxPrice - minPrice)) / 50n
+        const dh = chartH - margin.top - margin.bottom
+        const dy = (dh / 1.875) * hoveredIndexData.y
+        tooltipLine
+          .style('opacity', 1)
+          .attr('x1', realX)
+          .attr('y1', dh - dy)
+          .attr('x2', realX)
+          .attr('y2', dh)
+          .raise()
+        // .attr('cx', xScale(xAccessor(hoveredIndexData)))
+        // .attr('cy', yScale(yAccessor(hoveredIndexData)))
+        tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh - dy - 4} ${realX + 6},${dh - dy - 12} ${realX - 6},${dh - dy - 12}`)
+        // tooltipEllipse
+        //   .attr('cx', realX)
+        //   .attr('cy', dh - dy / 2)
+        //   .attr('opacity', 1)
+        //   .raise()
+
+        tooltipText
+          .attr('x', realX)
+          .attr('y', dh - dy - 16)
+          .text(displayBalance(dx + minPrice, 2))
+          .raise()
+        // .attr('y', dh - dy / 2 + 6)
+
+        setCx(dx + minPrice)
+        setX(x)
+      }
+      svg.select('#mouse-rect').remove()
       svg
         .append('rect')
+        .attr('id', 'mouse-rect')
         .attr('width', chartW - margin.right - margin.left)
         .attr('height', chartH - margin.top - margin.bottom + 100)
         .attr('y', -100)
         .style('opacity', 0.0)
-        .on('touchmouse mousemove', function (event) {
-          const mousePos = d3.pointer(event, this)
-          const xAccessor = (d: any) => d.x
-          const yAccessor = (d: any) => d.y
-          const realX = mousePos[0]
-          const x = xScale.invert(realX)
-          const xBisector = d3.bisector(xAccessor).left
-          const bisectionIndex = xBisector(data, x)
-          const hoveredIndexData = data[Math.max(0, bisectionIndex - 1)]
-          const dx = (BigInt(bisectionIndex) * (maxPrice - minPrice)) / 50n
-          const dh = chartH - margin.top - margin.bottom
-          const dy = (dh / 1.875) * hoveredIndexData.y
-          tooltipLine
-            .style('opacity', 1)
-            .attr('x1', realX)
-            .attr('y1', dh - dy)
-            .attr('x2', realX)
-            .attr('y2', dh)
-            .raise()
-          // .attr('cx', xScale(xAccessor(hoveredIndexData)))
-          // .attr('cy', yScale(yAccessor(hoveredIndexData)))
-          tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh + 6} ${realX + 6},${dh + 14} ${realX - 6},${dh + 14}`)
-
-          // tooltipEllipse
-          //   .attr('cx', realX)
-          //   .attr('cy', dh - dy / 2)
-          //   .attr('opacity', 1)
-          //   .raise()
-
-          tooltipText
-            .attr('x', realX - 15)
-            .attr('y', dh + 30)
-            .text(displayBalance(dx + minPrice, 2))
-            .raise()
-          // .attr('y', dh - dy / 2 + 6)
-
-          setCx(dx + minPrice)
-          setX(x)
-        })
+        .on('touchmouse mousemove', onMouseEvent)
         .on('mouseleave', function (event) {
-          tooltipEllipse.attr('opacity', 0)
-          tooltipText.text('')
-          tooltipLine.style('opacity', 0).raise()
-          tooltipArrow.attr('opacity', 0)
-          setX(0)
+          if (defaultValue != undefined) {
+            onMouseEvent(createInitEvent(defaultValue, svg.node()))
+          } else {
+            tooltipEllipse.attr('opacity', 0)
+            tooltipText.text('')
+            tooltipLine.style('opacity', 0).raise()
+            tooltipArrow.attr('opacity', 0)
+          }
         })
+      if (defaultValue != undefined) setTimeout(() => onMouseEvent(createInitEvent(defaultValue, svg.node())))
     }
-  }, [chartRef, minPrice, expectedPrice, maxPrice])
+  }, [chartRef, minPrice, expectedPrice, maxPrice, defaultValue])
 
   useLayoutEffect(() => {
     if (!svgRef.current) return
@@ -184,8 +209,8 @@ export const BetaD3Chart = ({
           if (selection[1] < width) {
             const bp = minPrice + ((maxPrice - minPrice) * BigInt(xPercentage.toFixed(0))) / 100n
             const price = displayBalance(bp)
-            setShowEnd(true)
-            setEndValue(price)
+            // setShowEnd(true)
+            // setEndValue(price)
 
             endText
               .attr('x', selection[1] + 25)
@@ -208,8 +233,10 @@ export const BetaD3Chart = ({
         [width - xPadding, height],
       ])
       // .on('brush', brushed)
+      svg.select('#brush-g').remove()
       const brushG = svg
         .append('g')
+        .attr('id', 'brush-g')
         .call(brush)
         .call(brush.move, [xPadding, width - xPadding])
 
@@ -248,60 +275,28 @@ export const BetaD3Chart = ({
     }
   }, [svgRef, chartW, chartH, minPrice, maxPrice, withBrush])
 
-  useEffect(() => {
-    if (!svgRef.current) return
-    const svgM = d3.select(svgRef.current)
-    const svg = svgM.select('#g')
-    const width = chartW - margin.left - margin.right
-    const height = chartH - margin.top - margin.bottom
-    if (chartW > 0 && chartH > 0) {
-      const xAxisScale = d3
-        .scaleLinear()
-        .domain([Number(displayBalance(minPrice)), Number(displayBalance(maxPrice))])
-        .range([0, width])
-      svg.select('#price-scale').remove()
-      const axisX = svg
-        .append('g')
-        .attr('id', 'price-scale')
-        .attr('transform', `translate(0,${height})`)
-        .call(
-          d3
-            .axisBottom(xAxisScale)
-            .tickValues([Number(displayBalance(minPrice)), Number(displayBalance(expectedPrice)), Number(displayBalance(maxPrice))])
-            .tickSize(0)
-            .tickPadding(30),
-        )
-      axisX.selectAll('text').style('font-size', '18px')
-    }
-  }, [minPrice, expectedPrice, maxPrice, svgRef, chartW, chartH])
-
   return (
     <div className={'relative px-16'}>
-      {/*{x > 0 && x <= 1 && (*/}
-      {/*  <div className={'flex justify-end mb-8 absolute top-4 left-0'}>*/}
-      {/*    <div className={'border border-black rounded-lg p-2 w-[380px] text-sm'}>*/}
-      {/*      The probability of a deal occurring above {displayBalance(cx)} is {((1 - x) * 100).toFixed(0)}%.*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*)}*/}
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <>
-            <div className='absolute text-xs bottom-20 -ml-16 flex flex-col items-center'>
-              Random Price &lt; {displayBalance(cx, 2)}
-              <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(0)}%</div>
-            </div>
-
-            <div className='absolute bottom-20 right-0 text-xs flex flex-col items-center -mr-16'>
-              Random Price &gt; {displayBalance(cx, 2)}
-              <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(0)}%</div>
-            </div>
+            {showType == 'left' && (
+              <div className='absolute text-xs bottom-20 -ml-16 flex flex-col items-center'>
+                Price &lt; {displayBalance(cx, 2)}
+                <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(0)}%</div>
+              </div>
+            )}
+            {showType == 'right' && (
+              <div className='absolute bottom-20 right-0 text-xs flex flex-col items-center -mr-16'>
+                Price &gt; {displayBalance(cx, 2)}
+                <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(0)}%</div>
+              </div>
+            )}
           </>
         )}
-        {/*<div className="text-center mb-4 text-xs pr-8">Expected Price</div>*/}
-        {/*<div id={'chart'} ref={chartRef} className={'bg-grayx'}></div>*/}
+        <div className='absolute bottom-[26px] right-0 text-xs -mr-[60px]'>Price (USDC)</div>
         <div id={'chart'} ref={chartRef} className={'bg-grayx'}>
-          <svg ref={svgRef} width={chartW} height={chartH + 10}>
+          <svg ref={svgRef} width={chartW} height={chartH + 15}>
             <rect
               id={'33222'}
               width={1}
@@ -313,27 +308,16 @@ export const BetaD3Chart = ({
               strokeWidth={1}
               strokeDasharray={'4,4'}
             />
-            {/*<text fill={'#fff'} fontSize={12} x={chartW / 2 - 40} y={20}>*/}
-            {/*  Expected price*/}
-            {/*</text>*/}
-            <rect width={chartW + 80} height={1} x={0} y={chartH - 20} fill={'#fff'} />
+            <rect width={chartW - 30} height={1} x={10} y={chartH - 20} fill={'#fff'} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />
               <polygon id={'tooltip-arrow'} fill={'#fff'} points={'2,2 2,2 2,2'} />
               <ellipse ry={16} rx={30} stroke={'#fff'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'tooltip-ellipse'} />
-              <text id={'tooltip-text'} fontSize={13} fill={'#fff'} />
+              <text id={'tooltip-text'} fontSize={14} fill={'#ffffff'} textAnchor='middle' />
               <ellipse ry={16} rx={30} stroke={'#fff'} opacity={0} fill={'#00FFE080'} fontSize={14} id={'end-tooltip-ellipse'} />
               <text id={'end-tooltip-text'} fontSize={13} fontWeight={800} />
             </g>
           </svg>
-          <div className={'-mt-4 py-2 text-sm flex items-center justify-between mb-4 px-16'}>
-            <div className={'border border-white rounded-full w-[60px] text-center -ml-4'}>{displayBalance(minPrice)}</div>
-            <div className={'flex flex-col items-center text-xs'}>
-              <div className='triangle-up mb-1' />
-              <div>Expected Price</div>
-            </div>
-            <div className={'border border-white rounded-full w-[60px] text-center -mr-4'}>{displayBalance(maxPrice)}</div>
-          </div>
         </div>
       </div>
     </div>

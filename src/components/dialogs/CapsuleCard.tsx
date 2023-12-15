@@ -11,7 +11,8 @@ export const CapsuleCard = () => {
         <div className={'text-lg font-light flex items-center justify-between mb-1'}>
           Schrödinger`s time capsules
           <div className='flex text-2xl font-semibold ml-auto gap-1'>
-            <Image src={'/usdc.svg'} alt={'usdc'} width={28} height={28} />
+            {/* <Image src={'/usdc.svg'} alt={'usdc'} width={28} height={28} /> */}
+            {"$ "}
             {currentPrice}
           </div>
         </div>

@@ -1,28 +1,30 @@
-import * as Dialog from '@radix-ui/react-dialog'
-import { Cross2Icon } from '@radix-ui/react-icons'
 import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { parseEther, parseUnits, UserRejectedRequestError } from 'viem'
-import { InputWithButton } from '@/components/InputWithButton'
-import React, { useContext, useEffect, useRef, useState } from 'react'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
-import { FetcherContext } from '@/contexts/FetcherContext'
-import { displayBalance } from '@/utils/display'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
-import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
-import { sleep } from '@/utils/sleep'
-import { toast } from 'sonner'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { FetcherContext } from '@/contexts/FetcherContext'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
-import Stepper from 'awesome-react-stepper'
-import { Spinner } from '@/components/Spinner'
-import { useAccount } from 'wagmi'
-import { ERROR_SIGN_REJECTED, ERROR_SYSTEM } from '@/config/error'
+import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
+import { displayBalance } from '@/utils/display'
 import { handleError } from '@/utils/error'
+import { sleep } from '@/utils/sleep'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import Stepper from 'awesome-react-stepper'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { parseEther } from 'viem'
+import { useAccount } from 'wagmi'
+import { SimpleTip } from '../Tooltip'
+import { MinMax } from './MinMax'
+import { AuthBalanceFee } from './AuthBalanceFee'
 
 export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
@@ -36,6 +38,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
   const [wrongMsg, setWrongMsg] = useState('')
   const maxAmount = selected?.order?.remainingQuantity ?? 0
   useEffect(() => setAmount(maxAmount.toFixed() ?? '1'), [selected])
+  const reqMatchOrder = useRequestMatchOrder()
 
   const canBuy =
     collateralBalance >= (parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n && Number(amount) <= maxAmount
@@ -141,6 +144,11 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         return
       }
 
+      // do request match order;
+      const makerHash = seaport.getOrderHash(order?.entry?.parameters)
+      const takerHash = seaport.getOrderHash(fo.parameters)
+      const hashes = [makerHash, takerHash] as any
+      await reqMatchOrder({ args: [hashes] })
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
@@ -178,25 +186,17 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
                 minPrice={parseEther(selected?.min)}
                 expectedPrice={parseEther(selected?.mid)}
                 maxPrice={parseEther(selected?.max)}
+                showType='left'
+                defaultValue={30}
               />
             </div>
-            <div className='flex justify-center mb-6'>
-              <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
-                {selected?.mid}
-              </div>
-            </div>
+            <MinMax min={selected?.min as any} max={selected?.max as any} disableInput={true} />
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>
               <InputWithButton amount={amount} setAmount={setAmount} />
               <div>{displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)} USDC</div>
             </div>
-            <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
-              <div className={'text-white'}>
-                Authorization required for {displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)}{' '}
-                USDC
-              </div>
-              USDC Balance: {displayBalance(collateralBalance)}
-            </div>
+            <AuthBalanceFee auth={(parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n} balance />
             <div className='flex justify-center mb-4 mt-6'>
               <button className={'btn-primary w-[170px]'} onClick={fillSellOrder} disabled={!canBuy}>
                 {canBuy ? 'Buy' : 'Not enough'}

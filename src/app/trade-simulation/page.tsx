@@ -89,8 +89,8 @@ export default function Page() {
           <Image src={'/capsule-1.png'} alt={'capsule'} width={88} height={120} />
           <div className={'text-[38px] font-semibold ml-8 text-gray-200 uppercase'}>Schrödinger`s Time Capsules / USDC</div>
           <div className='flex items-center text-2xl gap-2 ml-auto'>
-            <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} />
-            {currentPrice}
+            {/* <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} /> */}
+            {"$ " + currentPrice}
           </div>
         </div>
         <div className='grid grid-cols-2 gap-8 mt-10'>

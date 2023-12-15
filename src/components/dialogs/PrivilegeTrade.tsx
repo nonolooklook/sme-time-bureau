@@ -1,28 +1,29 @@
-import * as Dialog from '@radix-ui/react-dialog'
-import { Cross2Icon } from '@radix-ui/react-icons'
-import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
-import React, { useContext, useRef, useState } from 'react'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
-import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
-import { sleep } from '@/utils/sleep'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
-import { useAccount } from 'wagmi'
-import Stepper from 'awesome-react-stepper'
 import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
+import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { handleError } from '@/utils/error'
+import { sleep } from '@/utils/sleep'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import Stepper from 'awesome-react-stepper'
+import { useContext, useRef, useState } from 'react'
 import { parseEther } from 'viem'
+import { useAccount } from 'wagmi'
+import { BetaD3Chart3 } from '../BetaD3Chart3'
+import { AuthBalanceFee } from './AuthBalanceFee'
+import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
 
-export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
+export const PrivilegeTrade = ({ open, onChange, maxCount, order }: { open: boolean; onChange: any; maxCount: number; order: any }) => {
   const { nftBalance, listedCount, currentMaxPrice } = useContext(FetcherContext)
   const { availableAmount } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
@@ -31,12 +32,12 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
   const [amount, setAmount] = useState('1')
   const [wrongMsg, setWrongMsg] = useState('')
   const [o, setO] = useState(false)
-
+  const reqMatchOrder = useRequestMatchOrder()
   const enabled = Number(amount) <= Math.min(availableAmount, maxCount)
-
+  const makerOrder = order
   const fillBidOrder = async () => {
     try {
-      if (!signer) return
+      if (!signer || !makerOrder) return
       setO(true)
       const seaport = new Seaport(signer, {
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
@@ -101,7 +102,11 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
         setWrongMsg(res?.data?.data)
         return
       }
-
+      // do request match order
+      const makerHash = seaport.getOrderHash(makerOrder?.entry?.parameters)
+      const takerHash = seaport.getOrderHash(order.parameters)
+      const hashes = [makerHash, takerHash] as any
+      await reqMatchOrder({ args: [hashes] })
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
@@ -131,47 +136,7 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
           </div>
           <CapsuleCard />
           <div className={'mt-6 mb-4'}>Get rewards from Time-Weaving</div>
-          <div className='flex flex-col gap-4'>
-            <div className='border border-gray-600 rounded-2xl p-4'>
-              <div className='flex justify-between items-center'>
-                <div>
-                  <div className={'text-2xl'}>Common</div>
-                  <div className={'flex items-center'}>
-                    Probability：<div className={'text-2xl'}>99.89%</div>
-                  </div>
-                </div>
-                <div className={'w-[280px] flex justify-center'}>
-                  <img src={'/tp-1.png'} alt={'tp'} width={246} height={100} />
-                </div>
-              </div>
-            </div>
-            <div className='border border-gray-600 rounded-2xl p-4'>
-              <div className='flex justify-between items-center'>
-                <div>
-                  <div className={'text-2xl'}>Epic</div>
-                  <div className={'flex items-center'}>
-                    Probability：<div className={'text-2xl'}>0.1%</div>
-                  </div>
-                </div>
-                <div className={'w-[280px] flex justify-center'}>
-                  <img src={'/tp-2.png'} alt={'tp'} width={260} height={102} />
-                </div>
-              </div>
-            </div>
-            <div className='border border-gray-600 rounded-2xl p-4'>
-              <div className='flex justify-between items-center'>
-                <div>
-                  <div className={'text-2xl'}>Legendary</div>
-                  <div className={'flex items-center'}>
-                    Probability：<div className={'text-2xl'}>0.01%</div>
-                  </div>
-                </div>
-                <div className={'w-[280px] flex justify-center'}>
-                  <img src={'/tp-3.png'} alt={'tp'} width={280} height={100} />
-                </div>
-              </div>
-            </div>
-          </div>
+          <BetaD3Chart3 />
           <div className='px-10'>
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6 mt-6'>
               <div>Quantity</div>
@@ -185,11 +150,8 @@ export const PrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; on
                 Max({Math.min(maxCount, availableAmount)})
               </div>
             </div>
-            <div className='my-3 text-gray-400 pl-4 text-sm flex justify-between'>
-              <div className={'text-white'}>Total price maximum: {1010 * Number(amount)} USDC</div>
-              Transaction fees: 0.5%
-            </div>
           </div>
+          <AuthBalanceFee maximum={1010n * BigInt(amount) * 10n ** 18n} fee />
           <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!enabled}>
               Trade
