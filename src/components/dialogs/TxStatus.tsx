@@ -188,12 +188,13 @@ export type TxStatusProps = {
     max: string
     price?: string
     priceType?: ValueType
+    txHash?: string
   }
   onClose?: () => void
   onRetry?: () => void
 }
-const TestStep: TxStatusProps['step'] = { step: 2, min: '8', max: '10', price: '20000', priceType: 'large' }
-export function TxStatus({ type, step = TestStep, onClose, onRetry }: TxStatusProps) {
+
+export function TxStatus({ type, step, onClose, onRetry }: TxStatusProps) {
   const canClose = type == 'fail' || (type == 'step' && step && step.step == 2)
   const wrapClose = () => {
     canClose && onClose && onClose()
@@ -262,7 +263,7 @@ export function TxStatus({ type, step = TestStep, onClose, onRetry }: TxStatusPr
               {step.step > 0 && (
                 <div className='flex flex-col gap-6 w-full'>
                   <PriceItem tit='Max price:' value={step.max} />
-                  <PriceItem tit='Final price:' value={step.price} valueType={step.priceType} />
+                  <PriceItem tit='Final price:' value={step.price} valueType={step.priceType} txHash={step.txHash} />
                   <PriceItem tit='Min price:' value={step.min} />
                 </div>
               )}

@@ -23,6 +23,8 @@ import { BetaD3Chart } from '../BetaD3Chart'
 import { BetaD3Chart3 } from '../BetaD3Chart3'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { TxStatus, getPriceType, useTxStatus } from './TxStatus'
+import { displayTradePrice } from '@/utils/price'
+import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({
   open,
@@ -102,7 +104,7 @@ export const PrivilegeTrade = ({
       })
 
       await sleep(2000)
-     
+
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -136,7 +138,17 @@ export const PrivilegeTrade = ({
         }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          setTypeStep({ type: 'step', step: { step: 2, min, max, price: r2?.data?.price, priceType: getPriceType(r2?.data?.price) } })
+          setTypeStep({
+            type: 'step',
+            step: {
+              step: 2,
+              min,
+              max,
+              txHash: r2?.data?.txHash,
+              price: displayBalance(parseEther(r2?.data?.price)),
+              priceType: getPriceType(r2?.data?.price),
+            },
+          })
         }
         if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
           clearInterval(itr)
@@ -183,7 +195,7 @@ export const PrivilegeTrade = ({
               </div>
             </div>
           )}
-          <AuthBalanceFee maximum={1010n * BigInt(amount) * 10n ** 18n} fee />
+          <AuthBalanceFee maximum={1010n * BigInt(amount) * 10n ** 18n} />
           <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!enabled}>
               Trade

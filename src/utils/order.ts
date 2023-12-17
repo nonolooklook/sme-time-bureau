@@ -1,5 +1,6 @@
 import { parseUnits } from 'viem'
 import { displayBalance } from '@/utils/display'
+import { privilegeExpectPrice } from '@/config/privilege'
 
 export const getBidOrderMinPrice = (order: any) => {
   const minP = order?.entry?.parameters?.offer?.[0]?.startAmount
@@ -65,4 +66,14 @@ export const getOrderPerMinMax = (order: any) => {
 
 export function getExpectPrice(min: bigint, max: bigint) {
   return (min + max) / 2n
+}
+
+export function getOrderEPbigint(order: any) {
+  if (order.type === '3') return privilegeExpectPrice
+  const [min, max] = getOrderPerMinMaxBigint(order)
+  return getExpectPrice(min, max)
+}
+
+export function getOrderEP(order: any) {
+  return displayBalance(getOrderEPbigint(order))
 }

@@ -22,7 +22,8 @@ import { useAccount } from 'wagmi'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { MinMax } from './MinMax'
 import { TxStatus, useTxStatus } from './TxStatus'
-import { getOrderMinMax } from '@/utils/order'
+import { getOrderMinMax, getOrderPerMinMax } from '@/utils/order'
+import { displayBalance } from '@/utils/display'
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { availableAmount, mutate } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
@@ -150,8 +151,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       const takerHash = seaport.getOrderHash(fo.parameters)
       const hashes = [makerHash, takerHash] as any
       await reqMatchOrder({ args: [hashes] })
-      
-      const [min, max] = getOrderMinMax(entry)
+
+      const [min, max] = getOrderPerMinMax(entry)
       setTypeStep({ type: 'loading', step: { step: 0, min, max } })
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
@@ -160,7 +161,10 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
         }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          setTypeStep({ type: 'step', step: { step: 2, min, max, price: r2?.data?.price } })
+          setTypeStep({
+            type: 'step',
+            step: { step: 2, min, max, txHash: r2?.data?.txHash, price: displayBalance(parseEther(r2?.data?.price)) },
+          })
         }
         if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
           clearInterval(itr)

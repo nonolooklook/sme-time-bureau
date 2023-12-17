@@ -10,7 +10,7 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
 import { displayBalance } from '@/utils/display'
 import { handleError } from '@/utils/error'
-import { getOrderMinMax } from '@/utils/order'
+import { getOrderMinMax, getOrderPerMinMax } from '@/utils/order'
 import { sleep } from '@/utils/sleep'
 import { Seaport } from '@opensea/seaport-js'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
@@ -146,7 +146,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       const hashes = [makerHash, takerHash] as any
       await reqMatchOrder({ args: [hashes] })
 
-      const [min, max] = getOrderMinMax(entry)
+      const [min, max] = getOrderPerMinMax(entry)
       setTypeStep({ type: 'step', step: { step: 0, min, max } })
 
       const itr = setInterval(async () => {
@@ -156,7 +156,10 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          setTypeStep({ type: 'step', step: { step: 2, min, max, price: r2?.data?.price } })
+          setTypeStep({
+            type: 'step',
+            step: { step: 2, min, max, txHash: r2?.data?.txHash, price: displayBalance(parseEther(r2?.data?.price)) },
+          })
         }
         if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
           clearInterval(itr)

@@ -21,7 +21,7 @@ export const getCurrentExploerUrl = () => {
     url = arbitrum.blockExplorers.default.url
   }
   if (chainId == arbitrumSepolia.id) {
-    url = arbitrumSepolia.blockExplorers.default.url
+    url = "https://sepolia.arbiscan.io"
   }
 
   return url.endsWith('/') ? url.slice(0, url.length - 1) : url
