@@ -1,25 +1,24 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import Image from 'next/image'
-import React, { useEffect, useRef, useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
-import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
-import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { parseUnits } from 'viem'
-import { Seaport } from '@opensea/seaport-js'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { NFTContractAddress, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { displayBalance, ellipseAddress } from '@/utils/display'
+import { sleep } from '@/utils/sleep'
+import { Seaport } from '@opensea/seaport-js'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
+import * as Dialog from '@radix-ui/react-dialog'
 import Stepper from 'awesome-react-stepper'
-import { sleep } from '@/utils/sleep'
-import { displayBalance, ellipseAddress } from '@/utils/display'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
+import { parseUnits } from 'viem'
+import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 
 export default function Scratch() {
   const ref = useRef<HTMLDivElement>(null)
@@ -38,7 +37,7 @@ export default function Scratch() {
         args: [address as Address, 0n],
       },
       {
-        address: ERC20_ADDRESS[arbitrumGoerli.id] as Address,
+        address: ERC20_ADDRESS[getCurrentChainId()] as Address,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: ['0x28c73A60ccF8c66c14EbA8935984e616Df2926e3'],

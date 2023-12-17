@@ -128,8 +128,8 @@ export const BetaD3Chart = ({
       const tooltipText = svg.select('#tooltip-text')
       const onMouseEvent = function (event: any) {
         const mousePos = d3.pointer(event, svg.node())
-        console.info('ent:', event)
-        console.info('pos:', mousePos)
+        // console.info('ent:', event)
+        // console.info('pos:', mousePos)
         const xAccessor = (d: any) => d.x
         const yAccessor = (d: any) => d.y
         const realX = mousePos[0]

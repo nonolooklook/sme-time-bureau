@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react'
-import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
+import { useMemo, useState } from 'react'
 
 export const PriceChart = ({
   selectedPrice,

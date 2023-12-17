@@ -1,6 +1,5 @@
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { InputWithButton } from '@/components/InputWithButton'
-import { Spinner } from '@/components/Spinner'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -16,13 +15,14 @@ import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import Stepper from 'awesome-react-stepper'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { parseEther } from 'viem'
 import { useAccount } from 'wagmi'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { MinMax } from './MinMax'
+import { TxStatus, useTxStatus } from './TxStatus'
+import { getOrderMinMax } from '@/utils/order'
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { availableAmount, mutate } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
@@ -32,13 +32,13 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
   const [loading, setLoading] = useState(false)
   const [wrongMsg, setWrongMsg] = useState('')
   const [amount, setAmount] = useState('1')
-  const [o, setO] = useState(false)
 
   const maxAmount = !!availableAmount && !!selected?.order ? Math.min(availableAmount, selected?.order?.remainingQuantity) : 0
   const canAccept = maxAmount >= Number(amount)
   useEffect(() => setAmount(maxAmount?.toFixed() ?? '1'), [maxAmount])
   // console.log(availableAmount, selected, amount, maxAmount)
   const reqMatchOrder = useRequestMatchOrder()
+  const { txsOpen, txsProps, setTxsOpen, setTypeStep } = useTxStatus(() => fillBidOrder())
   const fillBidOrder = async () => {
     try {
       if (Number(amount) <= 0) {
@@ -46,7 +46,8 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
         return
       }
       if (!signer) return
-      setO(true)
+      setTypeStep({ type: 'loading' })
+      setTxsOpen(true)
       const seaport = new Seaport(signer, {
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
@@ -123,7 +124,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       })
 
       await sleep(2000)
-      ref?.current?.click()
+
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -140,7 +141,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
 
       console.log(res)
       if (!res?.data?.status) {
-        ref?.current?.click()
+        setTypeStep({ type: 'fail' })
         setWrongMsg(res?.data?.data)
         return
       }
@@ -149,16 +150,25 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       const takerHash = seaport.getOrderHash(fo.parameters)
       const hashes = [makerHash, takerHash] as any
       await reqMatchOrder({ args: [hashes] })
-
+      
+      const [min, max] = getOrderMinMax(entry)
+      setTypeStep({ type: 'loading', step: { step: 0, min, max } })
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        if (r2?.data?.status === 'requested random number') {
+          setTypeStep({ type: 'step', step: { step: 1, min, max } })
+        }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          ref?.current?.click()
+          setTypeStep({ type: 'step', step: { step: 2, min, max, price: r2?.data?.price } })
+        }
+        if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
+          clearInterval(itr)
+          setTypeStep({ type: 'fail' })
         }
       }, 5000)
     } catch (e: any) {
-      setO(false)
+      setTypeStep({ type: 'fail' })
       handleError(e)
     }
 
@@ -213,50 +223,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-      <Dialog.Root open={o} onOpenChange={() => setO(false)}>
-        <Dialog.Portal>
-          <Dialog.Overlay className={'dialog-overlay'} />
-          <Dialog.Content className={'dialog-content'} onPointerDownOutside={(e) => e.preventDefault()}>
-            <div className='text-right'>
-              <Dialog.Close asChild>
-                <button className='IconButton' aria-label='Close'>
-                  <Cross2Icon />
-                </button>
-              </Dialog.Close>
-            </div>
-            <div
-              onClick={() => {
-                if (ref.current) {
-                  ref.current.click()
-                }
-              }}
-            />
-            <div className={'py-10'} />
-            <Stepper
-              allowClickControl={false}
-              backBtn={<></>}
-              continueBtn={<div ref={ref} />}
-              submitBtn={<></>}
-              fillStroke={'#FFAC03'}
-              activeColor={'#FFAC03'}
-              activeProgressBorder={'#FFAC03'}
-              contentBoxClassName={'text-sm text-center mb-10'}
-            >
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Initiating random number request to Chainlink.</h1>
-              </div>
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Waiting for Chainlink to return a random number</h1>
-              </div>
-              <div className={'w-[370px] mt-10 flex items-center gap-2 justify-center'}>
-                <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
-              </div>
-            </Stepper>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {txsOpen && <TxStatus {...txsProps} />}
     </>
   )
 }

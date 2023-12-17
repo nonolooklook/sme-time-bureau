@@ -1,20 +1,19 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import Image from 'next/image'
-import { useState } from 'react'
+import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
+import { ERC1155ABI } from '@/config/abi/ERC1155'
+import { NFTContractAddress, getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { useApprove } from '@/hooks/useApprove'
 import { useMint } from '@/hooks/useMint'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Spinner } from '@/components/Spinner'
-import { InputWithButton } from '@/components/InputWithButton'
+import Image from 'next/image'
 import Link from 'next/link'
-import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
-import { getCurrentChainId, NFTContractAddress } from '@/config/contract'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { useApprove } from '@/hooks/useApprove'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { arbitrumGoerli } from 'viem/chains'
+import { useState } from 'react'
 import { parseEther } from 'viem'
+import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
 
 export default function Page() {
   const { address } = useAccount()
@@ -28,7 +27,7 @@ export default function Page() {
         functionName: 'totalSupply',
       },
       {
-        address: ERC20_ADDRESS[arbitrumGoerli.id] as `0x${string}`,
+        address: ERC20_ADDRESS[getCurrentChainId()] as `0x${string}`,
         abi: erc20ABI,
         functionName: 'allowance',
         args: [address as `0x${string}`, NFTContractAddress[getCurrentChainId()] as Address],

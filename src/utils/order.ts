@@ -24,3 +24,45 @@ export const getListOrderMaxPrice = (order: any) => {
   const count = parseUnits(order?.entry?.parameters?.offer?.[0]?.startAmount, 0)
   return Number(displayBalance(BigInt(maxP) / count).replace(',', ''))
 }
+
+const getFraction = (num: number, den: number, value: bigint): bigint => {
+  return (BigInt(num) * value) / BigInt(den)
+}
+
+export const getOrderMinMaxBigint = (order: any) => {
+  const num = order?.numerator || 1
+  const den = order?.denominator || 1
+  const ops: any[] = order.parameters.offer[0]?.itemType == 1 ? order?.parameters.offer : order?.parameters.consideration
+  let min = 0n,
+    max = 0n
+  ops.forEach((op) => {
+    min += BigInt(op.startAmount)
+    max += BigInt(op.endAmount)
+  })
+  return [getFraction(num, den, min), getFraction(num, den, max)]
+}
+
+export const getOrderMinMax = (order: any) => {
+  return getOrderMinMaxBigint(order).map(displayBalance)
+}
+
+export const getOrderPerMinMaxBigint = (order: any) => {
+  const ops: any[] = order.parameters.offer[0]?.itemType == 1 ? order?.parameters.offer : order?.parameters.consideration
+  let min = 0n,
+    max = 0n
+  ops.forEach((op) => {
+    min += BigInt(op.startAmount)
+    max += BigInt(op.endAmount)
+  })
+  const nft = order.parameters.offer[0]?.itemType == 1 ? order?.parameters.consideration[0] : order?.parameters.offer[0]
+  const count = BigInt(nft.startAmount)
+  return [min / count, max / count]
+}
+
+export const getOrderPerMinMax = (order: any) => {
+  return getOrderPerMinMaxBigint(order).map(displayBalance)
+}
+
+export function getExpectPrice(min: bigint, max: bigint) {
+  return (min + max) / 2n
+}

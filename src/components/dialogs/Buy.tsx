@@ -1,7 +1,6 @@
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { InputWithButton } from '@/components/InputWithButton'
-import { Spinner } from '@/components/Spinner'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
@@ -11,35 +10,32 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
 import { displayBalance } from '@/utils/display'
 import { handleError } from '@/utils/error'
+import { getOrderMinMax } from '@/utils/order'
 import { sleep } from '@/utils/sleep'
 import { Seaport } from '@opensea/seaport-js'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
 import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import Stepper from 'awesome-react-stepper'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { parseEther } from 'viem'
 import { useAccount } from 'wagmi'
-import { SimpleTip } from '../Tooltip'
-import { MinMax } from './MinMax'
 import { AuthBalanceFee } from './AuthBalanceFee'
+import { MinMax } from './MinMax'
+import { TxStatus, useTxStatus } from './TxStatus'
 
 export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
-  const ref = useRef<HTMLDivElement>(null)
   const { collateralBalance } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
-  const [o, setO] = useState(false)
-
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
   const [wrongMsg, setWrongMsg] = useState('')
   const maxAmount = selected?.order?.remainingQuantity ?? 0
   useEffect(() => setAmount(maxAmount.toFixed() ?? '1'), [selected])
   const reqMatchOrder = useRequestMatchOrder()
-
+  const { txsOpen, txsProps, setTxsOpen, setTypeStep } = useTxStatus(() => fillSellOrder())
   const canBuy =
     collateralBalance >= (parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n && Number(amount) <= maxAmount
 
@@ -54,7 +50,8 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
-      setO(true)
+      setTypeStep({ type: 'loading' })
+      setTxsOpen(true)
       const order = selected?.order
       const csd = order?.entry?.parameters?.consideration
       const startAmount = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.startAmount) + BigInt(amount)).toString(), '0')
@@ -122,7 +119,6 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       })
 
       await sleep(2000)
-      ref?.current?.click()
       const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
         method: 'POST',
         headers: {
@@ -139,7 +135,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
 
       console.log(res)
       if (!res?.data?.status) {
-        ref?.current?.click()
+        setTypeStep({ type: 'fail' })
         setWrongMsg(res?.data?.data)
         return
       }
@@ -149,15 +145,26 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       const takerHash = seaport.getOrderHash(fo.parameters)
       const hashes = [makerHash, takerHash] as any
       await reqMatchOrder({ args: [hashes] })
+
+      const [min, max] = getOrderMinMax(entry)
+      setTypeStep({ type: 'step', step: { step: 0, min, max } })
+
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        if (r2?.data?.status === 'requested random number') {
+          setTypeStep({ type: 'step', step: { step: 1, min, max } })
+        }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          ref?.current?.click()
+          setTypeStep({ type: 'step', step: { step: 2, min, max, price: r2?.data?.price } })
+        }
+        if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
+          clearInterval(itr)
+          setTypeStep({ type: 'fail' })
         }
       }, 5000)
     } catch (e: any) {
-      setO(false)
+      setTypeStep({ type: 'fail' })
       handleError(e)
     }
 
@@ -205,50 +212,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-      <Dialog.Root open={o} onOpenChange={() => setO(false)}>
-        <Dialog.Portal>
-          <Dialog.Overlay className={'dialog-overlay'} />
-          <Dialog.Content className={'dialog-content'} onPointerDownOutside={(e) => e.preventDefault()}>
-            <div className='text-right'>
-              <Dialog.Close asChild>
-                <button className='IconButton' aria-label='Close'>
-                  <Cross2Icon />
-                </button>
-              </Dialog.Close>
-            </div>
-            <div
-              onClick={() => {
-                if (ref.current) {
-                  ref.current.click()
-                }
-              }}
-            />
-            <div className={'py-10'} />
-            <Stepper
-              allowClickControl={false}
-              backBtn={<></>}
-              continueBtn={<div ref={ref} />}
-              submitBtn={<></>}
-              fillStroke={'#FFAC03'}
-              activeColor={'#FFAC03'}
-              activeProgressBorder={'#FFAC03'}
-              contentBoxClassName={'text-sm text-center mb-10'}
-            >
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Initiating random number request to Chainlink.</h1>
-              </div>
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Waiting for Chainlink to return a random number</h1>
-              </div>
-              <div className={'w-[370px] mt-10 flex items-center gap-2 justify-center'}>
-                <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
-              </div>
-            </Stepper>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {txsOpen && <TxStatus {...txsProps} />}
     </>
   )
 }

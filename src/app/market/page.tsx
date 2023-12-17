@@ -1,31 +1,29 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import Image from 'next/image'
-import React, { useEffect, useRef, useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
 import { Spinner } from '@/components/Spinner'
-import { Address, useAccount, useContractReads } from 'wagmi'
-import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
-import * as Checkbox from '@radix-ui/react-checkbox'
-import { CheckIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
-import Stepper from 'awesome-react-stepper'
-import { Seaport } from '@opensea/seaport-js'
-import { useEthersSigner } from '@/hooks/useEthersSigner'
-import { SEAPORT_ADDRESS } from '@/config/seaport'
-import { arbitrumGoerli } from 'viem/chains'
-import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
-import { ItemType } from '@opensea/seaport-js/lib/constants'
-import { parseUnits } from 'viem'
+import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
+import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
+import { SEAPORT_ADDRESS } from '@/config/seaport'
+import { useEthersSigner } from '@/hooks/useEthersSigner'
+import { useOrders } from '@/hooks/useOrders'
 import { displayBalance } from '@/utils/display'
 import { calculateMidPrice } from '@/utils/price'
-import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
 import { sleep } from '@/utils/sleep'
-import { useOrders } from '@/hooks/useOrders'
+import { Seaport } from '@opensea/seaport-js'
+import { ItemType } from '@opensea/seaport-js/lib/constants'
+import { MatchOrdersFulfillment } from '@opensea/seaport-js/lib/types'
+import * as Checkbox from '@radix-ui/react-checkbox'
+import * as Dialog from '@radix-ui/react-dialog'
+import { CheckIcon } from '@radix-ui/react-icons'
+import Stepper from 'awesome-react-stepper'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { parseUnits } from 'viem'
+import { useAccount } from 'wagmi'
 
 export default function Market() {
   const ref = useRef<HTMLDivElement>(null)
@@ -143,7 +141,7 @@ export default function Market() {
       if (!signer) return
       setOpen(true)
       const seaport = new Seaport(signer, {
-        overrides: { contractAddress: SEAPORT_ADDRESS[arbitrumGoerli.id] },
+        overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
       const finalMakerOrders = bidOrders?.filter((l, i) => checkedBids?.[i])

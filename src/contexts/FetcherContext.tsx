@@ -21,6 +21,16 @@ interface FetcherContextArgs {
   currentPrice: number
   currentMaxPrice: number
   gasFee: bigint
+  mintInfo?: {
+    total: bigint
+    supply: bigint
+    start: bigint
+    end: bigint
+    price: bigint
+    token: `0x${string}`
+    permax: bigint
+    receiver: `0x${string}`
+  }
 }
 
 const FetcherContext = React.createContext<FetcherContextArgs>({
@@ -109,6 +119,7 @@ const FetcherContextProvider = ({ children }: any) => {
         currentPrice: mid,
         currentMaxPrice: maxPrice,
         gasFee: data?.[5]?.result ?? 0n,
+        mintInfo: data?.[2].result,
       }}
     >
       {children}

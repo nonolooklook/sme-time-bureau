@@ -1,21 +1,12 @@
 'use client'
 
 import { Header } from '@/components/Header'
-import Image from 'next/image'
-import { useContext, useState } from 'react'
-import { useMint } from '@/hooks/useMint'
-import * as Dialog from '@radix-ui/react-dialog'
-import { Spinner } from '@/components/Spinner'
-import { InputWithButton } from '@/components/InputWithButton'
-import { PortfolioListed } from '@/components/portfolio/PortfolioListed'
 import { PortfolioAvailable } from '@/components/portfolio/PortfolioAvailable'
-import { Address, useAccount, useContractReads } from 'wagmi'
-import { NFTContractAddress } from '@/config/contract'
-import { ERC1155ABI } from '@/config/abi/ERC1155'
-import { displayBalance } from '@/utils/display'
-import { useUserOrders } from '@/hooks/useUserOrders'
+import { PortfolioHistory } from '@/components/portfolio/PortfolioHistory'
+import { PortfolioListed } from '@/components/portfolio/PortfolioListed'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { useContext, useState } from 'react'
 
 export default function Portfolio() {
   const { nftBalance, listedCount, bidCount } = useContext(FetcherContext)
@@ -55,11 +46,20 @@ export default function Portfolio() {
           >
             My bidding ({bidCount})
           </div>
+          <div
+            className={`cursor-pointer px-6 rounded-full border py-2 ${
+              type === 3 ? 'text-primary border-primary' : 'text-white border-white'
+            }`}
+            onClick={() => setType(3)}
+          >
+            Trade History
+          </div>
         </div>
         <div className={`pt-8 ${type === 0 ? 'rounded-tl-sm' : ''}`}>
           {type === 0 && <PortfolioAvailable />}
           {type === 1 && <PortfolioListed isBid={false} />}
           {type === 2 && <PortfolioListed isBid={true} />}
+          {type === 3 && <PortfolioHistory/>}
         </div>
       </div>
     </div>

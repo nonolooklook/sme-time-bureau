@@ -8,9 +8,7 @@ import { PlaceABid } from '@/components/dialogs/PlaceABid'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { SaleDialog } from '@/components/dialogs/Sale'
 import { FetcherContext } from '@/contexts/FetcherContext'
-import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { useOrders } from '@/hooks/useOrders'
-import { useQuantity } from '@/hooks/useQuantity'
 import { displayBalance } from '@/utils/display'
 import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
 import { calculateMidPrice, displayTradePrice } from '@/utils/price'
@@ -27,7 +25,7 @@ export default function Page() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
-  const [privilege, setPrivilege] = useState<{ order: any; count: number } | undefined>()
+  const [privilege, setPrivilege] = useState<{ order: any; count: number; type?: '1' | '3' } | undefined>()
   const [openBid, setOpenBid] = useState(false)
   const [openList, setOpenList] = useState(false)
   const [selectedPrice, setSelectedPrice] = useState(0)
@@ -51,9 +49,12 @@ export default function Page() {
       : listOrders
 
   useInterval(() => {
-    if (type === 'list') {
-      setOpenList(true)
-      router.push('/trade')
+    if (type === 'privilege1') {
+      const privilegeOrder = bidOrders?.find((item) => item.type === '3')
+      if (privilegeOrder && !privilege) {
+        setPrivilege({ order: privilegeOrder, count: privilegeOrder.remainingQuantity, type: '1' })
+        router.push('/trade')
+      }
     }
     if (type === 'privilege') {
       const privilegeOrder = bidOrders?.find((item) => item.type === '3')
@@ -100,7 +101,9 @@ export default function Page() {
                 {finalBidOrders?.map((order) => {
                   const minP = order?.entry?.parameters?.offer?.[0]?.startAmount
                   const maxP = order?.entry?.parameters?.offer?.[0]?.endAmount
+                  
                   const mid = calculateMidPrice(minP, maxP)
+
                   let count = BigInt(order?.entry?.parameters?.consideration?.[0]?.startAmount)
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
@@ -289,6 +292,7 @@ export default function Page() {
         </div>
         {privilege && (
           <PrivilegeTrade
+            type={privilege.type}
             order={privilege.order}
             open={true}
             onChange={(open: boolean) => !open && setPrivilege(undefined)}

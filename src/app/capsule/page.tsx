@@ -1,34 +1,35 @@
 'use client'
 
+import { CircleProgress } from '@/components/CircleProgress'
 import { Header } from '@/components/Header'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import Image from 'next/image'
 import { InputWithButton } from '@/components/InputWithButton'
+import { Spinner } from '@/components/Spinner'
 import { Dot } from '@/components/icons/dot'
+import { getCurrentChainId } from '@/config/contract'
+import { ERC20_ADDRESS } from '@/config/erc20'
+import { FetcherContext } from '@/contexts/FetcherContext'
+import { useApprove } from '@/hooks/useApprove'
+import { useAvailableAmount } from '@/hooks/useAvailableAmount'
+import { useCountdown } from '@/hooks/useCountdown'
+import { useMint } from '@/hooks/useMint'
+import { useOfficialAddress } from '@/hooks/useOfficialAddress'
+import { useOrders } from '@/hooks/useOrders'
+import { useQuantity } from '@/hooks/useQuantity'
 import { useTops } from '@/hooks/useTops'
 import { displayBalance, ellipseAddress } from '@/utils/display'
-import { CircleProgress } from '@/components/CircleProgress'
-import { useCountdown } from '@/hooks/useCountdown'
-import { Address, parseEther } from 'viem'
-import { FetcherContext } from '@/contexts/FetcherContext'
-import { useMint } from '@/hooks/useMint'
-import { Spinner } from '@/components/Spinner'
-import { toast } from 'sonner'
-import { useApprove } from '@/hooks/useApprove'
+import classNames from 'classnames'
+import Image from 'next/image'
 import Link from 'next/link'
-import { useQuantity } from '@/hooks/useQuantity'
-import { useAvailableAmount } from '@/hooks/useAvailableAmount'
-import { useOfficialAddress } from '@/hooks/useOfficialAddress'
-import { ERC20_ADDRESS } from '@/config/erc20'
-import { getCurrentChainId } from '@/config/contract'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { Address, parseEther } from 'viem'
 import { erc20ABI, useContractRead } from 'wagmi'
 
 export default function Page() {
-  const { collateralBalance, totalMintedCount, mintedCount, allowance4nft, nftBalance, listedCount } = useContext(FetcherContext)
+  const { collateralBalance, totalMintedCount, mintedCount, allowance4nft, mintInfo } = useContext(FetcherContext)
   const [amount, setAmount] = useState('1')
   const [scrollPosition, setScrollPosition] = useState(0)
   const { total, used } = useQuantity()
-
   const handleScroll = () => setScrollPosition(window.pageYOffset)
   const scrollTo = useCallback((i: number) => window.scrollTo({ left: 0, top: i === 0 ? 0 : i === 1 ? 660 : 1600, behavior: 'smooth' }), [])
   useEffect(() => {
@@ -37,12 +38,16 @@ export default function Page() {
   }, [])
 
   const index = scrollPosition < 660 ? 0 : scrollPosition > 1100 ? 2 : 1
-
+  const { orders } = useOrders(true)
+  const privilegeOrder = useMemo(() => orders?.find((item) => item.type === '3'), [orders])
   const { tops } = useTops()
-  const endTime = 1701130328000
-  const endTime2 = endTime + 7 * 24 * 3600 * 1000
-  const shouldCountdown = endTime > new Date().getTime()
+  const startTime = mintInfo ? Number((mintInfo.start * 1000n).toString()) : 1700000328000
+  const startDate = useMemo(() => new Date(startTime), [startTime])
+  const endTime = mintInfo ? Number((mintInfo.end * 1000n).toString()) : 1701130328000
+  const endTime2 = (privilegeOrder ? privilegeOrder.entry.parameters.startTime * 1000 : endTime) + 7 * 24 * 3600 * 1000
+  const shouldCountdown = mintInfo && mintInfo.end * 1000n > new Date().getTime()
   const shouldCountdown2 = endTime2 > new Date().getTime()
+  const canTrade = shouldCountdown2 && !shouldCountdown && used < total
   const ended = !shouldCountdown && !shouldCountdown2
   const [days, hours, minutes, seconds] = useCountdown(endTime)
   const [days2, hours2, minutes2, seconds2] = useCountdown(endTime2)
@@ -50,9 +55,6 @@ export default function Page() {
   const shouldApprove = allowance4nft < parseEther(amount as `${number}`) * 10n
   const { approve, isApproveLoading } = useApprove(() => {})
   const canMint = !!mint && !isMintLoading && mintedCount < 5 && shouldCountdown
-
-  console.log('You had minted: ', mintedCount, collateralBalance)
-
   const { availableAmount } = useAvailableAmount()
 
   const { remaining } = useQuantity()
@@ -90,10 +92,10 @@ export default function Page() {
                   <div className='flex gap-2 items-center mb-3'>
                     <Image src={'/timer.svg'} alt={'timer'} width={20} height={20} />
                     <div className='flex items-center'>
-                      Start on: &nbsp; 18 <div className={'w-[1px] h-[8px] bg-gray-400 mx-2'} /> 10{' '}
-                      <div className={'w-[1px] h-[8px] bg-gray-400 mx-2'} /> 2023
+                      Start on: &nbsp; {startDate.getUTCDay()} <div className={'w-[1px] h-[8px] bg-gray-400 mx-2'} />{' '}
+                      {startDate.getUTCMonth()} <div className={'w-[1px] h-[8px] bg-gray-400 mx-2'} /> {startDate.getUTCFullYear()}
                       <div className={'w-[1px] h-[8px] bg-gray-400 mx-2'} />
-                      8:00 (UTC)
+                      {startDate.getUTCHours()}:{startDate.getUTCMinutes()} (UTC)
                     </div>
                   </div>
                   <div className='flex items-center gap-2'>
@@ -215,12 +217,12 @@ export default function Page() {
 
           <div className='flex mb-40 gap-10'>
             <div>
-              <div className={'capsule-title mb-8'}>Time-Weaving Privilege Trade (Not started yet)</div>
+              <div className={'capsule-title mb-8'}>{`Time-Weaving Privilege Trade ${canTrade ? '' : '(Not started yet)'}`}</div>
               <div className={'capsule-desc mb-8'}>
                 After the event, Stochastic Universe will retrieve all Schrödinger`s Time Capsules at a fixed price, i.e. Time Reset Trade.
               </div>
               <div className={'text-gray-200 text-sm mb-3'}>• End countdown</div>
-              {shouldCountdown2 && !shouldCountdown ? (
+              {canTrade ? (
                 <div className={'flex gap-2'}>
                   <CircleProgress ratio={days2 / 30}>
                     <div className={'flex flex-col items-center justify-center h-full'}>
@@ -266,26 +268,20 @@ export default function Page() {
                 <div className={`w-[4px] rounded-full h-[36px] bg-primary absolute -top-2`} style={{ left: `${(used / total) * 100}%` }} />
               </div>
               <div className='flex gap-10 items-center'>
-                {shouldCountdown2 && (
-                  <Link
-                    href={'/trade?type=privilege'}
-                    className={
-                      'bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
-                    }
-                  >
-                    TRADE
-                  </Link>
-                )}
-                {!shouldCountdown2 && (
-                  <button
-                    className={
-                      'opacity-50 bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold'
-                    }
-                  >
-                    TRADE
-                  </button>
-                )}
-
+                <Link
+                  href={canTrade ? '/trade?type=privilege' : ''}
+                  onClick={(e) => {
+                    !canTrade && e.preventDefault()
+                  }}
+                  className={classNames(
+                    'bg-primary flex items-center justify-center rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold',
+                    {
+                      'opacity-50': !canTrade,
+                    },
+                  )}
+                >
+                  TRADE
+                </Link>
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
                   You have {availableAmount} capsules
                 </div>
@@ -316,7 +312,7 @@ export default function Page() {
               <Image src={'/capsule-1.png'} alt={'capsule'} width={320} height={520} className={'-rotate-90'} />
             </div>
             <div>
-              <div className={'text-[38px] w-[540px] mb-8'}>Time Reset Trade (Not started yet)</div>
+              <div className={'text-[38px] w-[540px] mb-8'}>{`Time Reset Trade ${ended ? '' : '(Not started yet)'}`}</div>
               <div className={'text-sm text-gray-400 mb-8'}>Time-Weaving Privilege Trade will be followed by a Time Reset Trade.</div>
               <div className={'text-gray-200 mb-3 mt-10 flex flex-col gap-2'}>
                 <div className='flex items-center'>
@@ -337,14 +333,17 @@ export default function Page() {
                 </div>
               </div>
               <div className='flex gap-10 mt-12 items-center'>
-                <button
-                  disabled={!ended}
+                <Link
+                  href={ended ? '/trade?type=privilege2' : ''}
+                  onClick={(e) => {
+                    !ended && e.preventDefault()
+                  }}
                   className={`${
                     ended ? '' : 'opacity-50'
-                  } bg-primary rounded-full w-[160px] text-2xl text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold`}
+                  } bg-primary rounded-full w-[160px] text-2xl leading-[48px] text-center shadow shadow-amber-400 shadow-2xl h-[48px] font-semibold`}
                 >
                   SELL
-                </button>
+                </Link>
                 <div className={'bg-white bg-opacity-30 rounded-full flex items-center justify-center px-6 h-[30px] text-gray-300'}>
                   You have {availableAmount} capsules
                 </div>

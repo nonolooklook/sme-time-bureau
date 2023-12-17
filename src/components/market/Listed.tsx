@@ -1,7 +1,3 @@
-import Image from 'next/image'
-import { InputWithButton } from '@/components/InputWithButton'
-import { BetaD3Chart } from '@/components/BetaD3Chart'
-import { PriceInput } from '@/components/PriceInput'
 import { useState } from 'react'
 
 export const Listed = () => {

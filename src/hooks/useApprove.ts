@@ -1,8 +1,7 @@
-import { Address, erc20ABI, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi'
-import { getCurrentChainId, NFTContractAddress } from '../config/contract'
-import { parseEther } from 'viem'
-import { arbitrumGoerli } from 'viem/chains'
 import { ERC20_ADDRESS } from '@/config/erc20'
+import { parseEther } from 'viem'
+import { Address, erc20ABI, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi'
+import { NFTContractAddress, getCurrentChainId } from '../config/contract'
 
 export const useApprove = (onSuccess: any) => {
   const { config } = usePrepareContractWrite({

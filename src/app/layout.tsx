@@ -1,10 +1,9 @@
-import { Providers } from './providers'
-import { Montserrat, Exo_2 } from 'next/font/google'
-import './global.css'
-import { Toaster } from 'sonner'
-import { ReactNode } from 'react'
+import { Montserrat } from 'next/font/google'
 import Script from 'next/script'
-import Head from 'next/head'
+import { ReactNode } from 'react'
+import { Toaster } from 'sonner'
+import './global.css'
+import { Providers } from './providers'
 
 const montserrat = Montserrat({ subsets: ['latin'], weight: ['700', '600', '400', '300'] })
 

@@ -20,6 +20,16 @@ interface SimulationFetcherContextArgs {
   allowance4nft: bigint
   currentPrice: number
   currentMaxPrice: number
+  mintInfo?: {
+    total: bigint
+    supply: bigint
+    start: bigint
+    end: bigint
+    price: bigint
+    token: `0x${string}`
+    permax: bigint
+    receiver: `0x${string}`
+  }
 }
 
 const SimulationFetcherContext = React.createContext<SimulationFetcherContextArgs>({
@@ -96,6 +106,7 @@ const SimulationFetcherContextProvider = ({ children }: any) => {
         nftBalance: Number(data?.[1]?.result) ?? 0,
         listedCount: listedCount,
         bidCount: bidCount,
+        mintInfo: data?.[2]?.result,
         totalMintedCount: Number(data?.[2]?.result?.total) ?? 0,
         mintedCount: Number(data?.[4]?.result) ?? 0,
         allowance4nft: data?.[3]?.result ?? 0n,

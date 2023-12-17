@@ -1,12 +1,13 @@
+import { privilegeOrderRange } from '@/config/privilege'
 import { calculateBetaFunction } from '@/utils/beta'
 import { displayBalance } from '@/utils/display'
 import * as d3 from 'd3'
 import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 
 const defData = [
-  { min: 0, max: 20, beta: 9989, flex: 15 },
-  { min: 190, max: 210, beta: 10, flex: 4 },
-  { min: 990, max: 1010, beta: 1, flex: 1 },
+  { min: privilegeOrderRange[0][0], max: privilegeOrderRange[0][1], beta: 9989, flex: 15 },
+  { min: privilegeOrderRange[1][0], max: privilegeOrderRange[1][1], beta: 10, flex: 4 },
+  { min: privilegeOrderRange[2][0], max: privilegeOrderRange[2][1], beta: 1, flex: 1 },
 ]
 
 const bottom = 20
@@ -178,7 +179,54 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       tooltipLine.style('opacity', 0).raise()
       tooltipArrow.attr('opacity', 0)
     }
+    const createInitEvent = (): any => {
+      const node = svg.node()
+      if (!node) return null
+      const rect = node.getBoundingClientRect()
+      let point = ((node as any)?.ownerSVGElement || node).createSVGPoint()
+      point.x = rect.left + lSpace + lPadding + itemWidth * 0.7
+      point.y = 0
+      // console.info('p:', point.x)
+      point.matrixTransform(node.getScreenCTM())
+      const event = new MouseEvent('mousemove', {
+        view: window,
+        clientX: point.x,
+        clientY: 100,
+      })
+      return event
+    }
 
+    const initEvent = createInitEvent()
+    const onMouseEvnet = (event: any) => {
+      const mousePos = d3.pointer(event, svg.node())
+      const realX = mousePos[0]
+      // console.info('realX:', realX, event == initEvent)
+      const rd = xRangeDatas.find((item) => item.min <= realX && realX <= item.max)
+      if (!rd) {
+        event !== initEvent && onMouseEvnet(initEvent)
+      } else {
+        const xValue = rd.scaler(realX)
+        const betaX = rd.xScaler.invert(realX)
+        const index = Math.round(betaX * 100)
+        const topY = rd.yScaler(rd.data[index]) - bottom
+        const cx = BigInt((rd.cScaler(realX) * 10 ** 4).toFixed(0) + '00000000000000')
+        tooltipLine
+          .style('opacity', 1)
+          .attr('x1', realX)
+          .attr('y1', topY)
+          .attr('x2', realX)
+          .attr('y2', height - bottom)
+          .raise()
+        tooltipText
+          .text(displayBalance(cx, 2))
+          .attr('x', realX)
+          .attr('y', topY - 14)
+        tooltipArrow.attr('opacity', 1).attr('points', `${realX},${topY - 4} ${realX + 6},${topY - 10} ${realX - 6},${topY - 10}`)
+        setX(xValue)
+        setCx(cx)
+      }
+    }
+    onMouseEvnet(initEvent)
     svg.select('#rect-mouse').remove()
     svg
       .append('rect')
@@ -186,40 +234,9 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       .attr('width', width)
       .attr('height', height)
       .style('opacity', 0.0)
-      .on('touchmouse mousemove', function (event) {
-        const mousePos = d3.pointer(event, this)
-        const realX = mousePos[0]
-        // console.info('realX:', realX)
-        const rd = xRangeDatas.find((item) => item.min <= realX && realX <= item.max)
-        if (!rd) {
-          hiddenTooltips()
-          setX(-1)
-        } else {
-          const xValue = rd.scaler(realX)
-          const betaX = rd.xScaler.invert(realX)
-          const index = Math.round(betaX * 100)
-          const topY = rd.yScaler(rd.data[index]) - bottom
-          const cx = BigInt((rd.cScaler(realX) * 10 ** 4).toFixed(0) + '00000000000000')
-          tooltipLine
-            .style('opacity', 1)
-            .attr('x1', realX)
-            .attr('y1', topY)
-            .attr('x2', realX)
-            .attr('y2', height - bottom)
-            .raise()
-          tooltipText
-            .text(displayBalance(cx, 2))
-            .attr('x', realX)
-            .attr('y', topY - 14)
-          tooltipArrow.attr('opacity', 1).attr('points', `${realX},${topY - 4} ${realX + 6},${topY - 10} ${realX - 6},${topY - 10}`)
-          setX(xValue)
-          setCx(cx)
-        }
-        // const x = xScale.invert(realX)
-      })
+      .on('touchmouse mousemove', onMouseEvnet)
       .on('mouseleave', function (event) {
-        setX(0)
-        hiddenTooltips()
+        onMouseEvnet(initEvent)
       })
   }, [chartRef, data])
 
@@ -228,10 +245,10 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       <div className={'relative'}>
         {x > 0 && x <= 1 && (
           <div className={''}>
-            <div className='absolute text-xs bottom-20 left-2 flex flex-col items-center'>
+            {/* <div className='absolute text-xs bottom-20 left-2 flex flex-col items-center'>
               Price &lt; {displayBalance(cx, 2)}
               <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(4)}%</div>
-            </div>
+            </div> */}
             <div className='absolute bottom-20 right-0 text-xs flex flex-col items-center'>
               Price &gt; {displayBalance(cx, 2)}
               <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(4)}%</div>
