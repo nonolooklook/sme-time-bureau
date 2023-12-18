@@ -20,9 +20,9 @@ const getRole = (item: any, account: string) => {
 }
 
 const getSide = (item: any, role: string) => {
+  if (role == '-') return '-'
   const type = item?.fillOrderDetail?.takerOrders[0]?.parameters.offer[0]?.itemType
   const takerOfferIsUsdc = type === 1
-  if (role == '-') return '-'
   return role == 'Taker' ? (takerOfferIsUsdc ? 'Buy' : 'Sale') : takerOfferIsUsdc ? 'Sale' : 'Buy'
 }
 
@@ -41,13 +41,14 @@ export const PortfolioHistory = () => {
         header={['Order number', 'Date', 'Pair', 'Side', 'Expect price', 'Executed', 'Role', 'MinPrice/MaxPrice', 'Fee', 'Total', 'Txn hash']}
         data={history.map((item: any) => {
           const makerOrder = item?.fillOrderDetail?.makerOrders[0]
+          const count = Number(makerOrder.numerator)
           const role = getRole(item, address as any)
           const side = getSide(item, role)
           const [min, max] = getOrderPerMinMaxBigint(makerOrder)
           const txLink = getCurrentExploerUrl() + '/tx/' + item.txHash
-          const fee = (Number(item.transaction[0].price) * 0.005).toFixed(2)
-          const executedPrice = Number(item.transaction[0].price * 0.995).toFixed(2)
-          const total = Number(item.transaction[0].price).toFixed(2)
+          const fee = (Number(item.transaction[0].price) * 0.005 * count).toFixed(2)
+          const executedPrice = Number(item.transaction[0].price).toFixed(2)
+          const total = (Number(item.transaction[0].price) * count).toFixed(2)
           return [
             shortStr(item._id), // Order number
             getDate(item), // Date
@@ -72,8 +73,8 @@ export const PortfolioHistory = () => {
             fee + ' USDC', // Fee
             total + ' USDC', // Total
             <div className='flex items-center gap-2' key='txhash'>
-              <a href={txLink} target='_blank' rel='noreferrer'>
-                {shortStr(item.txHash, 10, 10)}
+              <a href={txLink} target='_blank' rel='noreferrer' className='text-yellow-400'>
+                {shortStr(item.txHash, 8, 6)}
               </a>
               <Share2Icon className='cursor-pointer text-yellow-400 text-2xl' onClick={() => window.open(txLink, '_blank')} />
             </div>,

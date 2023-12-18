@@ -4,6 +4,7 @@ import { TimeNFT } from '@/config/abi/TimeNFT'
 import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { SME_GAS_MANAGER } from '@/config/key'
+import { useOfficialAddress } from '@/hooks/useOfficialAddress'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 import { useUserOrders } from '@/hooks/useUserOrders'
 import React from 'react'
@@ -57,7 +58,7 @@ const FetcherContextProvider = ({ children }: any) => {
   const bidCount = bidOrders?.reduce((count: number, cv: any) => Number(cv?.entry.parameters?.consideration?.[0]?.startAmount) + count, 0)
 
   const { orders, mutate: mutateOrders } = useOrderDistribution()
-
+  useOfficialAddress()
   useInterval(() => {
     mutateOrders?.()
   }, 3000)

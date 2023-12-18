@@ -69,11 +69,20 @@ export function getExpectPrice(min: bigint, max: bigint) {
 }
 
 export function getOrderEPbigint(order: any) {
-  if (order.type === '3') return privilegeExpectPrice
   const [min, max] = getOrderPerMinMaxBigint(order)
+  if (isPrivilegeOrder(order)) return privilegeExpectPrice
   return getExpectPrice(min, max)
 }
 
 export function getOrderEP(order: any) {
   return displayBalance(getOrderEPbigint(order))
+}
+
+export const memoPrivilege = {
+  privilegeOfferer: '',
+}
+
+export function isPrivilegeOrder(order: any) {
+  const [min, max] = getOrderPerMinMaxBigint(order)
+  return (order.type == '3' && min !== max) || (min !== max && order.parameters.offerer == memoPrivilege.privilegeOfferer)
 }
