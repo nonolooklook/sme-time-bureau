@@ -13,6 +13,7 @@ import { displayBalance } from '@/utils/display'
 import {
   getBidOrderMaxPrice,
   getBidOrderMinPrice,
+  getExpectPrice,
   getListOrderMaxPrice,
   getListOrderMinPrice,
   getOrderPerMinMaxBigint,
@@ -61,7 +62,16 @@ export default function Page() {
         return item.type === '3' && min == max
       })
       if (privilegeOrder && !privilege) {
-        setPrivilege({ order: privilegeOrder, count: privilegeOrder.remainingQuantity, type: '1' })
+        const [min, max] = getOrderPerMinMaxBigint(privilegeOrder.entry)
+        const count = privilegeOrder?.entry?.parameters?.consideration?.[0]?.startAmount
+        setOpenSale(true)
+        setSelected({
+          min: displayBalance(min),
+          max: displayBalance(max),
+          mid: displayBalance(getExpectPrice(min,max)),
+          count: count?.toString(),
+          order: privilegeOrder,
+        })
         router.push('/trade')
       }
     }

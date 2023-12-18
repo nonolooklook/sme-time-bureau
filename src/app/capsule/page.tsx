@@ -52,6 +52,7 @@ export default function Page() {
   const shouldCountdown2 = endTime2 > new Date().getTime()
   const canTrade = shouldCountdown2 && !shouldCountdown && used < total
   const ended = !shouldCountdown && !shouldCountdown2
+  // const ended = true
   const [days, hours, minutes, seconds] = useCountdown(endTime)
   const [days2, hours2, minutes2, seconds2] = useCountdown(endTime2)
   const { mint, isMintLoading } = useMint(amount, true, () => toast.success('Mint successfully'))
@@ -337,7 +338,7 @@ export default function Page() {
               </div>
               <div className='flex gap-10 mt-12 items-center'>
                 <Link
-                  href={ended ? '/trade?type=privilege2' : ''}
+                  href={ended ? '/trade?type=privilege1' : ''}
                   onClick={(e) => {
                     !ended && e.preventDefault()
                   }}
