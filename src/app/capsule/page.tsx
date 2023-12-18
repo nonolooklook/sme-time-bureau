@@ -18,12 +18,15 @@ import { useQuantity } from '@/hooks/useQuantity'
 import { useTops } from '@/hooks/useTops'
 import { displayBalance, ellipseAddress } from '@/utils/display'
 import classNames from 'classnames'
+import { utcFormat } from 'd3'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Address, parseEther } from 'viem'
 import { erc20ABI, useContractRead } from 'wagmi'
+
+const formatDate = utcFormat('%d/%m/%Y %H:%M(UTC)')
 
 export default function Page() {
   const { collateralBalance, totalMintedCount, mintedCount, allowance4nft, mintInfo } = useContext(FetcherContext)
@@ -184,7 +187,7 @@ export default function Page() {
                   <div className={'ml-2'}>
                     <div className={'mb-3'}>Mint Time Capsules</div>
                     <div>Start on</div>
-                    <div>18/11/2023 8:00(UTC)</div>
+                    <div>{formatDate(startDate)}</div>
                   </div>
                 </div>
 
@@ -196,7 +199,7 @@ export default function Page() {
                   <div className={'ml-2'}>
                     <div className={'mb-3'}>Time-Weaving Privilege Trade</div>
                     <div>Start on</div>
-                    <div>18/10/2023 8:00(UTC)</div>
+                    <div>{formatDate(new Date(endTime))}</div>
                   </div>
                 </div>
 
@@ -208,7 +211,7 @@ export default function Page() {
                   <div className={'ml-2'}>
                     <div className={'mb-3'}>Time Reset Trade</div>
                     <div>Start on</div>
-                    <div>18/10/2023 8:00(UTC)</div>
+                    <div>{formatDate(new Date(endTime + 7 * 24 * 3600 * 1000))}</div>
                   </div>
                 </div>
               </div>

@@ -10,7 +10,13 @@ import { SaleDialog } from '@/components/dialogs/Sale'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useOrders } from '@/hooks/useOrders'
 import { displayBalance } from '@/utils/display'
-import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
+import {
+  getBidOrderMaxPrice,
+  getBidOrderMinPrice,
+  getListOrderMaxPrice,
+  getListOrderMinPrice,
+  getOrderPerMinMaxBigint,
+} from '@/utils/order'
 import { calculateMidPrice, displayTradePrice } from '@/utils/price'
 import * as HoverCard from '@radix-ui/react-hover-card'
 import { Cross2Icon } from '@radix-ui/react-icons'
@@ -50,14 +56,20 @@ export default function Page() {
 
   useInterval(() => {
     if (type === 'privilege1') {
-      const privilegeOrder = bidOrders?.find((item) => item.type === '3')
+      const privilegeOrder = bidOrders?.find((item) => {
+        const [min, max] = getOrderPerMinMaxBigint(item.entry)
+        return item.type === '3' && min == max
+      })
       if (privilegeOrder && !privilege) {
         setPrivilege({ order: privilegeOrder, count: privilegeOrder.remainingQuantity, type: '1' })
         router.push('/trade')
       }
     }
     if (type === 'privilege') {
-      const privilegeOrder = bidOrders?.find((item) => item.type === '3')
+      const privilegeOrder = bidOrders?.find((item) => {
+        const [min, max] = getOrderPerMinMaxBigint(item.entry)
+        return item.type === '3' && min != max
+      })
       if (privilegeOrder && !privilege) {
         setPrivilege({ order: privilegeOrder, count: privilegeOrder.remainingQuantity })
         router.push('/trade')
@@ -101,7 +113,7 @@ export default function Page() {
                 {finalBidOrders?.map((order) => {
                   const minP = order?.entry?.parameters?.offer?.[0]?.startAmount
                   const maxP = order?.entry?.parameters?.offer?.[0]?.endAmount
-                  
+
                   const mid = calculateMidPrice(minP, maxP)
 
                   let count = BigInt(order?.entry?.parameters?.consideration?.[0]?.startAmount)
@@ -116,7 +128,8 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           key={order?.hash}
                           onClick={() => {
-                            if (order?.type === '3') {
+                            const [min, max] = getOrderPerMinMaxBigint(order?.entry)
+                            if (order?.type === '3' && min !== max) {
                               setPrivilege({ order, count: order?.remainingQuantity })
                               return
                             }
