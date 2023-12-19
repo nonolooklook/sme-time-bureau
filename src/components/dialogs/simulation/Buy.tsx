@@ -187,15 +187,15 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
               </Dialog.Close>
             </div>
             <CapsuleCard />
-            <div className={'-mt-6'}>
-              <BetaD3Chart
-                minPrice={parseEther(selected?.min)}
-                expectedPrice={parseEther(selected?.mid)}
-                maxPrice={parseEther(selected?.max)}
-                showType='left'
-                defaultValue={30}
-              />
-            </div>
+
+            <BetaD3Chart
+              minPrice={parseEther(selected?.min)}
+              expectedPrice={parseEther(selected?.mid)}
+              maxPrice={parseEther(selected?.max)}
+              showType='left'
+              defaultValue={30}
+            />
+
             <MinMax min={selected?.min} max={selected?.max} disableInput />
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>

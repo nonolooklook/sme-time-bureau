@@ -191,15 +191,14 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
 
             <CapsuleCard />
 
-            <div className={'-mt-6'}>
-              <BetaD3Chart
-                minPrice={parseEther(selected?.min)}
-                expectedPrice={parseEther(selected?.mid)}
-                maxPrice={parseEther(selected?.max)}
-                showType='left'
-                defaultValue={30}
-              />
-            </div>
+            <BetaD3Chart
+              minPrice={parseEther(selected?.min)}
+              expectedPrice={parseEther(selected?.mid)}
+              maxPrice={parseEther(selected?.max)}
+              showType='left'
+              defaultValue={30}
+            />
+
             <MinMax min={selected?.min as any} max={selected?.max as any} disableInput={true} />
             <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
               <div>Quantity</div>

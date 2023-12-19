@@ -198,7 +198,7 @@ export const PrivilegeTrade = ({
           <AuthBalanceFee maximum={1010n * BigInt(amount) * 10n ** 18n} />
           <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!enabled}>
-              Trade
+              Sell
             </button>
           </div>
           {txsOpen && <TxStatus {...txsProps} />}

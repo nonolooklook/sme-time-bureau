@@ -138,7 +138,7 @@ export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolea
           </div>
           <CapsuleCard />
 
-          <div className={'-mt-6'}>
+          
             <BetaD3Chart
               minPrice={parseEther(min)}
               expectedPrice={parseEther('9')}
@@ -146,7 +146,7 @@ export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolea
               defaultValue={70}
               showType='right'
             />
-          </div>
+         
           <MinMax min={min} max={max} onChange={(min, max) => setMinMax([min, max])} />
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>

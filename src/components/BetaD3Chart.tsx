@@ -74,7 +74,7 @@ export const BetaD3Chart = ({
         .x((d: any) => xScale(d.x))
         .y((d: any) => yScale(d.y))
         .curve(d3.curveCatmullRom.alpha(0.5))
-
+      // bg
       svg.select('#bg-path').remove()
       svg
         .append('path')
@@ -82,6 +82,7 @@ export const BetaD3Chart = ({
         .attr('id', 'bg-path')
         .attr('d', (d) => line(data as any))
         .style('fill', 'url(#gradient)')
+      // line
       svg.select('#curue-line').remove()
       svg
         .append('path')
@@ -131,7 +132,6 @@ export const BetaD3Chart = ({
         // console.info('ent:', event)
         // console.info('pos:', mousePos)
         const xAccessor = (d: any) => d.x
-        const yAccessor = (d: any) => d.y
         const realX = mousePos[0]
         const x = xScale.invert(realX)
         const xBisector = d3.bisector(xAccessor).left
@@ -147,22 +147,12 @@ export const BetaD3Chart = ({
           .attr('x2', realX)
           .attr('y2', dh)
           .raise()
-        // .attr('cx', xScale(xAccessor(hoveredIndexData)))
-        // .attr('cy', yScale(yAccessor(hoveredIndexData)))
         tooltipArrow.attr('opacity', 1).attr('points', `${realX},${dh - dy - 4} ${realX + 6},${dh - dy - 12} ${realX - 6},${dh - dy - 12}`)
-        // tooltipEllipse
-        //   .attr('cx', realX)
-        //   .attr('cy', dh - dy / 2)
-        //   .attr('opacity', 1)
-        //   .raise()
-
         tooltipText
           .attr('x', realX)
           .attr('y', dh - dy - 16)
           .text(displayBalance(dx + minPrice, 2))
           .raise()
-        // .attr('y', dh - dy / 2 + 6)
-
         setCx(dx + minPrice)
         setX(x)
       }
@@ -308,6 +298,9 @@ export const BetaD3Chart = ({
               strokeWidth={1}
               strokeDasharray={'4,4'}
             />
+            <text textAnchor='middle' fill='#fff' x={chartW / 2} y={margin.top - 30}>
+              Expect price
+            </text>
             <rect width={chartW - 30} height={1} x={10} y={chartH - 20} fill={'#fff'} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />

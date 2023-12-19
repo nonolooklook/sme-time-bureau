@@ -28,7 +28,7 @@ export function AuthBalanceFee({
       )}
       {!!maximum && (
         <div className={'text-white'}>
-          Total price maximum: <span className='text-xl font-bold'>{displayBalance(maximum)}</span> USDC
+          Maximum price: <span className='text-xl font-bold'>{displayBalance(maximum)}</span> USDC
         </div>
       )}
       {!!balance && (
