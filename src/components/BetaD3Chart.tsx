@@ -137,7 +137,7 @@ export const BetaD3Chart = ({
         const xBisector = d3.bisector(xAccessor).left
         const bisectionIndex = xBisector(data, x)
         const hoveredIndexData = data[Math.max(0, bisectionIndex - 1)]
-        const dx = (BigInt(bisectionIndex) * (maxPrice - minPrice)) / 50n
+        const dx = (BigInt(bisectionIndex) * (maxPrice - minPrice)) / 100n
         const dh = chartH - margin.top - margin.bottom
         const dy = (dh / 1.875) * hoveredIndexData.y
         tooltipLine
