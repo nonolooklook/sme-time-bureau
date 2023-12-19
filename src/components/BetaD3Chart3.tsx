@@ -1,4 +1,4 @@
-import { OrderRange, privilegeOrderRange } from '@/config/privilege'
+import { privilegeOrderRange } from '@/config/privilege'
 import { calculateBetaDist, calculateBetaFunction, calculateBetaInv } from '@/utils/beta'
 import { displayBalance } from '@/utils/display'
 import * as d3 from 'd3'
@@ -68,8 +68,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
     const count = data.length
     const itemWidth = (width - gap * (count - 1) - lSpace - rSpace - lPadding - rPadding) / count
     const xRangeDatas: {
-      min: number
-      max: number
+      xRange: [number, number]
       data: number[]
       item: (typeof defData)[0]
       itemIndex: number
@@ -85,7 +84,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
         .scaleLinear()
         .domain([0, 1.875])
         .range([height, (height * (sumflex - item.flex)) / sumflex])
-      const xRange = [xOffset, xOffset + itemWidth]
+      const xRange: [number, number] = [xOffset, xOffset + itemWidth]
       const xScale = d3.scaleLinear().domain([0, 1]).range(xRange)
       const line = d3
         .line()
@@ -97,8 +96,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       xRangeDatas.push({
         item: item as any,
         itemIndex: index,
-        min: xOffset,
-        max: xOffset + itemWidth,
+        xRange,
         data: itemdata.map((item) => item.y),
         xScaler: xScale,
         yScaler: yScale,
@@ -198,7 +196,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       const mousePos = d3.pointer(event, svg.node())
       const realX = mousePos[0]
       // console.info('realX:', realX, event == initEvent)
-      const rd = xRangeDatas.find((item) => item.min <= realX && realX <= item.max)
+      const rd = xRangeDatas.find((item) => item.xRange[0] <= realX && realX <= item.xRange[1])
       if (!rd) {
         event.isTrusted && onMouseEvnet(createInitEvent())
       } else {
@@ -227,7 +225,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
         setCx(cx)
       }
     }
-    setTimeout(() => onMouseEvnet(createInitEvent()),100)
+    setTimeout(() => onMouseEvnet(createInitEvent()), 100)
     svg.select('#rect-mouse').remove()
     svg
       .append('rect')
