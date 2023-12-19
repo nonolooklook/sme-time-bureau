@@ -7,6 +7,7 @@ import { SME_GAS_MANAGER } from '@/config/key'
 import { useOfficialAddress } from '@/hooks/useOfficialAddress'
 import { useOrderDistribution } from '@/hooks/useOrderDistribution'
 import { useUserOrders } from '@/hooks/useUserOrders'
+import { memoAccount } from '@/utils/order'
 import React from 'react'
 import { useInterval } from 'usehooks-ts'
 import { Address, erc20ABI, useAccount, useContractReads } from 'wagmi'
@@ -50,7 +51,7 @@ const FetcherContext = React.createContext<FetcherContextArgs>({
 // This context maintain 2 counters that can be used as a dependencies on other hooks to force a periodic refresh
 const FetcherContextProvider = ({ children }: any) => {
   const { address } = useAccount()
-
+  memoAccount.current = address as any
   const { orders: listOrders } = useUserOrders(false, address ?? '')
   const { orders: bidOrders } = useUserOrders(true, address ?? '')
 

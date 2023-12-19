@@ -1,9 +1,16 @@
-import { parseEther } from "viem"
+import { parseEther } from 'viem'
 
-export const privilegeOrderRange: [number, number][] = [
-  [0, 20],
-  [90, 110],
-  [990, 1010],
+export type OrderRange = {
+  min: number
+  max: number
+  a: number // alpha
+  b: number // beta
+}
+
+export const privilegeOrderRange: OrderRange[] = [
+  { min: 0, max: 20, a: 2, b: 3 },
+  { min: 90, max: 110, a: 3, b: 3 },
+  { min: 990, max: 1010, a: 3, b: 3 },
 ]
 
-export const privilegeExpectPrice = parseEther('20') * BigInt(5000) / BigInt(9989) 
+export const privilegeExpectPrice = parseEther('8.19')

@@ -1,13 +1,13 @@
-import { privilegeOrderRange } from '@/config/privilege'
-import { calculateBetaFunction } from '@/utils/beta'
+import { OrderRange, privilegeOrderRange } from '@/config/privilege'
+import { calculateBetaDist, calculateBetaFunction, calculateBetaInv } from '@/utils/beta'
 import { displayBalance } from '@/utils/display'
 import * as d3 from 'd3'
 import { Fragment, useLayoutEffect, useRef, useState } from 'react'
 
 const defData = [
-  { min: privilegeOrderRange[0][0], max: privilegeOrderRange[0][1], beta: 9989, flex: 15 },
-  { min: privilegeOrderRange[1][0], max: privilegeOrderRange[1][1], beta: 10, flex: 4 },
-  { min: privilegeOrderRange[2][0], max: privilegeOrderRange[2][1], beta: 1, flex: 1 },
+  { ...privilegeOrderRange[0], beta: 9989, flex: 15 },
+  { ...privilegeOrderRange[1], beta: 10, flex: 4 },
+  { ...privilegeOrderRange[2], beta: 1, flex: 1 },
 ]
 
 const bottom = 20
@@ -25,7 +25,6 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
   const [cx, setCx] = useState(0n)
   const [chartW, setChartW] = useState(0)
   const [chartH, setChartH] = useState(0)
-
   useLayoutEffect(() => {
     if (!chartRef.current || !svgRef.current) return
     // if (rendered) return
@@ -72,7 +71,8 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       min: number
       max: number
       data: number[]
-      scaler: d3.ScaleLinear<number, number, never>
+      item: (typeof defData)[0]
+      itemIndex: number
       xScaler: d3.ScaleLinear<number, number, never>
       yScaler: d3.ScaleLinear<number, number, never>
       cScaler: d3.ScaleLinear<number, number, never>
@@ -92,14 +92,14 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
         .x((d: any) => xScale(d.x))
         .y((d: any) => yScale(d.y) - bottom)
         .curve(d3.curveCatmullRom.alpha(0.5))
-      const d = calculateBetaFunction(3, 3)
+      const d = calculateBetaFunction(index == 0 ? 2 : 3, 3)
       const itemdata = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
-      const range = [tempSumbeta / sumbeta, (tempSumbeta + item.beta) / sumbeta]
       xRangeDatas.push({
+        item: item as any,
+        itemIndex: index,
         min: xOffset,
         max: xOffset + itemWidth,
         data: itemdata.map((item) => item.y),
-        scaler: d3.scaleLinear().domain(xRange).range(range),
         xScaler: xScale,
         yScaler: yScale,
         cScaler: d3.scaleLinear().domain(xRange).range([item.min, item.max]),
@@ -174,17 +174,16 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       .style('pointer-events', 'none')
     const tooltipArrow = svg.select('#tooltip-arrow').attr('points', '0,0 0,0 0,0').attr('fill', '#fff')
     const tooltipText = svg.select('#tooltip-text')
-    const hiddenTooltips = () => {
-      tooltipText.text('')
-      tooltipLine.style('opacity', 0).raise()
-      tooltipArrow.attr('opacity', 0)
-    }
+
     const createInitEvent = (): any => {
       const node = svg.node()
       if (!node) return null
       const rect = node.getBoundingClientRect()
       let point = ((node as any)?.ownerSVGElement || node).createSVGPoint()
-      point.x = rect.left + lSpace + lPadding + itemWidth * 0.7
+      const item = xRangeDatas[0]
+      const rate = (sumbeta * 0.7) / item.item.beta
+      const betaX = calculateBetaInv(rate, item.item.a, item.item.b)
+      point.x = rect.left + lSpace + lPadding + itemWidth * betaX
       point.y = 0
       // console.info('p:', point.x)
       point.matrixTransform(node.getScreenCTM())
@@ -195,17 +194,14 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       })
       return event
     }
-
-    const initEvent = createInitEvent()
     const onMouseEvnet = (event: any) => {
       const mousePos = d3.pointer(event, svg.node())
       const realX = mousePos[0]
       // console.info('realX:', realX, event == initEvent)
       const rd = xRangeDatas.find((item) => item.min <= realX && realX <= item.max)
       if (!rd) {
-        event !== initEvent && onMouseEvnet(initEvent)
+        event.isTrusted && onMouseEvnet(createInitEvent())
       } else {
-        const xValue = rd.scaler(realX)
         const betaX = rd.xScaler.invert(realX)
         const index = Math.round(betaX * 100)
         const topY = rd.yScaler(rd.data[index]) - bottom
@@ -222,11 +218,16 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
           .attr('x', realX)
           .attr('y', topY - 14)
         tooltipArrow.attr('opacity', 1).attr('points', `${realX},${topY - 4} ${realX + 6},${topY - 10} ${realX - 6},${topY - 10}`)
-        setX(xValue)
+        let tempSumBetaRate = 0
+        for (let i = 0; i < rd.itemIndex; i++) {
+          const xrd = xRangeDatas[i]
+          tempSumBetaRate += xrd.item.beta / sumbeta
+        }
+        setX(tempSumBetaRate + (calculateBetaDist(betaX, rd.item.a, rd.item.b) * rd.item.beta) / sumbeta)
         setCx(cx)
       }
     }
-    onMouseEvnet(initEvent)
+    setTimeout(() => onMouseEvnet(createInitEvent()),100)
     svg.select('#rect-mouse').remove()
     svg
       .append('rect')
@@ -236,7 +237,7 @@ export const BetaD3Chart3 = ({ data = defData }: { data?: { min: number; max: nu
       .style('opacity', 0.0)
       .on('touchmouse mousemove', onMouseEvnet)
       .on('mouseleave', function (event) {
-        onMouseEvnet(initEvent)
+        onMouseEvnet(createInitEvent())
       })
   }, [chartRef, data])
 

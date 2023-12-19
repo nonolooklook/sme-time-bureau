@@ -1,7 +1,7 @@
-import { calculateBetaFunction } from '@/utils/beta'
+import { calculateBetaDist, calculateBetaFunction, calculateBetaInv } from '@/utils/beta'
 import { displayBalance } from '@/utils/display'
 import * as d3 from 'd3'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 const d = calculateBetaFunction(3, 3)
 const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
@@ -111,7 +111,7 @@ export const BetaD3Chart = ({
         .style('pointer-events', 'none')
       const createInitEvent = (value: number, target: any): any => {
         if (!target) return null
-        const realX = xScale(value / 100)
+        const realX = xScale(calculateBetaInv(value / 100, 3, 3))
         const rect = target.getBoundingClientRect()
         let point = (target.ownerSVGElement || target).createSVGPoint()
         point.x = realX
@@ -244,10 +244,6 @@ export const BetaD3Chart = ({
         .on('touchmouse mousemove', (event: any) => {
           const mousePos = d3.pointer(event, this)
           dropTooltip.style('opacity', 0)
-          // dropTooltip
-          //   .style('opacity', 1)
-          //   .selectAll('tspan')
-          //   .attr('x', mousePos[0] - 100);
         })
         .on('mouseleave', () => {
           dropTooltip.style('opacity', 0)
@@ -273,13 +269,17 @@ export const BetaD3Chart = ({
             {showType == 'left' && (
               <div className='absolute text-xs bottom-20 -ml-16 flex flex-col items-center'>
                 Price &lt; {displayBalance(cx, 2)}
-                <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>{(x * 100).toFixed(0)}%</div>
+                <div className={'px-3 mt-1 py-1 text-xs rounded-full border border-white'}>
+                  {(calculateBetaDist(x, 3, 3) * 100).toFixed(0)}%
+                </div>
               </div>
             )}
             {showType == 'right' && (
               <div className='absolute bottom-20 right-0 text-xs flex flex-col items-center -mr-16'>
                 Price &gt; {displayBalance(cx, 2)}
-                <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>{((1 - x) * 100).toFixed(0)}%</div>
+                <div className={'px-3 mt-1 py-1 text-xs rounded-full border-white border'}>
+                  {((1 - calculateBetaDist(x, 3, 3)) * 100).toFixed(0)}%
+                </div>
               </div>
             )}
           </>

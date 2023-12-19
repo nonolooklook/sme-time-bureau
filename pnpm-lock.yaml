@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@formulajs/formulajs':
+    specifier: ^4.3.4
+    version: 4.3.4
   '@opensea/seaport-js':
     specifier: ^2.0.4
     version: 2.0.4
@@ -952,6 +955,14 @@ packages:
 
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
+    dev: false
+
+  /@formulajs/formulajs@4.3.4:
+    resolution: {integrity: sha512-iETOopDEUmKaeEUofUfazebhihErh+klyRQbEemDnnBj0hcwNu3xF0oAPHVL0vU/E01rVjy/ZC+1UBMOVkXrvQ==}
+    hasBin: true
+    dependencies:
+      bessel: 1.0.2
+      jstat: 1.9.6
     dev: false
 
   /@humanwhocodes/config-array@0.11.11:
@@ -3055,6 +3066,11 @@ packages:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
     dev: false
 
+  /bessel@1.0.2:
+    resolution: {integrity: sha512-Al3nHGQGqDYqqinXhQzmwmcRToe/3WyBv4N8aZc5Pef8xw2neZlR9VPi84Sa23JtgWcucu18HxVZrnI0fn2etw==}
+    engines: {node: '>=0.8'}
+    dev: false
+
   /bigint-buffer@1.1.5:
     resolution: {integrity: sha512-trfYco6AoZ+rKhKnxA0hgX0HAbVP/s808/EuDSe2JDzUnCp/xAsli35Orvk67UrTEcwuxZqYZDmfA2RXJgxVvA==}
     engines: {node: '>= 10.0.0'}
@@ -5019,6 +5035,10 @@ packages:
   /jsonparse@1.3.1:
     resolution: {integrity: sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==}
     engines: {'0': node >= 0.2.0}
+    dev: false
+
+  /jstat@1.9.6:
+    resolution: {integrity: sha512-rPBkJbK2TnA8pzs93QcDDPlKcrtZWuuCo2dVR0TFLOJSxhqfWOVCSp8aV3/oSbn+4uY4yw1URtLpHQedtmXfug==}
     dev: false
 
   /jsx-ast-utils@3.3.5:

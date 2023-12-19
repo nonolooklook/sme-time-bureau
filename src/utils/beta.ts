@@ -1,49 +1,26 @@
+import { BETADIST, BETAINV } from '@formulajs/formulajs'
+
 function strip(num: number, precision = 12) {
   return +parseFloat(num.toPrecision(precision))
 }
+
+export const calculateBetaDist = (x: number, a: number, b: number) => {
+  if (x <= 0) return 0
+  if (x >= 1) return 1
+  return BETADIST(x, a, b, true, 0, 1)
+}
+
+export const calculateBetaInv = (y: number, a: number, b: number) => {
+  if (y <= 0) return 0
+  if (y >= 1) return 1
+  return BETAINV(y, a, b, 0, 1)
+}
+
 export const calculateBetaFunction = (alpha: number, beta: number) => {
   const data = []
   for (let i = 0; i <= 100; ++i) {
     const x = strip(0.01 * i)
-    const y = betaFunction(alpha, beta, x)
-    data.push({ x, y, name: '2.35' })
-  }
-  return data
-}
-
-export const calculateFirstBetaFunction = (alpha: number, beta: number) => {
-  const data = []
-  for (let i = 0; i <= 50; ++i) {
-    const x = strip(0.02 * i)
-    const y = betaFunction(alpha, beta, x)
-    data.push({ x, y, name: '2.35' })
-  }
-
-  // for (let i = 1; i <= 20; ++i) {
-  //   data.push({ x: strip(0.02 * (i + 50)), y: 0, name: '2.35' })
-  // }
-
-  return data
-}
-
-export const calculateSecondBetaFunction = (alpha: number, beta: number) => {
-  const data = []
-  for (let i = 0; i <= 50; ++i) {
-    const x = strip(0.02 * i)
-    const y = betaFunction(alpha, beta, x)
-    data.push({ x, y, name: '2.35' })
-  }
-
-  // for (let i = 1; i <= 20; ++i) {
-  //   data.push({ x: strip(0.03 * (i + 50)), y: 0, name: '2.35' })
-  // }
-
-  return data
-}
-export const calculate33BetaFunction = (alpha: number, beta: number) => {
-  const data = []
-  for (let i = 0; i <= 50; ++i) {
-    const x = strip(0.02 * i)
+    // const y = (calculateBetaDist(x, alpha, beta) - calculateBetaDist(x - 0.01, alpha, beta)) * 100
     const y = betaFunction(alpha, beta, x)
     data.push({ x, y, name: '2.35' })
   }

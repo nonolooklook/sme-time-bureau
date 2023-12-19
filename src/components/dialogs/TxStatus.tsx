@@ -345,7 +345,7 @@ export function getPriceType(price: string | number): ValueType | undefined {
   const nump = Number(price)
   for (let index = 0; index < privilegeOrderRange.length; index++) {
     const element = privilegeOrderRange[index]
-    if (nump < element[1]) return ValueTypes[index]
+    if (nump < element.max) return ValueTypes[index]
   }
   return ValueTypes[2]
 }

@@ -86,3 +86,10 @@ export function isPrivilegeOrder(order: any) {
   const [min, max] = getOrderPerMinMaxBigint(order)
   return (order.type == '3' && min !== max) || (min !== max && order.parameters.offerer == memoPrivilege.privilegeOfferer)
 }
+
+export const memoAccount = {
+  current: '',
+}
+export function isSelfMaker(order: any) {
+  return order.parameters.offerer == memoAccount.current
+}

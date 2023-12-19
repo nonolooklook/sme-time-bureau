@@ -17,10 +17,13 @@ import {
   getListOrderMaxPrice,
   getListOrderMinPrice,
   getOrderPerMinMaxBigint,
+  isPrivilegeOrder,
+  isSelfMaker,
 } from '@/utils/order'
 import { calculateMidPrice, displayTradePrice } from '@/utils/price'
 import * as HoverCard from '@radix-ui/react-hover-card'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import classNames from 'classnames'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useContext, useState } from 'react'
@@ -68,7 +71,7 @@ export default function Page() {
         setSelected({
           min: displayBalance(min),
           max: displayBalance(max),
-          mid: displayBalance(getExpectPrice(min,max)),
+          mid: displayBalance(getExpectPrice(min, max)),
           count: count?.toString(),
           order: privilegeOrder,
         })
@@ -130,7 +133,7 @@ export default function Page() {
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
                   const wc = `${50 * order?.remainingQuantity}px`
-
+                  const isPrivilege = isPrivilegeOrder(order.entry)
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
                       <HoverCard.Trigger asChild>
@@ -138,8 +141,7 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           key={order?.hash}
                           onClick={() => {
-                            const [min, max] = getOrderPerMinMaxBigint(order?.entry)
-                            if (order?.type === '3' && min !== max) {
+                            if (isPrivilege) {
                               setPrivilege({ order, count: order?.remainingQuantity })
                               return
                             }
@@ -153,11 +155,11 @@ export default function Page() {
                             })
                           }}
                         >
-                          <div className='grid grid-cols-4 text-gray-200'>
+                          <div className={classNames('grid grid-cols-4', isSelfMaker(order?.entry) ? 'text-orange-300' : 'text-gray-200')}>
                             <div>{order?.remainingQuantity}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxP) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minP) / count)}</div>
-                            <div className={'text-right pr-2'}>{order?.type === '3' ? '$8.19' : displayTradePrice(realMid)}</div>
+                            <div className={'text-right pr-2'}>{isPrivilege ? '$8.19' : displayTradePrice(realMid)}</div>
                           </div>
                           <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
                         </div>
@@ -235,7 +237,7 @@ export default function Page() {
                           }}
                           key={order?.hash}
                         >
-                          <div className='grid grid-cols-4 text-gray-200'>
+                          <div className={classNames('grid grid-cols-4', isSelfMaker(order?.entry) ? 'text-orange-300' : 'text-gray-200')}>
                             <div className={'pl-2'}>{displayTradePrice(realMid)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minp) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxp) / count)}</div>
