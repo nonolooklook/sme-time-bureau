@@ -300,8 +300,8 @@ export default function Page() {
                 <div className={'text-[20px] mb-4'}>Top 10 winnings</div>
                 <div className='flex flex-col gap-2'>
                   {tops?.map((top) => (
-                    <div className={'bg-white bg-opacity-10 px-3 py-1 flex items-center justify-between'} key={top.orderHash}>
-                      {ellipseAddress(top?.orderHash, 6)}
+                    <div className={'bg-white bg-opacity-10 px-3 py-1 flex items-center justify-between'} key={top?.txHash}>
+                      {ellipseAddress(top?.fillorders[0].takerOffer, 6)}
                       <div className={'text-primary'}>${Number(top?.price)?.toFixed(2)}</div>
                     </div>
                   ))}
