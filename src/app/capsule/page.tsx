@@ -21,7 +21,7 @@ import classNames from 'classnames'
 import { utcFormat } from 'd3'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Address, parseEther } from 'viem'
 import { erc20ABI, useContractRead } from 'wagmi'
@@ -71,11 +71,26 @@ export default function Page() {
     args: [officialAddress as Address],
     enabled: !!officialAddress,
   })
-
+  // auto scroll
+  const refState = useRef<any>({})
+  refState.current.shouldCountdown = shouldCountdown
+  refState.current.shouldCountdown2 = shouldCountdown2
+  refState.current.ended = ended
+  useEffect(() => {
+    setTimeout(() => {
+      if (refState.current.shouldCountdown2) scrollTo(1)
+      if (refState.current.ended) scrollTo(2)
+    }, 500)
+  }, [])
   return (
     <div
-      className={'relative min-h-screen bg-no-repeat'}
-      style={{ background: 'url(/capsule-bg.png)', backgroundSize: '100% 100%', backgroundPosition: 'center center' }}
+      className={'relative min-h-screen'}
+      style={{
+        background: 'url(/capsule-bg.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      }}
     >
       <Header />
       <div className={'container mx-auto text-white pt-40 pb-36'}>
@@ -293,7 +308,7 @@ export default function Page() {
             </div>
 
             <div
-              className={'w-[350px] grow shrink-0 bg-no-repeat p-[1px]'}
+              className={'w-[350px] grow shrink-0 !bg-no-repeat p-[1px]'}
               style={{ backgroundImage: 'url(/capsule-2.png)', backgroundSize: '100% 100%' }}
             >
               <div className={'bg-black bg-opacity-70 px-6 py-4 rounded-2xl'}>

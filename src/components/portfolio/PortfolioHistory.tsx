@@ -52,7 +52,7 @@ export const PortfolioHistory = () => {
           return [
             shortStr(item._id), // Order number
             getDate(item), // Date
-            'TimeBureau/USDC', // Pair
+            'TimeCapsule/USDC', // Pair
             <span
               key='side'
               className={classNames({

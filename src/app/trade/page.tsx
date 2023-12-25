@@ -7,6 +7,7 @@ import { ListForSale } from '@/components/dialogs/ListForSale'
 import { PlaceABid } from '@/components/dialogs/PlaceABid'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { SaleDialog } from '@/components/dialogs/Sale'
+import { ERROR_FILL_SELF_ORDER } from '@/config/error'
 import { FetcherContext } from '@/contexts/FetcherContext'
 import { useOrders } from '@/hooks/useOrders'
 import { displayBalance } from '@/utils/display'
@@ -27,6 +28,7 @@ import classNames from 'classnames'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useContext, useState } from 'react'
+import { toast } from 'sonner'
 import Cookies from 'ts-cookies'
 import { useInterval } from 'usehooks-ts'
 
@@ -92,8 +94,13 @@ export default function Page() {
 
   return (
     <div
-      className={'relative min-h-screen bg-no-repeat'}
-      style={{ background: 'url(/trade-bg.png)', backgroundSize: '100%', backgroundPosition: 'center center' }}
+      className={'relative min-h-screen'}
+      style={{
+        background: 'url(/trade-bg.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      }}
     >
       <Header />
       <BuyDialog open={openBuy} onChange={setOpenBuy} selected={selected} />
@@ -134,6 +141,8 @@ export default function Page() {
                   const realMid = mid / count
                   const wc = `${50 * order?.remainingQuantity}px`
                   const isPrivilege = isPrivilegeOrder(order.entry)
+                  const isSelf = isSelfMaker(order?.entry)
+
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
                       <HoverCard.Trigger asChild>
@@ -141,6 +150,7 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           key={order?.hash}
                           onClick={() => {
+                            if (isSelf) return toast.error(ERROR_FILL_SELF_ORDER)
                             if (isPrivilege) {
                               setPrivilege({ order, count: order?.remainingQuantity })
                               return
@@ -155,7 +165,7 @@ export default function Page() {
                             })
                           }}
                         >
-                          <div className={classNames('grid grid-cols-4', isSelfMaker(order?.entry) ? 'text-orange-300' : 'text-gray-200')}>
+                          <div className={classNames('grid grid-cols-4', isSelf ? 'text-orange-300' : 'text-gray-200')}>
                             <div>{order?.remainingQuantity}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxP) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minP) / count)}</div>
@@ -216,13 +226,14 @@ export default function Page() {
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
                   const wc = `${50 * order?.remainingQuantity}px`
-
+                  const isSelf = isSelfMaker(order?.entry)
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
                       <HoverCard.Trigger asChild>
                         <div
                           className={'relative py-1 cursor-pointer'}
                           onClick={() => {
+                            if (isSelf) return toast.error(ERROR_FILL_SELF_ORDER)
                             if (order?.type === '3') {
                               return
                             }
@@ -237,7 +248,7 @@ export default function Page() {
                           }}
                           key={order?.hash}
                         >
-                          <div className={classNames('grid grid-cols-4', isSelfMaker(order?.entry) ? 'text-orange-300' : 'text-gray-200')}>
+                          <div className={classNames('grid grid-cols-4', isSelf ? 'text-orange-300' : 'text-gray-200')}>
                             <div className={'pl-2'}>{displayTradePrice(realMid)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minp) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxp) / count)}</div>

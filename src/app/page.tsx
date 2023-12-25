@@ -54,8 +54,13 @@ export default function Page() {
 
   return (
     <div
-      className={'relative min-h-screen bg-contain bg-no-repeat'}
-      style={{ background: 'url(/home-bg.png)', backgroundSize: '100% 100%', backgroundPosition: 'center center' }}
+      className={'relative min-h-screen bg-contain'}
+      style={{
+        background: 'url(/home-bg.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center center',
+      }}
     >
       <Header />
       <Dialog.Root open={open && shouldShow} onOpenChange={setOpen}>

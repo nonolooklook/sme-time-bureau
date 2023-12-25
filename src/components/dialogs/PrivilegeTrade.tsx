@@ -1,4 +1,3 @@
-import { InputWithButton } from '@/components/InputWithButton'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
 import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
@@ -8,6 +7,7 @@ import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { useAvailableAmount } from '@/hooks/useAvailableAmount'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
+import { displayBalance } from '@/utils/display'
 import { handleError } from '@/utils/error'
 import { getExpectPrice, getOrderPerMinMax, getOrderPerMinMaxBigint } from '@/utils/order'
 import { sleep } from '@/utils/sleep'
@@ -19,12 +19,9 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { useMemo, useState } from 'react'
 import { parseEther } from 'viem'
 import { useAccount } from 'wagmi'
-import { BetaD3Chart } from '../BetaD3Chart'
 import { BetaD3Chart3 } from '../BetaD3Chart3'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { TxStatus, getPriceType, useTxStatus } from './TxStatus'
-import { displayTradePrice } from '@/utils/price'
-import { displayBalance } from '@/utils/display'
 
 export const PrivilegeTrade = ({
   open,
@@ -177,24 +174,7 @@ export const PrivilegeTrade = ({
           </div>
           <CapsuleCard />
           <div className={'mt-6 mb-4'}>Get rewards from Time-Weaving</div>
-          {type === '3' && <BetaD3Chart3 />}
-          {type === '1' && <BetaD3Chart minPrice={min} expectedPrice={ep} maxPrice={max} defaultValue={70} showType='right' />}
-          {type === '1' && (
-            <div className='px-10'>
-              <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6 mt-6'>
-                <div>Quantity</div>
-                <InputWithButton amount={amount} setAmount={setAmount} />
-                <div
-                  className={'cursor-pointer'}
-                  onClick={() => {
-                    setAmount(availableAmount <= 0 ? '1' : availableAmount.toFixed())
-                  }}
-                >
-                  Max({Math.min(maxCount, availableAmount)})
-                </div>
-              </div>
-            </div>
-          )}
+          <BetaD3Chart3 />
           <AuthBalanceFee maximum={1010n * BigInt(amount) * 10n ** 18n} />
           <div className='flex justify-center mb-4 mt-6'>
             <button className={'btn-primary w-[100px]'} onClick={fillBidOrder} disabled={!enabled}>

@@ -15,8 +15,13 @@ export default function Portfolio() {
 
   return (
     <div
-      className={'relative min-h-screen bg-no-repeat'}
-      style={{ background: 'url(/trade-bg.png)', backgroundSize: '100%', backgroundPosition: 'center center' }}
+      className={'relative min-h-screen'}
+      style={{
+        background: 'url(/trade-bg.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      }}
     >
       <Header />
 
@@ -59,7 +64,7 @@ export default function Portfolio() {
           {type === 0 && <PortfolioAvailable />}
           {type === 1 && <PortfolioListed isBid={false} />}
           {type === 2 && <PortfolioListed isBid={true} />}
-          {type === 3 && <PortfolioHistory/>}
+          {type === 3 && <PortfolioHistory />}
         </div>
       </div>
     </div>

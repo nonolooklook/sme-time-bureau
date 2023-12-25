@@ -74,8 +74,13 @@ export default function Page() {
 
   return (
     <div
-      className={'relative min-h-screen bg-no-repeat'}
-      style={{ background: 'url(/trade-bg.png)', backgroundSize: '100%', backgroundPosition: 'center center' }}
+      className={'relative min-h-screen'}
+      style={{
+        background: 'url(/trade-bg.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+      }}
     >
       <Header />
       <SimulationBuyDialog open={openBuy} onChange={setOpenBuy} selected={selected} />
@@ -90,7 +95,7 @@ export default function Page() {
           <div className={'text-[38px] font-semibold ml-8 text-gray-200 uppercase'}>Schrödinger`s Time Capsules / USDC</div>
           <div className='flex items-center text-2xl gap-2 ml-auto'>
             {/* <Image src={'/usdc.svg'} alt={'usdc'} width={24} height={24} /> */}
-            {"$ " + currentPrice}
+            {'$ ' + currentPrice}
           </div>
         </div>
         <div className='grid grid-cols-2 gap-8 mt-10'>

@@ -7,7 +7,7 @@ const d = calculateBetaFunction(3, 3)
 const data = d.map((t) => (t.x === 0 && t.y === 0 ? { name: 'b', x: 0, y: 0 } : t))
 
 const marginX = 80
-const margin = { top: 60, bottom: 20, left: marginX, right: marginX }
+const margin = { top: 60, bottom: 0, left: marginX, right: marginX }
 
 export const BetaD3Chart = ({
   minPrice,
@@ -284,7 +284,9 @@ export const BetaD3Chart = ({
             )}
           </>
         )}
-        <div className='absolute bottom-[26px] right-0 text-xs -mr-[60px]'>Price (USDC)</div>
+        <div className='absolute right-0 text-xs -mr-[60px]' style={{ bottom: margin.bottom + 6 }}>
+          Price (USDC)
+        </div>
         <div id={'chart'} ref={chartRef} className={'bg-grayx'}>
           <svg ref={svgRef} width={chartW} height={chartH + 15}>
             <rect
@@ -301,7 +303,7 @@ export const BetaD3Chart = ({
             <text textAnchor='middle' fill='#fff' x={chartW / 2} y={margin.top - 30}>
               Expect price
             </text>
-            <rect width={chartW - 30} height={1} x={10} y={chartH - 20} fill={'#fff'} />
+            <rect width={chartW - 30} height={1} x={10} y={chartH - margin.bottom} fill={'#fff'} />
             <g transform={`translate(${margin.left}, ${margin.top})`} id={'g'}>
               <line id={'tooltip-line'} />
               <polygon id={'tooltip-arrow'} fill={'#fff'} points={'2,2 2,2 2,2'} />

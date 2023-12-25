@@ -22,6 +22,8 @@ import { toast } from 'sonner'
 import { parseEther } from 'viem'
 import { useAccount } from 'wagmi'
 import { MinMax } from '../MinMax'
+import { TxStatus, useTxStatus } from '../TxStatus'
+import { getOrderPerMinMax } from '@/utils/order'
 
 export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
@@ -29,8 +31,6 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
   const { balance: collateralBalance } = useSimulationUserBalance(address)
   console.log(collateralBalance)
   const [amount, setAmount] = useState('1')
-  const [o, setO] = useState(false)
-
   const signer = useEthersSigner()
   const [loading, setLoading] = useState(false)
   const [wrongMsg, setWrongMsg] = useState('')
@@ -39,7 +39,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
 
   const canBuy =
     collateralBalance >= (parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 36n && Number(amount) <= maxAmount
-
+  const { txsOpen, txsProps, setTxsOpen, setTypeStep } = useTxStatus(() => fillSellOrder())
   const fillSellOrder = async () => {
     try {
       if (Number(amount) <= 0) {
@@ -51,7 +51,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
         overrides: { contractAddress: SEAPORT_ADDRESS[getCurrentChainId()] },
         conduitKeyToConduit: CONDUIT_KEYS_TO_CONDUIT,
       })
-      setO(true)
+      setTxsOpen(true)
       const order = selected?.order
       const csd = order?.entry?.parameters?.consideration
       const startAmount = csd?.reduce((amount: string, cv: any) => (BigInt(cv?.startAmount) + BigInt(amount)).toString(), '0')
@@ -152,20 +152,33 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
 
       console.log(res)
       if (!res?.data?.status) {
-        ref?.current?.click()
+        setTypeStep({ type: 'fail' })
         setWrongMsg(res?.data?.data)
         return
       }
 
+      const [min, max] = getOrderPerMinMax(entry)
+      setTypeStep({ type: 'step', step: { step: 0, min, max } })
+
       const itr = setInterval(async () => {
         const r2 = await fetch('https://sme-demo.mcglobal.ai/mock-task/findByRequestId/' + res.data.requestId).then((r) => r.json())
+        if (r2?.data?.status === 'requested random number') {
+          setTypeStep({ type: 'step', step: { step: 1, min, max } })
+        }
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
-          ref?.current?.click()
+          setTypeStep({
+            type: 'step',
+            step: { step: 2, min, max, txHash: r2?.data?.txHash, price: displayBalance(parseEther(r2?.data?.price || '0')) },
+          })
+        }
+        if (r2?.data?.status && (r2?.data?.status as string).startsWith('processing response error')) {
+          clearInterval(itr)
+          setTypeStep({ type: 'fail' })
         }
       }, 5000)
     } catch (e: any) {
-      setO(false)
+      setTypeStep({ type: 'fail' })
       handleError(e)
     }
 
@@ -217,50 +230,7 @@ export const SimulationBuyDialog = ({ open, onChange, selected }: { open: boolea
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-      <Dialog.Root open={o} onOpenChange={() => setO(false)}>
-        <Dialog.Portal>
-          <Dialog.Overlay className={'dialog-overlay'} />
-          <Dialog.Content className={'dialog-content'} onPointerDownOutside={(e) => e.preventDefault()}>
-            <div className='text-right'>
-              <Dialog.Close asChild>
-                <button className='IconButton' aria-label='Close'>
-                  <Cross2Icon />
-                </button>
-              </Dialog.Close>
-            </div>
-            <div
-              onClick={() => {
-                if (ref.current) {
-                  ref.current.click()
-                }
-              }}
-            />
-            <div className={'py-10'} />
-            <Stepper
-              allowClickControl={false}
-              backBtn={<></>}
-              continueBtn={<div ref={ref} />}
-              submitBtn={<></>}
-              fillStroke={'#FFAC03'}
-              activeColor={'#FFAC03'}
-              activeProgressBorder={'#FFAC03'}
-              contentBoxClassName={'text-sm text-center mb-10'}
-            >
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Initiating random number request to Chainlink.</h1>
-              </div>
-              <div className={'mt-10 flex items-center gap-2 justify-center'}>
-                <Spinner />
-                <h1>Waiting for Chainlink to return a random number</h1>
-              </div>
-              <div className={'w-[370px] mt-10 flex items-center gap-2 justify-center'}>
-                <h1>{wrongMsg !== '' ? wrongMsg : 'Transaction successful.'}</h1>
-              </div>
-            </Stepper>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {txsOpen && <TxStatus {...txsProps} />}
     </>
   )
 }

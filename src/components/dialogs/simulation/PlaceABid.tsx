@@ -128,15 +128,15 @@ export const PlaceABidSimulation = ({ open, onChange, mutate }: { open: boolean;
             </Dialog.Close>
           </div>
           <CapsuleCard />
-  
-            <BetaD3Chart
-              minPrice={parseEther(min)}
-              expectedPrice={parseEther('9')}
-              maxPrice={parseEther(max)}
-              defaultValue={30}
-              showType='left'
-            />
-   
+
+          <BetaD3Chart
+            minPrice={parseEther(min)}
+            expectedPrice={parseEther('9')}
+            maxPrice={parseEther(max)}
+            defaultValue={30}
+            showType='left'
+          />
+
           <MinMax min={min} max={max} onChange={(min, max) => setMinMax([min, max])} />
           <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
             <div>Quantity</div>
