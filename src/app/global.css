@@ -24,7 +24,7 @@ body {
 }
 
 .btn {
-  @apply flex items-center gap-2 justify-center cursor-pointer;
+  @apply flex items-center gap-2 justify-center cursor-pointer select-none;
 }
 
 .btn:disabled {
@@ -32,7 +32,7 @@ body {
 }
 
 .btn-primary {
-  @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center;
+  @apply bg-primary rounded-full py-2 text-white px-8 text-2xl cursor-pointer flex items-center gap-2 justify-center select-none;
   box-shadow: 0px 8px 30px 0px rgba(255, 172, 3, 0.4);
 }
 

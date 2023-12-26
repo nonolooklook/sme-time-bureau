@@ -1,6 +1,5 @@
 import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { CapsuleCard } from '@/components/dialogs/CapsuleCard'
-import { InputWithButton } from '@/components/InputWithButton'
 import { getCurrentChainId, NFTContractAddress, TokenId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
@@ -10,7 +9,7 @@ import { useEthersSigner } from '@/hooks/useEthersSigner'
 import { useRequestMatchOrder } from '@/hooks/useRequestMatchOrder'
 import { displayBalance } from '@/utils/display'
 import { handleError } from '@/utils/error'
-import { getOrderMinMax, getOrderPerMinMax } from '@/utils/order'
+import { getOrderPerMinMax } from '@/utils/order'
 import { sleep } from '@/utils/sleep'
 import { Seaport } from '@opensea/seaport-js'
 import { ItemType } from '@opensea/seaport-js/lib/constants'
@@ -21,6 +20,7 @@ import { useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { parseEther } from 'viem'
 import { useAccount } from 'wagmi'
+import { InputQuantityValue } from '../InputQuantity'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { MinMax } from './MinMax'
 import { TxStatus, useTxStatus } from './TxStatus'
@@ -200,11 +200,11 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
             />
 
             <MinMax min={selected?.min as any} max={selected?.max as any} disableInput={true} />
-            <div className='flex text-2xl font-light bg-white bg-opacity-5 rounded-2xl h-[64px] justify-between flex items-center px-6'>
-              <div>Quantity</div>
-              <InputWithButton amount={amount} setAmount={setAmount} />
-              <div>{displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)} USDC</div>
-            </div>
+            <InputQuantityValue
+              amount={amount}
+              setAmount={setAmount}
+              value={`${displayBalance((parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n)} USDC`}
+            />
             <AuthBalanceFee auth={(parseEther(amount as `${number}`) * parseEther(selected?.max)) / 10n ** 18n} balance />
             <div className='flex justify-center mb-4 mt-6'>
               <button className={'btn-primary w-[170px]'} onClick={fillSellOrder} disabled={!canBuy}>

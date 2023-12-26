@@ -3,7 +3,7 @@ import { parseUnits } from 'viem'
 
 export const InputWithButton = ({ amount, setAmount, disable }: { amount: string; setAmount: any; disable?: boolean }) => {
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-2 select-none'>
       <div
         className={'w-[46px] h-[46px] flex items-center justify-center border border-gray-400 border-dotted rounded-full cursor-pointer'}
         onClick={() => {
