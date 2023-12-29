@@ -18,7 +18,7 @@ export const displayBalance = (balance: bigint | undefined, toFixed: number = 2)
   return (Math.floor(Number(formatEther(balance)) * N) / N).toLocaleString('en-US', {
     maximumFractionDigits: toFixed,
     minimumFractionDigits: toFixed,
-  })
+  }).replaceAll(',','')
   // return Number(formatEther(balance)).toLocaleString('en-US', {
   //   maximumFractionDigits: 3,
   // })

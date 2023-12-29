@@ -1,7 +1,6 @@
 'use client'
 
 import { getCurrentExploerUrl } from '@/config/contract'
-import { privilegeOrderRange } from '@/config/privilege'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon, Share2Icon } from '@radix-ui/react-icons'
 import classNames from 'classnames'
@@ -118,10 +117,11 @@ function LoadArrow({ anim, position }: { anim: boolean; position: '>>' | '<<' })
   )
 }
 
-export type ValueType = 'low' | 'mid' | 'large'
-const ValueTypes: ValueType[] = ['low', 'mid', 'large']
+export type ValueType = 'low' | 'mid' | 'large' | 'super'
+const ValueTypes: ValueType[] = ['low', 'mid', 'large', 'super']
 
 function PriceItem({ tit, value, txHash, valueType }: { tit: string; txHash?: string; value?: string; valueType?: ValueType }) {
+  // valueType && (valueType = 'large')
   const TypeValue = () => {
     if (!valueType) return <div>{value} USDC</div>
     return (
@@ -155,7 +155,10 @@ function PriceItem({ tit, value, txHash, valueType }: { tit: string; txHash?: st
           <span className='text-lg'>{value}</span>
           <span className='text-sm ml-1'>USDC</span>
         </div>
-        {valueType == 'large' && <Image src={'/rainbow.gif'} alt='' width={58} height={50} className='absolute -left-6 -top-3' />}
+        {valueType == 'super' && <Image src={'/rainbow.gif'} alt='' width={58} height={50} className='absolute -left-6 -top-3' />}
+        {valueType == 'large' && (
+          <Image src={'/rainbow.png'} alt='' width={58} height={29} className='absolute object-contain -left-8 top-1' />
+        )}
         {valueType == 'mid' && <Image src={'/smiling.png'} alt='' width={48} height={40} className='absolute -left-5 -top-2' />}
         {valueType == 'low' && <Image src={'/low.png'} alt='' width={48} height={40} className='absolute -left-5 -top-1' />}
       </div>
@@ -341,11 +344,18 @@ export function useTxStatus(onRetry?: TxStatusProps['onRetry']) {
   }
 }
 
+const privilegePriceRange = [
+  [0, 10],
+  [10, 20],
+  [90, 110],
+  [990, 1010],
+]
+
 export function getPriceType(price: string | number): ValueType | undefined {
   const nump = Number(price)
-  for (let index = 0; index < privilegeOrderRange.length; index++) {
-    const element = privilegeOrderRange[index]
-    if (nump < element.max) return ValueTypes[index]
+  for (let index = 0; index < privilegePriceRange.length; index++) {
+    const [_, max] = privilegePriceRange[index]
+    if (nump <= max) return ValueTypes[index]
   }
-  return ValueTypes[2]
+  return ValueTypes[privilegePriceRange.length - 1]
 }
