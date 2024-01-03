@@ -20,7 +20,7 @@ export const InputWithButton = ({ amount, setAmount, disable }: { amount: string
         value={amount}
         disabled={disable}
         className={'w-[80px] bg-transparent outline-0 text-center text-3xl font-semibold'}
-        onChange={(e) => setAmount(e.target.value)}
+        onChange={(e) => setAmount(e.target.value?.replaceAll('-',''))}
       />
 
       <div

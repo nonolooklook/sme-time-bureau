@@ -183,6 +183,7 @@ function PriceItem({ tit, value, txHash, valueType }: { tit: string; txHash?: st
     </div>
   )
 }
+
 export type TxStatusProps = {
   type: 'loading' | 'fail' | 'step'
   step?: {

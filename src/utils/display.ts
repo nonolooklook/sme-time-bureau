@@ -13,7 +13,7 @@ export const ellipseAddress = (address: string | null | undefined, width = 4): s
 }
 
 export const displayBalance = (balance: bigint | undefined, toFixed: number = 2): string => {
-  if (!balance) return '0.000'
+  if (!balance) return '0'
   const N = 10 ** toFixed
   return (Math.floor(Number(formatEther(balance)) * N) / N).toLocaleString('en-US', {
     maximumFractionDigits: toFixed,
@@ -25,6 +25,6 @@ export const displayBalance = (balance: bigint | undefined, toFixed: number = 2)
 }
 
 export const getMaxValue = (balance: bigint | undefined): string => {
-  if (!balance) return '0.000'
+  if (!balance) return '0'
   return (Math.floor(Number(formatEther(balance)) * 1000) / 1000).toFixed(3)
 }

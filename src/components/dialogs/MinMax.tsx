@@ -17,36 +17,40 @@ export function MinMax({
   max,
   onChange,
   disableInput,
+  maxLength = 8,
 }: {
   min: `${number}`
   max: `${number}`
+  maxLength?: number
   onChange?: (min: `${number}`, max: `${number}`) => void
   disableInput?: boolean
 }) {
   return (
     <div className='flex mb-6 justify-between'>
-      <div className='px-6 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-sm'>
+      <div className='px-5 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center gap-1 text-sm'>
         <div>Min</div>
         <input
           disabled={disableInput}
           type='text'
+          maxLength={maxLength}
           value={min}
-          className={'w-[90px] bg-transparent outline-0 text-center text-3xl font-semibold'}
-          onChange={(e) => checkInput(e.target.value) && onChange && onChange(e.target.value as `${number}`, max)}
+          className={'w-[120px] bg-transparent outline-0 text-center text-xl font-semibold overflow-x-auto'}
+          onChange={(e) => checkInput(e.target.value) && onChange && onChange(e.target.value.replaceAll('-', '') as `${number}`, max)}
         />
         {/* <Image src={'/usdc.svg'} alt={'usdc'} width={20} height={20} /> */}
       </div>
-      <div className='w-[120px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl'>
+      <div className='w-[160px] h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-xl px-5 overflow-hidden'>
         {displayBalance(calculateMidPriceFromBigInt(parseEther(min || '0'), parseEther(max || '0')))}
       </div>
-      <div className='px-6 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center text-sm'>
+      <div className='px-5 h-[48px] rounded-full bg-white bg-opacity-5 flex items-center justify-center gap-1 text-sm'>
         <div>Max</div>
         <input
           disabled={disableInput}
           type='text'
           value={max}
-          className={'w-[90px] bg-transparent outline-0 text-center text-3xl font-semibold'}
-          onChange={(e) => checkInput(e.target.value) && onChange && onChange(min, e.target.value as `${number}`)}
+          maxLength={maxLength}
+          className={'w-[120px] bg-transparent outline-0 text-center text-xl font-semibold overflow-x-auto'}
+          onChange={(e) => checkInput(e.target.value) && onChange && onChange(min, e.target.value.replaceAll('-', '') as `${number}`)}
         />
         {/* <Image src={'/usdc.svg'} alt={'usdc'} width={20} height={20} /> */}
       </div>
