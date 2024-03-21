@@ -166,12 +166,15 @@ export default function Page() {
                           }}
                         >
                           <div className={classNames('grid grid-cols-4', isSelf ? 'text-orange-300' : 'text-gray-200')}>
-                            <div>{order?.remainingQuantity}</div>
+                            <div className='whitespace-nowrap'>
+                              {order?.remainingQuantity}{' '}
+                              {isPrivilege && <span className=' bg-red-500 text-white rounded-full px-2 scale-75 inline-block'>Official</span>}
+                            </div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxP) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minP) / count)}</div>
                             <div className={'text-right pr-2'}>{isPrivilege ? '$8.19' : displayTradePrice(realMid)}</div>
                           </div>
-                          <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
+                          <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0 -z-[1]`} style={{ width: wc }} />
                         </div>
                       </HoverCard.Trigger>
                       <HoverCard.Portal>
@@ -254,7 +257,7 @@ export default function Page() {
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxp) / count)}</div>
                             <div className={'text-right'}>{order?.remainingQuantity}</div>
                           </div>
-                          <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
+                          <div className='absolute -z-[1] h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
                         </div>
                       </HoverCard.Trigger>
                       <HoverCard.Portal>
