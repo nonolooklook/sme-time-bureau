@@ -9,7 +9,7 @@ import * as HoverCard from '@radix-ui/react-hover-card'
 import Cookies from 'ts-cookies'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInterval } from 'usehooks-ts'
-import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice } from '@/utils/order'
+import { getBidOrderMaxPrice, getBidOrderMinPrice, getListOrderMaxPrice, getListOrderMinPrice, isPrivilegeOrder } from '@/utils/order'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { PrivilegeTrade } from '@/components/dialogs/PrivilegeTrade'
 import { useQuantity } from '@/hooks/useQuantity'
@@ -121,7 +121,7 @@ export default function Page() {
                   count = count === 0n ? 1n : count
                   const realMid = mid / count
                   const wc = `${50 * order?.remainingQuantity}px`
-
+                  const isPrivilege = isPrivilegeOrder(order.entry)
                   return (
                     <HoverCard.Root data-side={'right'} data-align={'end'} openDelay={200} key={order?.hash}>
                       <HoverCard.Trigger asChild>
@@ -129,7 +129,7 @@ export default function Page() {
                           className={'relative py-1 cursor-pointer'}
                           key={order?.hash}
                           onClick={() => {
-                            if (order?.type === '3') {
+                            if (isPrivilege) {
                               setPrivilegeCount(order?.remainingQuantity)
                               setOpenPrivilege(true)
                               return
@@ -145,12 +145,17 @@ export default function Page() {
                           }}
                         >
                           <div className='grid grid-cols-4 text-gray-200'>
-                            <div>{order?.remainingQuantity}</div>
+                            <div className='whitespace-nowrap'>
+                              {order?.remainingQuantity}
+                              {isPrivilege && (
+                                <span className=' bg-red-500 text-white rounded-full px-2 scale-75 inline-block'>Official</span>
+                              )}
+                            </div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxP) / count)}</div>
                             <div className={'text-center'}>{displayTradePrice(BigInt(minP) / count)}</div>
-                            <div className={'text-right pr-2'}>{order?.type === '3' ? '$8.19' : displayTradePrice(realMid)}</div>
+                            <div className={'text-right pr-2'}>{isPrivilege ? '$8.19' : displayTradePrice(realMid)}</div>
                           </div>
-                          <div className={`absolute h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
+                          <div className={`absolute -z-[1] h-[28px] bg-green-400 bg-opacity-30 top-0 right-0`} style={{ width: wc }} />
                         </div>
                       </HoverCard.Trigger>
                       <HoverCard.Portal>
@@ -233,7 +238,7 @@ export default function Page() {
                             <div className={'text-center'}>{displayTradePrice(BigInt(maxp) / count)}</div>
                             <div className={'text-right'}>{order?.remainingQuantity}</div>
                           </div>
-                          <div className='absolute z-0 h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
+                          <div className='absolute -z-[1] h-[28px] bg-red-400 bg-opacity-30 top-0 left-0' style={{ width: wc }} />
                         </div>
                       </HoverCard.Trigger>
                       <HoverCard.Portal>
