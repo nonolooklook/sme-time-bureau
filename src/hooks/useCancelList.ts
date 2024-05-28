@@ -1,3 +1,4 @@
+import { genURL } from '@/config/api'
 import { getCurrentChainId } from '@/config/contract'
 import { SEAPORT_ADDRESS } from '@/config/seaport'
 import { useEthersSigner } from '@/hooks/useEthersSigner'
@@ -28,7 +29,7 @@ export const useCancelList = (order: any, onSuccess?: any) => {
       }
       setIsCancelLoading(false)
 
-      fetch('https://sme-demo.mcglobal.ai/order/' + order?.hash, {
+      fetch(genURL('/order/') + order?.hash, {
         method: 'DELETE',
       })
         .then((r) => r.json())

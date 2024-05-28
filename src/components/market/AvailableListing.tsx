@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { parseEther, parseUnits } from 'viem'
 import { Address, useAccount, useContractReads } from 'wagmi'
 import { Spinner } from '../Spinner'
+import { genURL } from '@/config/api'
 
 export const AvailableListing = () => {
   const router = useRouter()
@@ -86,7 +87,7 @@ export const AvailableListing = () => {
 
       const order = await executeAllActions()
       const hash = seaport.getOrderHash(order.parameters)
-      await fetch('https://sme-demo.mcglobal.ai/order', {
+      await fetch(genURL('/order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

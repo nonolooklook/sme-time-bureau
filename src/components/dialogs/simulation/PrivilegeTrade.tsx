@@ -18,6 +18,7 @@ import { TxStatus, getPriceType, useTxStatus } from '../TxStatus'
 import { getOrderPerMinMax } from '@/utils/order'
 import { displayBalance } from '@/utils/display'
 import { AuthBalanceFee } from '../AuthBalanceFee'
+import { genURL } from '@/config/api'
 
 export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: boolean; onChange: any; maxCount: number }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -86,7 +87,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
 
       await sleep(2000)
 
-      const res = await fetch('https://sme-demo.mcglobal.ai/mock-task/fillOrder', {
+      const res = await fetch(genURL('/mock-task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ export const SimulationPrivilegeTrade = ({ open, onChange, maxCount }: { open: b
       const [min, max] = getOrderPerMinMax(order)
       setTypeStep({ type: 'step', step: { step: 0, min, max } })
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/mock-task/findByRequestId/' + res.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/mock-task/findByRequestId/') + res.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'requested random number') {
           setTypeStep({ type: 'step', step: { step: 1, min, max } })
         }

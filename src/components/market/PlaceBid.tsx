@@ -2,6 +2,7 @@ import { BetaD3Chart } from '@/components/BetaD3Chart'
 import { InputWithButton } from '@/components/InputWithButton'
 import { PriceInput } from '@/components/PriceInput'
 import { Spinner } from '@/components/Spinner'
+import { genURL } from '@/config/api'
 import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
@@ -88,7 +89,7 @@ export const PlaceBid = () => {
 
       const order = await executeAllActions()
       const hash = seaport.getOrderHash(order.parameters)
-      await fetch('https://sme-demo.mcglobal.ai/order', {
+      await fetch(genURL('/order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

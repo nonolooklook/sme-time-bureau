@@ -24,6 +24,7 @@ import { InputQuantityValue } from '../InputQuantity'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { MinMax } from './MinMax'
 import { TxStatus, useTxStatus } from './TxStatus'
+import { genURL } from '@/config/api'
 
 export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { address } = useAccount()
@@ -119,7 +120,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       })
 
       await sleep(2000)
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export const BuyDialog = ({ open, onChange, selected }: { open: boolean; onChang
       setTypeStep({ type: 'step', step: { step: 0, min, max } })
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'requested random number') {
           setTypeStep({ type: 'step', step: { step: 1, min, max } })
         }

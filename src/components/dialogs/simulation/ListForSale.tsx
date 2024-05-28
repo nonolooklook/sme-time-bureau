@@ -19,6 +19,7 @@ import { toast } from 'sonner'
 import { parseEther, parseUnits } from 'viem'
 import { useAccount } from 'wagmi'
 import { MinMax } from '../MinMax'
+import { genURL } from '@/config/api'
 
 export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolean; onChange: any; mutate: any }) => {
   const signer = useEthersSigner()
@@ -102,7 +103,7 @@ export const SimulationListForSale = ({ open, onChange, mutate }: { open: boolea
         signature: '',
       }
       const hash = seaport.getOrderHash(order.parameters)
-      await fetch('https://sme-demo.mcglobal.ai/mock-order', {
+      await fetch(genURL('/mock-order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

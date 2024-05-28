@@ -1,7 +1,8 @@
+import { genURL } from '@/config/api'
 import useSWR from 'swr'
 
 const fetcher = async ({ url, isBid }: any) => {
-  let res = await fetch(`https://sme-demo.mcglobal.ai/order?type=${isBid ? 1 : 2}`)
+  let res = await fetch(genURL(`/order?type=${isBid ? 1 : 2}`))
   return await res.json()
 }
 

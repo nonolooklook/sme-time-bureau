@@ -2,6 +2,7 @@
 
 import { Header } from '@/components/Header'
 import { Spinner } from '@/components/Spinner'
+import { genURL } from '@/config/api'
 import { NFTContractAddress, TokenId, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
@@ -99,7 +100,7 @@ export default function Market() {
 
       await sleep(2000)
       ref?.current?.click()
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +122,7 @@ export default function Market() {
       }
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
           ref?.current?.click()
@@ -199,7 +200,7 @@ export default function Market() {
 
       await sleep(2000)
       ref?.current?.click()
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -221,7 +222,7 @@ export default function Market() {
       }
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
           ref?.current?.click()

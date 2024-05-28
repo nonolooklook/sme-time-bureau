@@ -1,9 +1,10 @@
+import { genURL } from '@/config/api'
 import { memoPrivilege } from '@/utils/order'
 import { useEffect } from 'react'
 import useSWR from 'swr'
 
 const fetcher = async ({ url }: any) => {
-  let res = await fetch(`https://sme-demo.mcglobal.ai/order/initial/owner`)
+  let res = await fetch(genURL(`/order/initial/owner`))
   return await res.json()
 }
 

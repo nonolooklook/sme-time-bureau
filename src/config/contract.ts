@@ -1,28 +1,20 @@
-import { arbitrum, sepolia,arbitrumSepolia  } from 'viem/chains'
+import * as chains from 'viem/chains'
 
 export const NFTContractAddress = {
-  [arbitrumSepolia.id]: '0xBCACAFEdBe097EDeFF396de5328f683481E051E5',
-  [arbitrum.id]: '0xdD0BC7f52aE221fB488B9a965C0E2Df948749Daf',
-  [sepolia.id]: '0xD3Be6f86846B1949aA32F0c655fDd7D8c14feAdE',
+  //@ts-ignore
+  [chains[process.env.NEXT_PUBLIC_NETWORK].id]: process.env.NEXT_PUBLIC_NFT as string,
 }
-
-export const TokenId = 1n
+//@ts-ignore
+export const TokenId = BigInt(process.env.NEXT_PUBLIC_NFT_ID)
 
 // export const isProd = process.env.
 export const getCurrentChainId = () => {
-  return arbitrumSepolia.id
+  // @ts-ignore
+  return chains[process.env.NEXT_PUBLIC_NETWORK].id
 }
 
 export const getCurrentExploerUrl = () => {
-  const chainId = getCurrentChainId()
-  let url = ''
   // @ts-ignore
-  if (chainId == arbitrum.id) {
-    url = arbitrum.blockExplorers.default.url
-  }
-  if (chainId == arbitrumSepolia.id) {
-    url = "https://sepolia.arbiscan.io"
-  }
-
+  let url = chains[process.env.NEXT_PUBLIC_NETWORK].blockExplorers.default.url
   return url.endsWith('/') ? url.slice(0, url.length - 1) : url
 }

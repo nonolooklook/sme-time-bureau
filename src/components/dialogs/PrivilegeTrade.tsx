@@ -22,6 +22,7 @@ import { useAccount } from 'wagmi'
 import { BetaD3Chart3 } from '../BetaD3Chart3'
 import { AuthBalanceFee } from './AuthBalanceFee'
 import { TxStatus, getPriceType, useTxStatus } from './TxStatus'
+import { genURL } from '@/config/api'
 
 export const PrivilegeTrade = ({
   open,
@@ -102,7 +103,7 @@ export const PrivilegeTrade = ({
 
       await sleep(2000)
 
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +130,7 @@ export const PrivilegeTrade = ({
       const [min, max] = getOrderPerMinMax(order)
       setTypeStep({ type: 'step', step: { step: 0, min, max } })
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'requested random number') {
           setTypeStep({ type: 'step', step: { step: 1, min, max } })
         }

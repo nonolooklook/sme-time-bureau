@@ -3,6 +3,7 @@
 import { Header } from '@/components/Header'
 import { Spinner } from '@/components/Spinner'
 import { ERC1155ABI } from '@/config/abi/ERC1155'
+import { genURL } from '@/config/api'
 import { NFTContractAddress, getCurrentChainId } from '@/config/contract'
 import { ERC20_ADDRESS } from '@/config/erc20'
 import { CONDUIT_KEY, CONDUIT_KEYS_TO_CONDUIT } from '@/config/key'
@@ -51,7 +52,7 @@ export default function Scratch() {
   const price = remaining > 0 ? luckyPoolValue / parseUnits(remaining?.toFixed() as `${number}`, 0) : 0n
 
   useEffect(() => {
-    fetch('https://sme-demo.mcglobal.ai/transaction/topWinnings')
+    fetch(genURL('/transaction/topWinnings'))
       .then((r) => r.json())
       .then((r) => {
         setTops(r?.data)
@@ -60,7 +61,7 @@ export default function Scratch() {
   }, [])
 
   useEffect(() => {
-    fetch('https://sme-demo.mcglobal.ai/order/remainingNft')
+    fetch(genURL('/order/remainingNft'))
       .then((r) => r.json())
       .then((r) => {
         setRemaining(r.data)
@@ -118,7 +119,7 @@ export default function Scratch() {
     ref?.current?.click()
 
     try {
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +140,7 @@ export default function Scratch() {
       }
 
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'matched') {
           clearInterval(itr)
           ref?.current?.click()

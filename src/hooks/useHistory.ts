@@ -1,8 +1,9 @@
+import { genURL } from '@/config/api'
 import useSWR from 'swr'
 import { useAccount } from 'wagmi'
 
 const fetcher = async (key: string) => {
-  let res = await fetch(`https://sme-demo.mcglobal.ai/${key}`)
+  let res = await fetch(genURL(`/${key}`))
   return await res.json()
 }
 

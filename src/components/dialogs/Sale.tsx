@@ -24,6 +24,7 @@ import { MinMax } from './MinMax'
 import { TxStatus, useTxStatus } from './TxStatus'
 import { getOrderMinMax, getOrderPerMinMax } from '@/utils/order'
 import { displayBalance } from '@/utils/display'
+import { genURL } from '@/config/api'
 export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChange: any; selected: any }) => {
   const { availableAmount, mutate } = useAvailableAmount()
   const ref = useRef<HTMLDivElement>(null)
@@ -126,7 +127,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
 
       await sleep(2000)
 
-      const res = await fetch('https://sme-demo.mcglobal.ai/task/fillOrder', {
+      const res = await fetch(genURL('/task/fillOrder'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +156,7 @@ export const SaleDialog = ({ open, onChange, selected }: { open: boolean; onChan
       const [min, max] = getOrderPerMinMax(entry)
       setTypeStep({ type: 'loading', step: { step: 0, min, max } })
       const itr = setInterval(async () => {
-        const r2 = await fetch('https://sme-demo.mcglobal.ai/task/findByRequestId/' + res.data.data.requestId).then((r) => r.json())
+        const r2 = await fetch(genURL('/task/findByRequestId/') + res.data.data.requestId).then((r) => r.json())
         if (r2?.data?.status === 'requested random number') {
           setTypeStep({ type: 'step', step: { step: 1, min, max } })
         }
